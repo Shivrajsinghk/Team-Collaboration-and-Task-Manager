@@ -116,30 +116,48 @@ class TeamMembershipSerializer(serializers.ModelSerializer):
         return membership
 
 class SimpleUserSerializer(serializers.ModelSerializer):
+    role = serializers.SerializerMethodField()
     profile_picture = serializers.ImageField(
         source='profile.profile_picture',
         read_only=True
     )
+    def get_role(self, obj):
+        team = self.context.get('team')
+        if not team: 
+            return None
+        membership = TeamMembership.objects.filter(
+            team=team,
+            user=obj
+        ).first()
+        return membership.role if membership else None
+
     class Meta:
         model = User
-        fields = ['id', 'username', 'profile_picture'] 
+        fields = ['id', 'username', 'profile_picture', 'first_name', 'last_name', 'role'] 
 
 class TaskSerializer(serializers.ModelSerializer):
-    created_by = SimpleUserSerializer(
-        read_only=True
-    )
-    assigned_to = SimpleUserSerializer(
-        many=True, 
-        read_only=True
-    )
+    created_by = serializers.SerializerMethodField()
+    assigned_to = serializers.SerializerMethodField()
     team = serializers.StringRelatedField(read_only=True)
-
     assigned_to_ids = serializers.PrimaryKeyRelatedField(
         queryset = User.objects.all(),
         many = True,
         source = 'assigned_to',
         write_only = True
     )
+
+    def get_created_by(self, obj):
+        return SimpleUserSerializer(
+            obj.created_by,
+            context={'team': obj.team}
+        ).data
+    
+    def get_assigned_to(self, obj):
+        return SimpleUserSerializer(
+            obj.assigned_to.all(),
+            many=True,
+            context={'team': obj.team}
+        ).data
 
     class Meta:
         model = Task

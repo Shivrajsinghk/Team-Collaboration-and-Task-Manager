@@ -55,11 +55,14 @@ function Dashboard() {
         fetchprofile()
     }, [])
 
+    const sidebarBtn =
+    "flex w-full items-center gap-3 rounded-2xl px-5 py-3 text-sm font-medium text-[var(--color-cool-steel)] transition-all duration-300 hover:bg-white/[0.05] hover:text-white"
+
     return (
         <>
             <div className="flex">    
                 {/* Side Bar */}
-                <aside className="bg-white dark:bg-neutral-900 border-slate-300 dark:border-neutral-700 w-full h-full flex flex-col fixed top-0 left-0 max-w-[240px] py-6 px-3 overflow-auto bg-[linear-gradient(180deg,var(--color-onyx),var(--color-jet-black))] border-r border-[var(--color-cool-steel)]/15">
+                <aside className="bg-white mt-3 dark:bg-neutral-900 border-slate-300 dark:border-neutral-700 w-full h-full flex flex-col fixed top-0 left-0 max-w-[240px] py-6 px-3 overflow-auto bg-[linear-gradient(180deg,var(--color-onyx),var(--color-jet-black))] border-r border-[var(--color-cool-steel)]/15">
                     <hr className="my-5 border-slate-300 dark:border-neutral-700" />
                     {/* Side Bar Fields */}
                     <nav className="mt-6 flex-1 px-4">
@@ -67,7 +70,7 @@ function Dashboard() {
                             <li>
                                 <button
                                     onClick={() => navigate('/dashboard')}
-                                    className="flex w-full items-center gap-3 rounded-2xl px-5 py-3 text-sm font-medium text-white bg-white/[0.06]"
+                                    className={sidebarBtn}
                                 >
                                     <LayoutDashboard size={18} />
                                     Dashboard
@@ -81,7 +84,7 @@ function Dashboard() {
                                             block: "start"
                                         })
                                     }}
-                                    className="flex w-full items-center gap-3 rounded-2xl px-5 py-3 text-sm font-medium text-[var(--color-cool-steel)] transition hover:bg-white/[0.05] hover:text-white"
+                                    className={sidebarBtn}
                                 >
                                     <Users size={18} />
                                     Teams
@@ -90,7 +93,7 @@ function Dashboard() {
                             <li>
                                 <button
                                     onClick={() => {setIsAddTeamOpen(true)}}
-                                    className="flex w-full items-center gap-3 rounded-2xl px-5 py-3 text-sm font-medium text-[var(--color-cool-steel)] transition hover:bg-white/[0.05] hover:text-white"
+                                    className={sidebarBtn}
                                 >
                                     <CirclePlus size={18} />
                                     Add a Team

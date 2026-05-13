@@ -2,9 +2,27 @@ import React from 'react'
 import TaskCard from './TaskCard'
 import { Droppable } from '@hello-pangea/dnd'
 import TaskDashboard from './TaskDashboard'
+import { BadgeCheck, CircleDot, LoaderCircle, TicketPlus } from 'lucide-react'
 
+function getStatusIcon(status) {
+    switch(status) {
+        case 'todo':
+            return (
+                <CircleDot className="h-4 w-4 text-cyan-400" />
+            )
+        case 'in_progress':
+            return (
+                <LoaderCircle className="h-4 w-4 animate-spin text-yellow-400" />
+            )
+        case 'done':
+            return (
+                <BadgeCheck className="h-4 w-4 text-emerald-400" />
+            )
+        default:
+            return null
+    }
+}
 function Column({ title, tasks, status }) {
-
     return (
         <div
             className="
@@ -29,9 +47,12 @@ function Column({ title, tasks, status }) {
                     py-4
                 "
             >
-                <h2 className="text-xl font-bold text-white">
-                    {title}
-                </h2>
+                <div className="flex items-center gap-3">
+                    {getStatusIcon(status)}
+                    <h2 className="text-xl font-bold text-white">
+                        {title}
+                    </h2>
+                </div>
                 <span
                     className="
                         rounded-full

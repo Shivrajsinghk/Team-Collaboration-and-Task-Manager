@@ -1,8 +1,26 @@
 import React from 'react'
 import { Draggable } from '@hello-pangea/dnd'
-import { CalendarDays, MessageCircleMore, Paperclip, Circle, CircleDashed, AlertTriangle, Flame } from 'lucide-react'
+import { CalendarDays, MessageCircleMore, Paperclip, Circle, CircleDashed, AlertTriangle, Flame, ChevronDown } from 'lucide-react'
 import { useNavigate, useParams } from 'react-router-dom'
 
+function getPriorityIcon(priority) {
+    switch(priority) {
+        case 'low':
+            return (
+                <ChevronDown className="h-4 w-4 fill-emerald-400 text-emerald-400 shrink-0" />
+            )
+        case 'medium':
+            return (
+                <Flame className="h-4 w-4 text-yellow-400" />
+            )
+        case 'high':
+            return (
+                <AlertTriangle className="h-4 w-4 text-red-400" />
+            )
+        default:
+            return null
+    }
+}
 function TaskCard({ task, index }) {
     const navigate = useNavigate()
     const { id } = useParams()
@@ -30,25 +48,20 @@ function TaskCard({ task, index }) {
                 >
                     <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-[radial-gradient(circle_at_top_right,rgba(45,212,191,0.12),transparent_45%)] pointer-events-none" /> 
                     <div className="relative flex items-start justify-between gap-3">
-                        <h3 className="text-[15px] font-semibold text-white leading-snug">
+                        <h3 className="text-[15px] first-letter:capitalize font-semibold text-white leading-snug">
                             {task.title}
                         </h3>
-                        {task.priority === 'high' && (
-                            <AlertTriangle size={16} className="text-red-400 shrink-0" />
-                        )}
-                        {task.priority === 'medium' && (
-                            <Flame size={16} className="text-yellow-400 shrink-0" />
-                        )}
-                        {task.priority === 'low' && (
-                            <Circle size={12} className="fill-emerald-400 text-emerald-400 shrink-0" />
-                        )}
+                        {getPriorityIcon(task.priority)}
                     </div>
                     {task.description && (
-                        <p className="mt-1 text-sm leading-relaxed text-gray-400 line-clamp-3">
+                        <p className="mt-1 text-sm first-letter:capitalize leading-relaxed text-gray-400 line-clamp-3">
                             {task.description}
                         </p>
                     )}
                     <div className="mt-2 mb-3 flex gap-2 justify-between items-center">
+                        <span className={`rounded-lg border px-2.5 py-1 text-xs font-medium ${priorityStyles[task.priority]}`}>
+                            {task.priority.toUpperCase()}
+                        </span>
                         {task.due_date && (
                             <div className="flex items-center gap-2 text-xs text-gray-400">
                                 <CalendarDays size={14} />
@@ -57,9 +70,6 @@ function TaskCard({ task, index }) {
                                 </span>
                             </div>
                         )}
-                        <span className={`rounded-lg border px-2.5 py-1 text-xs font-medium ${priorityStyles[task.priority]}`}>
-                            {task.priority.toUpperCase()}
-                        </span>
                     </div>
                     <div className="mt-3 flex items-center justify-between gap-4 border-t border-white/5 pt-3">
                         <div className="flex justify-between min-w-0 items-center gap-4 text-xs text-gray-500">

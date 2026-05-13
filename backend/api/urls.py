@@ -26,6 +26,7 @@ urlpatterns = [
 
     # Task
     path('teams/<int:team_id>/tasks/', list_tasks, name='list_tasks'),
+    path('teams/<int:team_id>/tasks/<int:task_id>/', list_task, name='list_task'),
     path('teams/<int:team_id>/tasks/create/', create_task, name='create_task'),
     path('teams/<int:team_id>/tasks/<int:task_id>/update/', update_task, name='update_task'),
     path('teams/<int:team_id>/tasks/<int:task_id>/delete/', delete_task, name='delete_task'),

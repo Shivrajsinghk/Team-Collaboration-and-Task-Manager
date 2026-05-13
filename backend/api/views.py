@@ -338,6 +338,23 @@ def list_tasks(request, team_id):
     serializer = TaskSerializer(tasks, many=True)
     return Response(serializer.data, status=status.HTTP_200_OK)
 
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def list_task(request, team_id, task_id):
+    team = get_object_or_404(Team, id=team_id)
+    task = get_object_or_404(Task, team=team, id=task_id)
+    membership = TeamMembership.objects.filter(
+        user=request.user,
+        team=team
+    ).exists()
+    if not membership:
+        return Response(
+            {"error": "Not a team member"},
+            status=status.HTTP_403_FORBIDDEN
+        )
+    serializer = TaskSerializer(task)
+    return Response(serializer.data, status=status.HTTP_200_OK)
+
 @api_view(['PUT', 'PATCH'])
 @permission_classes([IsAuthenticated])
 def update_task(request, team_id, task_id):

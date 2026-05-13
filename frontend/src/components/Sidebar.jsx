@@ -59,7 +59,7 @@ function Sidebar() {
 
     return (
         <>
-            <aside className="bg-white dark:bg-neutral-900 border-slate-300 dark:border-neutral-700 w-full h-full flex flex-col fixed top-0 left-0 max-w-[240px] py-6 px-3 overflow-auto bg-[linear-gradient(180deg,var(--color-onyx),var(--color-jet-black))] border-r border-[var(--color-cool-steel)]/15">
+            <aside className="bg-white mt-3 dark:bg-neutral-900 border-slate-300 dark:border-neutral-700 w-full h-full flex flex-col fixed top-0 left-0 max-w-[240px] py-6 px-3 overflow-auto bg-[linear-gradient(180deg,var(--color-onyx),var(--color-jet-black))] border-r border-[var(--color-cool-steel)]/15">
                 <hr className="my-5 border-slate-300 dark:border-neutral-700" />
                 <nav className="mt-4 flex-1 px-4">
                     <ul className="space-y-2">

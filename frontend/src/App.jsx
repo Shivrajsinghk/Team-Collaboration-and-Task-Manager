@@ -17,6 +17,7 @@ import { loginSuccess, logout, setAuthResolved } from './Features/authslice'
 import TeamDashboard from './pages/TeamDashboard'
 import TeamSettings from './pages/TeamSettings'
 import TeamTasks from './pages/TeamTasks'
+import TaskDashboard from './components/TaskDashboard'
 
 function App() {
 	const dispatch = useDispatch()
@@ -55,23 +56,24 @@ function App() {
 	return (
 		<div>
 			{isAuthenticated && <Navbar />}
-				<Routes>
-					<Route path='/' element={<Home />} />
-					<Route path='/signup' element={<Signup />} />
-					<Route path='/login' element={<Login />} />
-					<Route element={<ProtectedRoute />}>
-						<Route path='/dashboard' element={<Dashboard />} />
-						<Route path='/profile' element={<Profile />} />
-						<Route path='/edit-profile' element={<EditProfile />} />
-						<Route path='/teams' element={<Teams />} />
-						<Route path='/team/:id' element={<Team />}>
-							<Route index element={<TeamDashboard />} />
-							<Route path='members' element={<Members />} />
-							<Route path='settings' element={<TeamSettings />} />
-							<Route path='tasks' element={<TeamTasks />} />
-						</Route>
+			<Routes>
+				<Route path='/' element={<Home />} />
+				<Route path='/signup' element={<Signup />} />
+				<Route path='/login' element={<Login />} />
+				<Route element={<ProtectedRoute />}>
+					<Route path='/dashboard' element={<Dashboard />} />
+					<Route path='/profile' element={<Profile />} />
+					<Route path='/edit-profile' element={<EditProfile />} />
+					<Route path='/teams' element={<Teams />} />
+					<Route path='/team/:id' element={<Team />}>
+						<Route index element={<TeamDashboard />} />
+						<Route path='members' element={<Members />} />
+						<Route path='settings' element={<TeamSettings />} />
+						<Route path='tasks' element={<TeamTasks />} />
+						<Route path='tasks/:task_id' element={<TaskDashboard />} />
 					</Route>
-				</Routes>
+				</Route>
+			</Routes>
 		</div>
 	)
 }

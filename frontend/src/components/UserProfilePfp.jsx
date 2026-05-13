@@ -1,4 +1,4 @@
-import React from "react"
+import React, { useState } from "react"
 import { useSelector } from 'react-redux'
 
 const BASE_URL = import.meta.env.VITE_DJANGO_BASE_URL 
@@ -12,18 +12,28 @@ function getMediaUrl(baseUrl, path) {
 function UserProfilePfp({ memberUser }) {
     const reduxUser = useSelector((state) => state.auth.user)
     const user = memberUser || reduxUser
+    const [imgError, setImgError] = useState(false);
 
     if (!user) return null
 
-    const profilePicture =
-        memberUser
-            ? `media/${user.user__profile__profile_picture}`
-            : user.profile_picture
+    const profilePicture = memberUser
+        ? (
+            user.profile_picture ||
+            (
+                user.user__profile__profile_picture
+                    ? `media/${user.user__profile__profile_picture}`
+                    : ''
+            )
+        )
+        : user.profile_picture
 
-    const fullName =
-        memberUser
-            ? user.user__first_name
-            : user.full_name
+    const fullName = memberUser
+        ? (
+            `${user.first_name || user.user__first_name || ''} ${
+                user.last_name || user.user__last_name || ''
+            }`
+        )
+        : user.full_name
             
     return (
         <div className="relative">
@@ -40,23 +50,16 @@ function UserProfilePfp({ memberUser }) {
                 "
             >
                 <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/5 to-indigo-500/5 opacity-0 transition duration-300 group-hover:opacity-100"></div>
-                {profilePicture ? (
+                {profilePicture && !imgError? (
                     <img
                         src={getMediaUrl(BASE_URL, profilePicture)}
                         alt={fullName}
+                        onError={() => setImgError(true)}
                         className="relative h-full w-full object-cover"
                     />
                 ) : (
-                    <div
-                        className="
-                        relative flex h-full w-full
-                        items-center justify-center
-                        bg-gradient-to-br
-                        from-teal-400 to-cyan-500
-                        text-sm font-bold uppercase text-white
-                        "
-                    >
-                        {(fullName || 'U').slice(0, 1)}
+                    <div className="flex h-8 w-8 items-center justify-center rounded-full border-2 border-[#0B1117] bg-gradient-to-br from-teal-400 to-indigo-500 text-xl font-semibold text-white shadow-2xl">
+                        {(fullName || "U").slice(0,1)}
                     </div>
                 )}
             </div>
