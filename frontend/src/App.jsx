@@ -17,7 +17,9 @@ import { loginSuccess, logout, setAuthResolved } from './Features/authslice'
 import TeamDashboard from './pages/TeamDashboard'
 import TeamSettings from './pages/TeamSettings'
 import TeamTasks from './pages/TeamTasks'
-import TaskDashboard from './components/TaskDashboard'
+import TaskDashboard from './pages/TaskDashboard'
+import MemberProfile from './pages/MemberProfile'
+import RightSlideDrawer from './components/RightSlideDrawer'
 
 function App() {
 	const dispatch = useDispatch()
@@ -68,9 +70,11 @@ function App() {
 					<Route path='/team/:id' element={<Team />}>
 						<Route index element={<TeamDashboard />} />
 						<Route path='members' element={<Members />} />
+						<Route path='members/:member_id' element={<MemberProfile />} />
 						<Route path='settings' element={<TeamSettings />} />
 						<Route path='tasks' element={<TeamTasks />} />
-						<Route path='tasks/:task_id' element={<TaskDashboard />} />
+						<Route path='tasks/:task_id' element={<TaskDashboard />}>
+						</Route>
 					</Route>
 				</Route>
 			</Routes>

@@ -18,11 +18,11 @@ function PreviousPageButton({className=""}) {
         <button
             onClick={handleBack}
             className={
-                `z-50 left-6 top-6 rounded-2xl border border-white/10 bg-white/5 p-3 transition hover:bg-white/10
+                `z-20 left-6  hover:border-cyan-400/20 top-6 rounded-2xl border border-white/10 bg-white/5 p-3 transition hover:bg-white/10
                 ${className}`
             }
         >
-            <ArrowLeft size={20} />
+            <ArrowLeft size={14} />
         </button>
     )
 }

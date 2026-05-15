@@ -37,6 +37,7 @@ function Dashboard() {
         try {
             const response = await api.get('teams/')
             setTeams(response.data)
+            console.log(response.data)
         } catch (err) {
             console.log(err)
             setTeams([])
@@ -117,6 +118,7 @@ function Dashboard() {
                         </div>
                     </div>
                 </aside>
+                {/* Main Section */}
                 <div className="ml-[240px] w-full min-h-screen text-white">
                     <div className="mx-auto max-w-7xl xl:max-w-[1400px] px-6 py-6">
                         <section className="relative overflow-hidden rounded-[2rem] border border-white/10 bg-[linear-gradient(135deg,#112826_0%,#081312_45%,#020404_100%)] p-6 shadow-[0_20px_50px_rgba(0,0,0,0.28)]">
@@ -130,21 +132,13 @@ function Dashboard() {
                                         {profile?.first_name}
                                     </h1>
                                 </div>
-                                <div className="grid grid-cols-2 gap-3 lg:w-[320px]">
+                                <div className="lg:w-[160px]">
                                     <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
                                         <p className="text-[10px] uppercase tracking-[0.25em] text-gray-500">
                                             Teams
                                         </p>
                                         <h2 className="mt-2 text-2xl font-bold text-white">
                                             {teams.length}
-                                        </h2>
-                                    </div>
-                                    <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
-                                        <p className="text-[10px] uppercase tracking-[0.25em] text-gray-500">
-                                            Tasks
-                                        </p>
-                                        <h2 className="mt-2 text-2xl font-bold text-white">
-                                            12
                                         </h2>
                                     </div>
                                 </div>

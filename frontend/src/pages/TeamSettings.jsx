@@ -56,12 +56,6 @@ function UpdateTeam() {
         }))
     }
 
-    if (loading) {
-        return (
-            <Loading />
-        )
-    }
-
     const handleSave = () => {
         async function fetchsave(){
             try{
@@ -78,6 +72,11 @@ function UpdateTeam() {
 
     return (
         <>
+            {loading && (
+                <div className="absolute top-4 right-4">
+                    <Loading />
+                </div>
+            )}
             <div className="min-h-screen ml-2 bg-[linear-gradient(180deg,#071714_0%,#020404_100%)] text-white">
                 <div className="mx-auto max-w-6xl px-6 py-8">
                     <div className="mb-8 flex items-center justify-between">
@@ -255,6 +254,7 @@ function UpdateTeam() {
             setIsDeleteOpen={setIsDeleteOpen}
             loading={loading} 
             setLoading={setLoading}
+            team={team}
             />
         </>
     )

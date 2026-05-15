@@ -1,7 +1,6 @@
 import React from 'react'
 import TaskCard from './TaskCard'
 import { Droppable } from '@hello-pangea/dnd'
-import TaskDashboard from './TaskDashboard'
 import { BadgeCheck, CircleDot, LoaderCircle, TicketPlus } from 'lucide-react'
 
 function getStatusIcon(status) {

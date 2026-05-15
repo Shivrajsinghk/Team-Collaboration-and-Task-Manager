@@ -12,7 +12,8 @@ function CreateTask({
     setLoading,
     team,
 }) {
-
+    console.log('sng',team);
+    
     const { id } = useParams()
     const [isDropdownOpen, setIsDropdownOpen] = useState(false)
     const [selectedMembers, setSelectedMembers] = useState([])
@@ -51,7 +52,6 @@ function CreateTask({
         <Modal isOpen={isCreateOpen} onClose={setIsCreateOpen}>
             <form 
             onSubmit={handleCreateSubmit}
-            // style={{ scrollbarWidth: 'thin' }}
             className="space-y-5"
             >
                 <h2 className="text-2xl font-bold text-white">
@@ -87,16 +87,22 @@ function CreateTask({
                         }
                         className="mt-2 flex w-full items-start justify-between rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-3"
                     >
-                        <div className="flex flex-wrap gap-3">
+                        <div className="flex flex-wrap gap-3 overflow-x-auto custom-scrollbar">
                             {selectedMembers.length > 0 ? ( 
                                 selectedMembers.map((selectedMember) => (
-                                    <div className="flex items-center gap-3" key={selectedMember.id}>
+                                    <div className="flex items-center gap-3" key={selectedMember.user__id}>
                                         <div className="flex h-10 w-10 overflow-hidden rounded-full">
-                                            <img
-                                                src={`${BASE_URL}/media/${selectedMember.user__profile__profile_picture}`}
-                                                alt={selectedMember.user__first_name}
-                                                className="h-full w-full object-cover"
-                                            />
+                                            {selectedMember.user__profile__profile_picture ? (
+                                                <img
+                                                    src={`${BASE_URL}/media/${selectedMember.user__profile__profile_picture}`}
+                                                    alt={selectedMember.user__first_name}
+                                                    className="h-full w-full object-cover"
+                                                />
+                                            ) : (
+                                                <div className="flex h-full w-full items-center justify-center rounded-full bg-gradient-to-br from-teal-400 to-indigo-500 text-sm font-bold text-white">
+                                                    {(selectedMember.user__first_name || "U").slice(0, 1)}
+                                                </div>
+                                            )}
                                         </div>
                                         <div className="text-left">
                                             <p className="font-medium text-white">
@@ -131,18 +137,18 @@ function CreateTask({
                                     onClick={() => {
                                         setSelectedMembers((prev) => {
                                             const alreadySelected = prev.find(
-                                                (m) => m.id === member.user__id
+                                                (m) => m.user__id === member.user__id
                                             )
                                             if (alreadySelected) {
                                                 return prev.filter(
-                                                    (m) => m.id !== member.user__id
+                                                    (m) => m.user__id !== member.user__id
                                                 )
                                             }
                                             return [...prev, member]
                                         })
                                     }}
                                     className={`flex w-full items-center gap-3 rounded-xl px-3 py-3 transition-all ${
-                                        selectedMembers.some((m) => m.id === member.user__id)
+                                        selectedMembers.some((m) => m.user__id === member.user__id)
                                             ? 'bg-teal-500/10 border border-teal-400/30'
                                             : 'hover:bg-white/10'
                                     }`}
@@ -155,7 +161,7 @@ function CreateTask({
                                                 className="h-full w-full object-cover"
                                             />
                                         ):(
-                                            <div className="flex h-full w-full items-center pb-1 justify-center rounded-full border-2 border-[#061414] bg-gradient-to-br from-teal-400 to-indigo-500 text-2xl font-bold text-white shadow-2xl">
+                                            <div className="flex h-full w-full items-center justify-center rounded-full bg-gradient-to-br from-teal-400 to-indigo-500 text-sm font-bold text-white">
                                                 {(member.user__first_name || "U").slice(0,1)}
                                             </div>
                                         )}
@@ -175,13 +181,13 @@ function CreateTask({
                     )}
                 </div>
                 <button
-                type="submit"
-                disabled={loading}
-                className={`w-full rounded-2xl py-3 text-sm font-semibold transition duration-300 ${
-                loading
-                ? "cursor-not-allowed bg-gray-500"
-                : "bg-gradient-to-r from-teal-400 to-cyan-500 text-black hover:scale-[1.01]"
-                }`}
+                    type="submit"
+                    disabled={loading}
+                    className={`w-full rounded-2xl py-3 text-sm font-semibold transition duration-300 ${
+                    loading
+                    ? "cursor-not-allowed bg-gray-500"
+                    : "bg-gradient-to-r from-teal-400 to-cyan-500 text-black hover:scale-[1.01]"
+                    }`}
                 >
                     {loading ? "Creating..." : "Create Task"}
                 </button>

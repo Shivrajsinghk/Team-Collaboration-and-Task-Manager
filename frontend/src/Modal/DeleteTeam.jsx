@@ -3,7 +3,7 @@ import Modal from './Modal'
 import api from '../api/axios'
 import { useNavigate, useParams } from 'react-router-dom'
 
-function DeleteTeam({isDeleteOpen, setIsDeleteOpen, loading, setLoading}) {
+function DeleteTeam({isDeleteOpen, setIsDeleteOpen, loading, setLoading, team}) {
     const { id } = useParams()
     const navigate = useNavigate()
 

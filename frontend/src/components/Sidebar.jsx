@@ -90,42 +90,6 @@ function Sidebar() {
                                 Members
                             </button>
                         </li>
-                        {/* <li>
-                            <button
-                                onClick={() => setIsInviteOpen(true)}
-                                className={sidebarBtn}
-                            >
-                                <Barcode size={18} />
-                                Invite Code
-                            </button>
-                        </li> */}
-                        {/* <li>
-                            <button
-                                onClick={() => setIsLeaveOpen(true)}
-                                className={`${sidebarBtn} hover:bg-red-500/10 hover:text-red-300`}
-                            >
-                                <LogOut size={18} />
-                                Leave Team
-                            </button>
-                        </li> */}
-                        <li>
-                            <button
-                                onClick={() => navigate(`/team/${id}/settings`)}
-                                className={sidebarBtn}
-                            >
-                                <Settings size={18} />
-                                Settings
-                            </button>
-                        </li>
-                        {/* <li>
-                            <button
-                                onClick={() => setIsDeleteOpen(true)}
-                                className={`${sidebarBtn} hover:bg-red-500/10 hover:text-red-300`}
-                            >
-                                <Trash2 size={18} />
-                                Delete Team
-                            </button>
-                        </li> */}
                     </ul>
                 </nav>
                 {/* Profile */}

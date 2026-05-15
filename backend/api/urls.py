@@ -23,6 +23,8 @@ urlpatterns = [
     path('teams/<int:team_id>/remove-user/<int:user_id>', remove_user_from_team, name='remove_user_from_team'),
     path('teams/<int:team_id>/promote/<int:user_id>', promote_member_to_admin, name='promote_member_to_admin'),
     path('teams/<int:team_id>/demote/<int:user_id>', demote_admin_to_member, name='demote_admin_to_member'),
+    path('teams/<int:team_id>/members/<int:member_id>', member_details, name='member_details'),
+    path('teams/<int:team_id>/members', members_list, name='members_list'),
 
     # Task
     path('teams/<int:team_id>/tasks/', list_tasks, name='list_tasks'),
@@ -30,4 +32,6 @@ urlpatterns = [
     path('teams/<int:team_id>/tasks/create/', create_task, name='create_task'),
     path('teams/<int:team_id>/tasks/<int:task_id>/update/', update_task, name='update_task'),
     path('teams/<int:team_id>/tasks/<int:task_id>/delete/', delete_task, name='delete_task'),
+    path('teams/<int:team_id>/tasks/<int:task_id>/members/<int:member_id>/remove', remove_member_from_task, name='remove_member_from_task'),
+    path('teams/<int:team_id>/tasks/<int:task_id>/members/<int:member_id>/add', add_member_to_task, name='add_member_to_task'),
 ] 

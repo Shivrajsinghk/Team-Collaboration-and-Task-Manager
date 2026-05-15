@@ -297,6 +297,57 @@ def demote_admin_to_member(request, team_id, user_id):
         status=status.HTTP_200_OK
     )
 
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def members_list(request, team_id):
+    team = get_object_or_404(Team, id=team_id)
+    if not TeamMembership.objects.filter(
+        user=request.user,
+        team=team
+    ).exists():
+        return Response(
+            {"error": "You are not part of this team."},
+            status=status.HTTP_403_FORBIDDEN
+        )
+    members = User.objects.filter(
+        team_memberships__team=team
+    ).distinct()
+
+    serializer = TeamMemberListSerializer(
+        members,
+        many=True,
+        context={'team': team}
+    )
+    return Response(
+        serializer.data,
+        status=status.HTTP_200_OK
+    )
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def member_details(request, team_id, member_id):
+    team = get_object_or_404(Team, id=team_id)
+    member = get_object_or_404(User, id=member_id)
+    if not TeamMembership.objects.filter(
+        user=request.user,
+        team=team
+    ).exists():
+        return Response(
+            {"error": "You are not part of this team."},
+            status=status.HTTP_403_FORBIDDEN
+        )
+    membership = TeamMembership.objects.filter(
+        user=member,
+        team=team
+    ).first()
+    if not membership:
+        return Response(
+            {"error": "This member is not part of this team."},
+            status=status.HTTP_403_FORBIDDEN
+        )
+    serializer = TeamMemberDetailsSerializer(member, context={'team': team})
+    return Response(serializer.data, status=status.HTTP_200_OK)
+
 
 
 # Task
@@ -408,3 +459,75 @@ def delete_task(request, team_id, task_id):
         return Response({"error": "Not allowed"}, status=status.HTTP_403_FORBIDDEN)
     task.delete()
     return Response({"message": "Task deleted"}, status=status.HTTP_200_OK)
+
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+def remove_member_from_task(request, team_id, member_id, task_id):
+    team = get_object_or_404(Team, id=team_id)
+    member = get_object_or_404(User, id=member_id)
+    task = get_object_or_404(Task, id=task_id, team=team)
+    isAdmin = TeamMembership.objects.filter(
+        user = request.user,
+        team = team,
+        role = 'admin'
+    ).exists()
+    if not isAdmin:
+        return Response(
+            {"error": "You are not allowed to remove a member from this task"},
+            status=status.HTTP_403_FORBIDDEN
+        )
+    membership = TeamMembership.objects.filter(
+        user = member,
+        team = team
+    ).first()
+    if not membership:
+        return Response(
+            {"error": "User is not the part of this team"},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    if not task.assigned_to.filter(id=member.id).exists():
+        return Response(
+            {"error": "User is not assigned to this task"},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    task.assigned_to.remove(member)
+    return Response(
+        {"message": "Member removed from task successfully"},
+        status=status.HTTP_200_OK
+    )
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def add_member_to_task(request, team_id, member_id, task_id):
+    team = get_object_or_404(Team, id=team_id)
+    member = get_object_or_404(User, id=member_id)
+    task = get_object_or_404(Task, id=task_id, team=team)
+    isAdmin = TeamMembership.objects.filter(
+        user = request.user,
+        team = team,
+        role = 'admin'
+    ).exists()
+    if not isAdmin:
+        return Response(
+            {"error": "You are not allowed to add a member to this task"},
+            status=status.HTTP_403_FORBIDDEN
+        )
+    membership = TeamMembership.objects.filter(
+        user = member,
+        team = team
+    ).first()
+    if not membership:
+        return Response(
+            {"error": "User is not the part of this team"},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    if task.assigned_to.filter(id=member.id).exists():
+        return Response(
+            {"error": "User is already assigned to this task"},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    task.assigned_to.add(member)
+    return Response(
+        {"message": "Member added to task successfully"},
+        status=status.HTTP_200_OK
+    )
