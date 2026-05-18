@@ -1,6 +1,6 @@
 import React from 'react'
 import { Draggable } from '@hello-pangea/dnd'
-import { CalendarDays, MessageCircleMore, Paperclip, Circle, CircleDashed, AlertTriangle, Flame, ChevronDown } from 'lucide-react'
+import { MessageCircleMore, Paperclip, Circle, CircleDashed, AlertTriangle, Flame, ChevronDown } from 'lucide-react'
 import { useNavigate, useParams } from 'react-router-dom'
 
 function getPriorityIcon(priority) {
@@ -63,11 +63,20 @@ function TaskCard({ task, index }) {
                             {task.priority.toUpperCase()}
                         </span>
                         {task.due_date && (
-                            <div className="flex items-center gap-2 text-xs text-gray-400">
-                                <CalendarDays size={14} />
-                                <span>
-                                    {new Date(task.due_date).toLocaleDateString()}
-                                </span>
+                            <div
+                                className="
+                                    rounded-full
+                                    border border-yellow-500/20
+                                    bg-yellow-500/10
+                                    px-2 py-1
+                                    text-xs
+                                    font-medium
+                                    text-yellow-300
+                                    whitespace-nowrap
+                                "
+                            >
+                                Due {' '}
+                                {new Date(task.due_date).toLocaleDateString()}
                             </div>
                         )}
                     </div>

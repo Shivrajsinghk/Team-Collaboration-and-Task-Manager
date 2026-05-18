@@ -5,17 +5,11 @@ from .models import *
 from .serializers import *
 from rest_framework import status
 from rest_framework.response import Response
-from django.contrib.auth import authenticate
-from rest_framework.decorators import authentication_classes, permission_classes, parser_classes
+from rest_framework.decorators import permission_classes, parser_classes
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
 from django.db import IntegrityError
 from django.shortcuts import get_object_or_404
-from django.db.models import Q
-
-@permission_classes([AllowAny])
-def home(request):
-    return HttpResponse("Hello, World!")
 
 # User 
 @api_view(["GET"])
@@ -35,7 +29,6 @@ def update_user_profile(request):
         serializer.save()
         return Response(serializer.data, status=status.HTTP_200_OK)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
 
 @api_view(['POST'])
 @permission_classes([AllowAny])

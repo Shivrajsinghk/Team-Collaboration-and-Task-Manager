@@ -12,8 +12,7 @@ function CreateTask({
     setLoading,
     team,
 }) {
-    console.log('sng',team);
-    
+        
     const { id } = useParams()
     const [isDropdownOpen, setIsDropdownOpen] = useState(false)
     const [selectedMembers, setSelectedMembers] = useState([])
@@ -24,7 +23,6 @@ function CreateTask({
         if (loading) return; 
         setLoading(true);
         const formData = new FormData(e.target);
-        console.log(selectedMembers)
         const data = {
             title: formData.get("task_title"),   
             description: formData.get("task_description"),    

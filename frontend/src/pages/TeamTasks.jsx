@@ -41,15 +41,12 @@ function TeamTasks() {
     const todoTasks = tasks.filter(
         (task) => task.status === 'todo'
     )
-
     const inProgressTasks = tasks.filter(
         (task) => task.status === 'in_progress'
     )
-
     const doneTasks = tasks.filter(
         (task) => task.status === 'done'
     )
-
     const handleDragEnd = async (result) => {
         if (!result.destination) return
         const taskId = Number(result.draggableId)
@@ -168,13 +165,11 @@ function TeamTasks() {
                             status="todo"
                             tasks={todoTasks}
                         />
-
                         <Column
                             title="In Progress"
                             status="in_progress"
                             tasks={inProgressTasks}
                         />
-
                         <Column
                             title="Done"
                             status="done"

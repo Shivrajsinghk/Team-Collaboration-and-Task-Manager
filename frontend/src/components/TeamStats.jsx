@@ -5,9 +5,7 @@ function TeamStats({team}) {
     const admin = team?.team?.all_members.filter((member) => {
         return member.role === 'admin'  
     })
-    console.log(team);
     
-
     return (
         <div className="mt-8 grid gap-6 md:grid-cols-3">
             <div className="group rounded-[2rem] border border-white/10 bg-white/[0.03] p-6 backdrop-blur-xl transition duration-300 hover:-translate-y-1 hover:border-teal-400/30">

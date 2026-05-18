@@ -9,6 +9,10 @@ class UserProfileSerializer(serializers.ModelSerializer):
     email = serializers.CharField(source='user.email', read_only=True)
     full_name = serializers.SerializerMethodField()
     remove_profile_picture = serializers.BooleanField(write_only=True, required=False, default=False)
+    total_tasks = serializers.SerializerMethodField(read_only=True)
+
+    def get_total_tasks(self, obj):
+        return obj.user.tasks_assigned.count()
 
     def get_full_name(self, obj):
         name = f"{obj.user.first_name} {obj.user.last_name}".strip()
@@ -16,7 +20,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = UserProfile
-        fields = ['id', "username", "email", 'first_name', 'last_name', "profile_picture", 'bio', 'status', 'last_seen', "full_name", "remove_profile_picture"]
+        fields = ['id', "username", "email", 'first_name', 'last_name', "profile_picture", 'bio', 'status', 'last_seen', "full_name", "remove_profile_picture", 'total_tasks']
 
     def update(self, instance, validated_data):
         user_data = validated_data.pop('user', {})
@@ -25,7 +29,6 @@ class UserProfileSerializer(serializers.ModelSerializer):
         user.first_name = user_data.get('first_name', user.first_name)
         user.last_name = user_data.get('last_name', user.last_name)
         user.save()
-
         if remove_profile_picture:
             if instance.profile_picture:
                 instance.profile_picture.delete(save=False)
@@ -61,10 +64,6 @@ class UsersRegistrationSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         validated_data.pop('confirm_password')
         user = User.objects.create_user(**validated_data)
-        user.first_name = validated_data.get('first_name', '')
-        user.last_name = validated_data.get('last_name', '')
-        user.save()
-        UserProfile.objects.get_or_create(user=user)
         return user
     
 class UserLoginSerializer(serializers.Serializer):
