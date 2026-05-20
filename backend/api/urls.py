@@ -29,7 +29,29 @@ urlpatterns = [
     path('teams/<int:team_id>/tasks/<int:task_id>/', list_task, name='list_task'),
     path('teams/<int:team_id>/tasks/create/', create_task, name='create_task'),
     path('teams/<int:team_id>/tasks/<int:task_id>/update/', update_task, name='update_task'),
+    path('teams/<int:team_id>/tasks/<int:task_id>/update/status/', update_task_status, name='update_task_status'),
     path('teams/<int:team_id>/tasks/<int:task_id>/delete/', delete_task, name='delete_task'),
     path('teams/<int:team_id>/tasks/<int:task_id>/members/<int:member_id>/remove', remove_member_from_task, name='remove_member_from_task'),
     path('teams/<int:team_id>/tasks/<int:task_id>/members/<int:member_id>/add', add_member_to_task, name='add_member_to_task'),
 ] 
+
+
+
+# # Teams
+# /teams/
+# /teams/{id}/
+
+# # Members
+# /teams/{id}/members/
+# /teams/{id}/members/{member_id}/
+
+# # Tasks
+# /teams/{id}/tasks/
+# /teams/{id}/tasks/{task_id}/
+
+# # Task Assignment
+# /teams/{id}/tasks/{task_id}/members/{member_id}/
+
+# # Role Actions
+# /teams/{id}/members/{member_id}/promote/
+# /teams/{id}/members/{member_id}/demote/

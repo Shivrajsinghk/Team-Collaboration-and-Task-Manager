@@ -59,7 +59,7 @@ function TeamTasks() {
         setTasks(updatedTasks)
         try {
             await api.patch(
-                `/teams/${id}/tasks/${taskId}/update/`,
+                `/teams/${id}/tasks/${taskId}/update/status/`,
                 {
                     status: newStatus
                 }

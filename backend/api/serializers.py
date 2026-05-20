@@ -279,3 +279,9 @@ class TeamMemberListSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ['id', 'username', 'first_name', 'last_name', 'role', 'status', 'profile_picture']
+
+class TaskStatusSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Task
+        fields = ['status']

@@ -283,11 +283,13 @@ function TaskDashboard() {
                 </div>
             </div>
 
-            <RightSlideDrawer
-            isSlideDrawerOpen={isSlideDrawerOpen}
-            setIsSlideDrawerOpen={setIsSlideDrawerOpen}
-            taskfetch={fetchTask}
-            />
+            {isSlideDrawerOpen && 
+                <RightSlideDrawer
+                isSlideDrawerOpen={isSlideDrawerOpen}
+                setIsSlideDrawerOpen={setIsSlideDrawerOpen}
+                taskfetch={fetchTask}
+                />
+            }
         </>
     )
 }
