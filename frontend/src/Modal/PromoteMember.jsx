@@ -22,7 +22,7 @@ function PromoteMember({
         setLoading(true)
         try {
             const response = await api.patch(
-                `teams/${id}/promote/${selectedMember.user__id}`
+                `api/teams/${id}/promote/${selectedMember.user__id}`
             )
             console.log(response.data)
             setIsMemberOpen(false)

@@ -11,7 +11,7 @@ function DeleteTask({isDeleteTaskOpen, setIsDeleteTaskOpen, setIsSlideDrawerOpen
     const handleDeleteTask = async () => {
         try{
             await api.delete(
-                `teams/${id}/tasks/${task_id}/delete/`
+                `api/teams/${id}/tasks/${task_id}/delete/`
             )  
             navigate(`/team/${id}/tasks`)
             setIsSlideDrawerOpen(false)

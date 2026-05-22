@@ -13,7 +13,7 @@ function MemberProfile() {
         async function fetchMember() {
             try {
                 const response = await api.get(
-                    `teams/${id}/members/${member_id}`
+                    `api/teams/${id}/members/${member_id}`
                 )
                 setMember(response.data)
             }
@@ -45,7 +45,7 @@ function MemberProfile() {
 
     return (
         <div className="relative min-h-screen ml-5 bg-black p-6">
-            <PreviousPageButton className="absolute left-10 top-10 text-white" />
+            <PreviousPageButton className="absolute left-12 top-12 text-white" />
             <div className="mx-auto max-w-7xl space-y-6">
                 <div className="rounded-[32px] border border-cyan-500/10 bg-gradient-to-br from-cyan-500/[0.08] via-black to-black p-8 shadow-[0_0_50px_rgba(0,255,255,0.05)]">
                     <div className="flex flex-col gap-8 lg:flex-row lg:items-center lg:justify-between">

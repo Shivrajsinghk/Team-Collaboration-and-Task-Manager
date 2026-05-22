@@ -3,15 +3,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import api from '../api/axios'
 import { useDispatch } from 'react-redux'
 import { loginSuccess } from '../Features/authslice'
-import {
-    Lock,
-    User,
-    ArrowRight,
-    Sparkles,
-    ShieldCheck,
-    Users,
-    Layers3
-} from "lucide-react"
+import { Lock, User, ArrowRight, Sparkles, ShieldCheck, Users, Layers3 } from "lucide-react"
 
 function Login() {
     const dispatch = useDispatch()
@@ -25,13 +17,13 @@ function Login() {
     const handleSubmit = async (e) => {
         e.preventDefault()
         try{
-            const tokenResponse = await api.post("/token/", {
+            const tokenResponse = await api.post("api/token/", {
                 username: formData.username,
                 password: formData.password
             })
             localStorage.setItem("access", tokenResponse.data.access)
             localStorage.setItem("refresh", tokenResponse.data.refresh)
-            const profileResponse = await api.get("user_profile/")
+            const profileResponse = await api.get("api/user_profile/")
             dispatch(loginSuccess({
                 user: profileResponse.data,
                 access: tokenResponse.data.access,

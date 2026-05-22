@@ -1,12 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import {
-    Save,
-    ArrowLeft,
-    Trash2,
-    LogOut,
-    Barcode,
-} from 'lucide-react'
+import { Save, ArrowLeft, Trash2, LogOut, Barcode } from 'lucide-react'
 import api from '../api/axios'
 import Loading from '../components/Loading'
 import TeamInfo from '../components/TeamInfo'
@@ -32,7 +26,7 @@ function UpdateTeam() {
     useEffect(() => {
         const fetchTeam = async () => {
             try{
-                const response = await api.get(`/teams/${id}`)
+                const response = await api.get(`api/teams/${id}`)
                 setTeam(response.data)
                 setFormData({
                     name: response.data?.team?.name || '',
@@ -59,7 +53,7 @@ function UpdateTeam() {
     const handleSave = () => {
         async function fetchsave(){
             try{
-                const response = await api.patch(`/teams/${id}/update/`, formData)
+                const response = await api.patch(`api/teams/${id}/update/`, formData)
                 setTeam(response.data)
                 navigate(`/team/${id}`)
             }
@@ -189,29 +183,29 @@ function UpdateTeam() {
                                     View Invite Code
                                 </button>
                             </section>
-                            {isAdmin &&
-                                <section className="rounded-[2rem] border border-red-500/15 bg-red-500/[0.03] p-6">
-                                    <h3 className="text-lg font-semibold text-white">
-                                        Danger Zone
-                                    </h3>
-                                    <p className="mt-1 text-sm text-gray-400">
-                                        Sensitive actions for this workspace.
-                                    </p>
-                                    <div className="mt-5 space-y-3">
-                                        <button
-                                            onClick={() => setIsLeaveOpen(true)}
-                                            className="
-                                            flex w-full items-center justify-center gap-2
-                                            rounded-2xl
-                                            border border-white/[0.08]
-                                            px-4 py-3
-                                            transition
-                                            hover:bg-white/[0.04]
-                                            "
-                                        >
-                                            <LogOut size={18} />
-                                            Leave Team
-                                        </button>
+                            <section className="rounded-[2rem] border border-red-500/15 bg-red-500/[0.03] p-6">
+                                <h3 className="text-lg font-semibold text-white">
+                                    Danger Zone
+                                </h3>
+                                <p className="mt-1 text-sm text-gray-400">
+                                    Sensitive actions for this workspace.
+                                </p>
+                                <div className="mt-5 space-y-3">
+                                    <button
+                                        onClick={() => setIsLeaveOpen(true)}
+                                        className="
+                                        flex w-full items-center justify-center gap-2
+                                        rounded-2xl
+                                        border border-white/[0.08]
+                                        px-4 py-3
+                                        transition
+                                        hover:bg-white/[0.04]
+                                        "
+                                    >
+                                        <LogOut size={18} />
+                                        Leave Team
+                                    </button>
+                                    {isAdmin &&
                                         <button
                                             onClick={() => setIsDeleteOpen(true)}
                                             className="
@@ -228,9 +222,9 @@ function UpdateTeam() {
                                             <Trash2 size={18} />
                                             Delete Team
                                         </button>
-                                    </div>
-                                </section>
-                            }
+                                    }
+                                </div>
+                            </section>
                         </div>
                     </div>
                 </div>

@@ -20,7 +20,7 @@ function AddMemberToTask({
         const fetchTeamMembers = async () => {
             try{
                 const response = await api.get(
-                    `teams/${id}/members`
+                    `api/teams/${id}/members`
                 )  
                 setMembers(response.data)
             }   
@@ -34,7 +34,7 @@ function AddMemberToTask({
     const handleSubmit = async (e) => {
         try{
             await api.post(
-                `teams/${id}/tasks/${task_id}/members/${selectedMember.id}/add`
+                `api/teams/${id}/tasks/${task_id}/members/${selectedMember.id}/add/`
             )  
             setIsAddMemberOpen(false)
             fetchtask()

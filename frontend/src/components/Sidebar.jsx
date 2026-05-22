@@ -2,18 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import api from '../api/axios'
 import UserProfilePfp from './UserProfilePfp'
-import {
-    LayoutDashboard,
-    CheckSquare,
-    Users,
-    LogOut,
-    Trash2,
-    Pencil,
-    Copy,
-    Barcode,
-    UserCircle2,
-    Settings 
-} from "lucide-react"
+import { LayoutDashboard, CheckSquare, Users, LogOut, Trash2, Pencil, Copy, Barcode, UserCircle2, Settings } from "lucide-react"
 import LeaveTeam from '../Modal/LeaveTeam'
 import DeleteTeam from '../Modal/DeleteTeam'
 import TeamInviteCode from '../Modal/TeamInviteCode'
@@ -35,7 +24,7 @@ function Sidebar() {
     useEffect(() => {
         const fetchprofile = async () => {
             try {
-                const response = await api.get("user_profile/")
+                const response = await api.get("api/user_profile/")
                 setProfile(response.data)
             } catch (error) {
                 console.log(error)
@@ -47,7 +36,7 @@ function Sidebar() {
     useEffect(() => {
         async function fetchapi(){
             try{
-                const response = await api.get(`/teams/${id}`)
+                const response = await api.get(`api/teams/${id}`)
                 setTeam(response.data)
             }
             catch(error){

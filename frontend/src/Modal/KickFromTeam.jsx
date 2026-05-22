@@ -22,7 +22,7 @@ function KickFromTeam({
         if (loading) return; 
         setLoading(true);
         try{
-            const response = await api.delete(`teams/${id}/remove-user/${selectedMember.user__id}`)
+            const response = await api.delete(`api/teams/${id}/remove-user/${selectedMember.user__id}`)
         }
         catch(error){
             console.log(error.response?.data?.error || error)

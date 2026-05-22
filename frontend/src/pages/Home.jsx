@@ -1,12 +1,6 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import {
-    ArrowRight,
-    Sparkles,
-    Users,
-    ShieldCheck,
-    Layers3
-} from "lucide-react";
+import { ArrowRight, Sparkles, Users, ShieldCheck, Layers3 } from "lucide-react";
 
 function Home() {
     const navigate = useNavigate();

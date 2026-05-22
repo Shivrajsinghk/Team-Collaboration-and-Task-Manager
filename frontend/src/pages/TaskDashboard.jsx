@@ -6,6 +6,7 @@ import TeamMembers from '../components/TeamMembers'
 import { Crown, ListTodo, MessagesSquare, SquareCheckBig, Users, CircleDot, LoaderCircle, BadgeCheck, Flame, Minus, ArrowDown, AlertTriangle, ChevronDown, Settings, X } from 'lucide-react'
 import PreviousPageButton from '../components/PreviousPageButton'
 import RightSlideDrawer from '../components/RightSlideDrawer'
+import TaskActivity from '../components/TaskActivity'
 
 function getStatusIcon(status) {
     switch(status) {
@@ -65,7 +66,7 @@ function TaskDashboard() {
     async function fetchTask() {
         try {
             const response = await api.get(
-                `teams/${id}/tasks/${task_id}`
+                `api/teams/${id}/tasks/${task_id}`
             )
             setTask(response.data)
         } 
@@ -182,8 +183,8 @@ function TaskDashboard() {
                         </div>
                     </div>
                 </div>
-                <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-                    <div className="space-y-6 lg:col-span-2">
+                <div className="flex mb-6 gap-6">
+                    <div className="flex-1">
                         <div className="rounded-3xl border border-white/10 bg-[#081312] p-6">
                             <div className="mb-6 flex items-center gap-3">
                                 <Users className="text-teal-300" size={24} />
@@ -233,8 +234,8 @@ function TaskDashboard() {
                             </div>
                         </div>
                     </div>
-                    <div className="space-y-6">
-                        <div className="rounded-3xl border border-white/10 bg-[#081312] p-6">
+                    <div className="w-48 space-y-6 shrink-0">
+                        <div className="rounded-3xl border min-h-28 border-white/10 bg-[#081312] p-6">
                             <div className="mb-4 flex items-center gap-3">
                                 <Crown className="h-6 w-6 text-cyan-400" />
                                 <h2 className="text-lg font-semibold">
@@ -257,29 +258,23 @@ function TaskDashboard() {
                                 </div>
                             </div>
                         </div>
-                        <div className="rounded-3xl border border-dashed border-white/10 bg-[#081312] p-6">
-                            <div className="mb-4 flex items-center gap-3">
-                                <ListTodo className="h-6 w-6 text-cyan-400" />
-                                <h2 className="text-lg font-semibold">
-                                    Subtasks / Checklist
-                                </h2>
-                            </div>
-                            <p className="text-zinc-500">
-                                You can add subtasks here later.
-                            </p>
-                        </div>
-                        <div className="rounded-3xl border border-dashed border-white/10 bg-[#081312] p-6">
-                            <div className="mb-4 flex items-center gap-3">
-                                <MessagesSquare className="h-6 w-6 text-cyan-400" />
-                                <h2 className="text-lg font-semibold">
-                                    Comments & Activity
-                                </h2>
-                            </div>
-                            <p className="text-zinc-500">
-                                Team discussions will appear here.
-                            </p>
+                        <div className="rounded-3xl border min-h-28 border-white/10 bg-[#081312] p-6">
+                            <div className='flex justify-center mt-1 items-center'>
+                                {task.priority == 'low' && (
+                                    <ChevronDown className="h-12 w-12 text-blue-400" />
+                                )}
+                                {task.priority == 'medium' && (
+                                    <Flame className="h-12 w-12 text-yellow-400" />
+                                )}
+                                {task.priority == 'high' && (
+                                    <AlertTriangle className="h-12 w-12 text-red-400" />
+                                )}
+                            </div>                        
                         </div>
                     </div>
+                </div>
+                <div className="rounded-3xl overflow-auto border border-dashed border-white/10 bg-[#081312] p-6">
+                    <TaskActivity />
                 </div>
             </div>
 

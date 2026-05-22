@@ -15,7 +15,7 @@ function TeamTasks() {
 
     const fetchTask = async () => {
         try {
-            const response = await api.get(`/teams/${id}/tasks`)
+            const response = await api.get(`api/teams/${id}/tasks`)
             setTasks(response.data)
         }
         catch (error) {
@@ -25,7 +25,7 @@ function TeamTasks() {
 
     const fetchTeam = async () => {
         try {
-            const response = await api.get(`/teams/${id}`)
+            const response = await api.get(`api/teams/${id}`)
             setTeam(response.data)
         }
         catch (error) {
@@ -59,7 +59,7 @@ function TeamTasks() {
         setTasks(updatedTasks)
         try {
             await api.patch(
-                `/teams/${id}/tasks/${taskId}/update/status/`,
+                `api/teams/${id}/tasks/${taskId}/update/status/`,
                 {
                     status: newStatus
                 }

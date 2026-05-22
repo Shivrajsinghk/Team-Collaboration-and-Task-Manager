@@ -25,7 +25,8 @@ function CreateTask({
         const formData = new FormData(e.target);
         const data = {
             title: formData.get("task_title"),   
-            description: formData.get("task_description"),    
+            description: formData.get("task_description"), 
+            due_date: formData.get("due_date"),   
             assigned_to_ids: selectedMembers.map((member) => member.user__id)
         }
         if(!data.title || !data.title.trim()){
@@ -34,7 +35,7 @@ function CreateTask({
             return
         }
         try{
-            const response = await api.post(`/teams/${id}/tasks/create/`, data)
+            const response = await api.post(`api/teams/${id}/tasks/create/`, data)
             fetchTask()
         }
         catch(error){
@@ -50,7 +51,7 @@ function CreateTask({
         <Modal isOpen={isCreateOpen} onClose={setIsCreateOpen}>
             <form 
             onSubmit={handleCreateSubmit}
-            className="space-y-5"
+            className="space-y-4"
             >
                 <h2 className="text-2xl font-bold text-white">
                     Create Task
@@ -62,7 +63,7 @@ function CreateTask({
                         name="task_title"
                         required
                         placeholder="Enter task title"
-                        className="mt-2 w-full rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-3 text-sm text-white placeholder:text-gray-500 focus:border-teal-400 focus:outline-none"
+                        className="w-full rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-2.5 text-sm text-white focus:border-teal-400 focus:outline-none focus:ring-2 focus:ring-teal-400/20"
                     />
                 </div>
                 <div>
@@ -71,8 +72,21 @@ function CreateTask({
                         type="text"
                         name="task_description"
                         placeholder="Enter task description"
-                        className="mt-2 w-full rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-3 text-sm text-white placeholder:text-gray-500 focus:border-teal-400 focus:outline-none"
+                        className="w-full rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-3 text-sm text-white focus:border-teal-400 focus:outline-none focus:ring-2 focus:ring-teal-400/20"
                     />
+                </div>
+                <div>
+                    <label className="text-sm text-gray-400">
+                        Due Date
+                    </label>
+                    <div className="relative mt-2">
+                        <input
+                            type="date"
+                            required
+                            name="due_date"
+                            className="w-full rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-3 text-sm text-white focus:border-teal-400 focus:outline-none focus:ring-2 focus:ring-teal-400/20"
+                        />
+                    </div>
                 </div>
                 <div className="relative">
                     <label className="text-sm text-gray-400">
@@ -126,7 +140,7 @@ function CreateTask({
                     {isDropdownOpen && (
                         <div
                             onWheel={(e) => e.stopPropagation()}
-                            className="absolute left-0 right-0 top-full z-[9999] mt-2 max-h-32 overflow-y-auto rounded-2xl border border-white/10 bg-[#0B1120] p-2 shadow-2xl scrollbar-thin scrollbar-track-transparent scrollbar-thumb-teal-500/40 hover:scrollbar-thumb-teal-400/60"
+                            className="absolute left-full bottom-0 ml-3 z-[9999] w-80 max-h-80 overflow-y-auto rounded-2xl border border-white/10 bg-[#0B1120] p-2 shadow-2xl scrollbar-thin scrollbar-track-transparent scrollbar-thumb-teal-500/40 hover:scrollbar-thumb-teal-400/60"
                         >
                             {team?.team?.all_members?.map((member) => (
                                 <button

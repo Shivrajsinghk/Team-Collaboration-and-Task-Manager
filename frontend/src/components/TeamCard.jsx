@@ -1,11 +1,6 @@
 import React from 'react'
 import { useNavigate } from 'react-router-dom'
-import {
-    ArrowUpRight,
-    CalendarDays,
-    Users,
-    Sparkles
-} from "lucide-react"
+import { ArrowUpRight, CalendarDays, Users, Sparkles } from "lucide-react"
 
 function formatCreatedAt(value) {
     if (!value) return 'Recently created'

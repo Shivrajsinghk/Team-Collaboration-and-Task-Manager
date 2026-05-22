@@ -37,7 +37,7 @@ function RightSlideDrawer({isSlideDrawerOpen, setIsSlideDrawerOpen, taskfetch}) 
 
     async function fetchtask(){
         try{
-            const response = await api.get(`teams/${id}/tasks/${task_id}`)
+            const response = await api.get(`api/teams/${id}/tasks/${task_id}`)
             setFormData({
                 title: response.data.title,
                 description: response.data.description,
@@ -61,7 +61,7 @@ function RightSlideDrawer({isSlideDrawerOpen, setIsSlideDrawerOpen, taskfetch}) 
         try{
             setIsSaving(true)
             await api.patch(
-                `teams/${id}/tasks/${task_id}/update/`,
+                `api/teams/${id}/tasks/${task_id}/update/`,
                 {
                     title: formData.title,
                     description: formData.description,

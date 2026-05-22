@@ -20,7 +20,7 @@ function CreateTeam({isCreateOpen, setIsCreateOpen, fetchapi, loading, setLoadin
             return
         }
         try{
-            const response = await api.post('teams/create/', data)
+            const response = await api.post('api/teams/create/', data)
             fetchapi()
         }
         catch(error){

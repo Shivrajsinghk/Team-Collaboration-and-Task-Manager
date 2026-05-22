@@ -18,7 +18,7 @@ function JoinTeam({isJoinOpen, setIsJoinOpen, fetchapi, loading, setLoading, set
             return
         }
         try{
-            const response = await api.post('teams/join/', data)
+            const response = await api.post('api/teams/join/', data)
             fetchapi()
         }
         catch(error){

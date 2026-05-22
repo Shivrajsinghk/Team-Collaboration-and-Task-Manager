@@ -22,7 +22,7 @@ function DemoteMember({
         setLoading(true)
         try {
             await api.patch(
-                `teams/${id}/demote/${selectedMember.user__id}`
+                `api/teams/${id}/demote/${selectedMember.user__id}`
             )
             setIsMemberOpen(false)
             setSelectedMember(null)

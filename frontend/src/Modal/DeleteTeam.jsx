@@ -12,7 +12,7 @@ function DeleteTeam({isDeleteOpen, setIsDeleteOpen, loading, setLoading, team}) 
         if (loading) return; 
         setLoading(true);
         try{
-            const response = await api.delete(`teams/${id}/delete/`)
+            const response = await api.delete(`api/teams/${id}/delete/`)
             navigate('/dashboard')
         }
         catch(error){

@@ -29,7 +29,7 @@ function Members() {
 
     async function fetchapi() {
         try {
-            const response = await api.get(`/teams/${id}`)
+            const response = await api.get(`api/teams/${id}`)
             setTeam(response.data)
         }
         catch (error) {

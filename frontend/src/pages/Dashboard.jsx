@@ -4,17 +4,7 @@ import Sidebar from '../components/Sidebar'
 import api from '../api/axios'
 import { useNavigate } from 'react-router-dom';
 import UserProfilePfp from '../components/UserProfilePfp';
-import {
-    LayoutDashboard,
-    Users,
-    PlusCircle,
-    UserPlus,
-    Sparkles,
-    ArrowRight,
-    Plus,
-    Hash,
-    CirclePlus,
-} from "lucide-react"
+import { LayoutDashboard, Users, PlusCircle, UserPlus, Sparkles, ArrowRight, Plus, Hash, CirclePlus } from "lucide-react"
 import CreateTeam from '../Modal/CreateTeam';
 import JoinTeam from '../Modal/JoinTeam';
 import AddTeam from '../Modal/AddTeam';
@@ -35,7 +25,7 @@ function Dashboard() {
 
     async function fetchapi() {
         try {
-            const response = await api.get('teams/')
+            const response = await api.get('api/teams/')
             setTeams(response.data)
         } catch (err) {
             console.log(err)
@@ -46,9 +36,8 @@ function Dashboard() {
     useEffect(() => {
         const fetchprofile = async () => {
             try {
-                const response = await api.get("user_profile/")
+                const response = await api.get("api/user_profile/")
                 setProfile(response.data)
-                console.log('th', response.data);
             } catch (error) {
                 console.log(error)
             }
@@ -157,7 +146,6 @@ function Dashboard() {
                 </div>
             </div>
 
-            {/* Add Team Modal */}
             <AddTeam 
             isAddTeamOpen={isAddTeamOpen}
             setIsAddTeamOpen={setIsAddTeamOpen}
@@ -165,7 +153,6 @@ function Dashboard() {
             setIsJoinOpen={setIsJoinOpen}
             />
 
-            {/* Create Team Modal */}
             <CreateTeam 
             loading={loading}
             setLoading={setLoading}
@@ -175,7 +162,6 @@ function Dashboard() {
             setIsAddTeamOpen={setIsAddTeamOpen}
             />
 
-            {/* Join Team Modal */}
             <JoinTeam 
             loading={loading}
             setLoading={setLoading}

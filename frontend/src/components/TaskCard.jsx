@@ -2,6 +2,7 @@ import React from 'react'
 import { Draggable } from '@hello-pangea/dnd'
 import { MessageCircleMore, Paperclip, Circle, CircleDashed, AlertTriangle, Flame, ChevronDown } from 'lucide-react'
 import { useNavigate, useParams } from 'react-router-dom'
+import { differenceInDays } from "date-fns";
 
 function getPriorityIcon(priority) {
     switch(priority) {
@@ -21,11 +22,25 @@ function getPriorityIcon(priority) {
             return null
     }
 }
+function formatDate(date){
+    const daysLeft = differenceInDays(
+        new Date(date),
+        new Date()
+    );
+    if (daysLeft < 0) {
+        return "Overdue";
+    }
+    if (daysLeft === 0) {
+        return "Due today";
+    }
+    return `${daysLeft} days left`;
+}
 function TaskCard({ task, index }) {
     const navigate = useNavigate()
     const { id } = useParams()
     const BASE_URL = import.meta.env.VITE_DJANGO_BASE_URL
 
+    
     const priorityStyles = {
         low: 'bg-emerald-500/15 text-emerald-300 border-emerald-500/20',
         medium: 'bg-yellow-500/15 text-yellow-300 border-yellow-500/20',
@@ -75,8 +90,7 @@ function TaskCard({ task, index }) {
                                     whitespace-nowrap
                                 "
                             >
-                                Due {' '}
-                                {new Date(task.due_date).toLocaleDateString()}
+                                {formatDate(task.due_date.split('T')[0])}
                             </div>
                         )}
                     </div>

@@ -4,18 +4,7 @@ import Loading from '../components/Loading'
 import { useNavigate } from 'react-router-dom'
 import { useDispatch } from 'react-redux'
 import { setUser as setAuthUser } from '../Features/authslice'
-import {
-    ArrowLeft,
-    Camera,
-    Mail,
-    User,
-    BadgeInfo,
-    PencilLine,
-    ImagePlus,
-    Trash2,
-    Save,
-    X
-} from "lucide-react"
+import { ArrowLeft, Camera, Mail, User, BadgeInfo, PencilLine, ImagePlus, Trash2, Save, X } from "lucide-react"
 import PreviousPageButton from '../components/PreviousPageButton'
 
 const BASE_URL = import.meta.env.VITE_DJANGO_BASE_URL
@@ -68,7 +57,7 @@ function EditProfile() {
             if (selectedFile) {
                 formDataToSend.append("profile_picture", selectedFile)
             }
-            const response = await api.patch("user_profile/update/", formDataToSend)
+            const response = await api.patch("api/user_profile/update/", formDataToSend)
             setLocalUser(response.data)
             dispatch(setAuthUser(response.data))
             navigate("/profile")
@@ -117,7 +106,7 @@ function EditProfile() {
     useEffect(() => {
         const fetchprofile = async () => {
             try {
-                const response = await api.get("user_profile/")
+                const response = await api.get("api/user_profile/")
                 setFormData({
                     username: response.data.username || "",
                     email: response.data.email || "",

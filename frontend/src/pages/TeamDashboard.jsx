@@ -1,25 +1,14 @@
 import React, { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import api from '../api/axios'
-import {
-    ArrowLeft,
-    Users,
-    Crown,
-    Shield,
-    CalendarDays,
-    UserCircle2,
-    Info,
-    Sparkles,
-    ShieldCheck,
-    Settings,
-    Barcode
-} from 'lucide-react'
+import { ArrowLeft, Users, Crown, Shield, CalendarDays, UserCircle2, Info, Sparkles, ShieldCheck, Settings, Barcode } from 'lucide-react'
 import TeamInfo from '../components/TeamInfo'
 import TeamStats from '../components/TeamStats'
 import UserProfilePfp from '../components/UserProfilePfp'
 import TeamMembers from '../components/TeamMembers'
 import PreviousPageButton from '../components/PreviousPageButton'
 import TeamInviteCode from '../Modal/TeamInviteCode'
+import TeamActivity from '../components/TeamActivity'
 
 function TeamDashboard() {
     const { id } = useParams()
@@ -29,7 +18,7 @@ function TeamDashboard() {
     
     async function fetchapi(){
         try{
-            const response = await api.get(`/teams/${id}`)
+            const response = await api.get(`api/teams/${id}`)
             setTeam(response.data)
         }
         catch(error){
@@ -110,6 +99,9 @@ function TeamDashboard() {
                         <TeamMembers 
                         team={team} 
                         />
+                    </div>
+                    <div className='mt-8'>
+                        <TeamActivity />
                     </div>
                 </div>
             </div>

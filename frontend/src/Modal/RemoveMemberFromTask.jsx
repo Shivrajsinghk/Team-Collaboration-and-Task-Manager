@@ -17,7 +17,7 @@ function RemoveMemberFromTask({
     const handleClick = async (e) => {
         try{
             await api.delete(
-                `teams/${id}/tasks/${task_id}/members/${selectedMember.id}/remove`
+                `api/teams/${id}/tasks/${task_id}/members/${selectedMember.id}/remove/`
             )  
             fetchtask()
             setIsRemoveMemberOpen(false)

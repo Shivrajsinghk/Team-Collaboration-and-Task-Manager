@@ -12,7 +12,7 @@ function LeaveTeam({isLeaveOpen, setIsLeaveOpen, loading, setLoading}) {
         if (loading) return; 
         setLoading(true);
         try{
-            const response = await api.delete(`teams/${id}/leave/`)
+            const response = await api.delete(`api/teams/${id}/leave/`)
             navigate('/dashboard')
         }
         catch(error){

@@ -1,16 +1,7 @@
 import React, { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import api from '../api/axios'
-import {
-    User,
-    Mail,
-    Lock,
-    ArrowRight,
-    Sparkles,
-    ShieldCheck,
-    Users,
-    Layers3
-} from "lucide-react"
+import { User, Mail, Lock, ArrowRight, Sparkles, ShieldCheck, Users, Layers3 } from "lucide-react"
 
 function Signup() {
     const navigate = useNavigate()
@@ -31,7 +22,7 @@ function Signup() {
             setError("")
             setSuccessMessage("")
             localStorage.clear()
-            await api.post('user_register/', {
+            await api.post('api/user_register/', {
                 first_name: formData.first_name,
                 last_name: formData.last_name,
                 username: formData.username,

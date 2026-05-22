@@ -34,12 +34,12 @@ function App() {
 				return
 			}
 			try {
-				const refreshResponse = await api.post("token/refresh/", {
+				const refreshResponse = await api.post("api/token/refresh/", {
 					refresh: storedRefresh,
 				})
 				const access = refreshResponse.data.access
 				localStorage.setItem("access", access)
-				const profileResponse = await api.get("user_profile/")
+				const profileResponse = await api.get("api/user_profile/")
 				dispatch(loginSuccess({
 					user: profileResponse.data,
 					access,
