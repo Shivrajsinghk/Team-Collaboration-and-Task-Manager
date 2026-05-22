@@ -41,8 +41,8 @@ INSTALLED_APPS = [
     'corsheaders',
     'rest_framework',
     'rest_framework_simplejwt',
-
-]
+    'activity',
+]   
 
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
