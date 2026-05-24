@@ -1,12 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
-import {
-    Users,
-    ShieldCheck,
-    Filter,
-    UserPlus
-} from 'lucide-react'
-import api from '../api/axios'
+import { Users, ShieldCheck, Filter, UserPlus } from 'lucide-react'
 import TeamMembers from '../components/TeamMembers'
 import Searchbar from '../components/Searchbar'
 import TeamInviteCode from '../Modal/TeamInviteCode'
@@ -14,9 +8,10 @@ import KickFromTeam from '../Modal/KickFromTeam'
 import TeamMember from '../Modal/TeamMember'
 import PromoteMember from '../Modal/PromoteMember'
 import DemoteMember from '../Modal/DemoteMember'
+import { getTeam } from '../api/teams'
 
 function Members() {
-    const { id } = useParams()
+    const { team_id } = useParams()
     const [team, setTeam] = useState(null)
     const [isMemberOpen, setIsMemberOpen] = useState(false)
     const [selectedMember, setSelectedMember] = useState(null)
@@ -29,7 +24,7 @@ function Members() {
 
     async function fetchapi() {
         try {
-            const response = await api.get(`api/teams/${id}`)
+            const response = await getTeam(team_id)
             setTeam(response.data)
         }
         catch (error) {
@@ -39,7 +34,7 @@ function Members() {
 
     useEffect(() => {
         fetchapi()
-    }, [id])
+    }, [team_id])
 
     return (
         <>

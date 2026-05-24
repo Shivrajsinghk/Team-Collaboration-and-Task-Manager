@@ -103,30 +103,32 @@ function ActivityMessage({ activity }) {
                 </div>
             )
         case 'TASK_DUE_DATE_CHANGED':
-            const oldDate = new Date(metadata.old_due_date)
-            const newDate = new Date(metadata.new_due_date)
-            return (
-                <div className="flex items-start gap-3">
-                    <span className="text-lg">{icon}</span>
-                    <p className="text-gray-200 leading-relaxed">
-                        <Actor>{actor}</Actor>{" "}
-                        {oldDate > newDate ? (
-                            <span>shortened deadline for </span>
-                        ) : (
-                            <span>extended deadline for </span>
-                        )}
-                        <Task>{taskTitle}</Task>{" "}
-                        from{" "}
-                        <Highlight color="text-yellow-400">
-                            {metadata.old_due_date?.split(" ")[0]}
-                        </Highlight>{" "}
-                        to{" "}
-                        <Highlight color="text-green-400">
-                            {metadata.new_due_date?.split(" ")[0]}
-                        </Highlight>
-                    </p>
-                </div>
-            )
+            {
+                const oldDate = new Date(metadata.old_due_date)
+                const newDate = new Date(metadata.new_due_date)
+                return (
+                    <div className="flex items-start gap-3">
+                        <span className="text-lg">{icon}</span>
+                        <p className="text-gray-200 leading-relaxed">
+                            <Actor>{actor}</Actor>{" "}
+                            {oldDate > newDate ? (
+                                <span>shortened deadline for </span>
+                            ) : (
+                                <span>extended deadline for </span>
+                            )}
+                            <Task>{taskTitle}</Task>{" "}
+                            from{" "}
+                            <Highlight color="text-yellow-400">
+                                {metadata.old_due_date?.split(" ")[0]}
+                            </Highlight>{" "}
+                            to{" "}
+                            <Highlight color="text-green-400">
+                                {metadata.new_due_date?.split(" ")[0]}
+                            </Highlight>
+                        </p>
+                    </div>
+                )
+            }
         case 'TASK_ASSIGNED':
             return (
                 <div className="flex items-start gap-3">

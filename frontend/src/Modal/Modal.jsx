@@ -1,6 +1,5 @@
 import React, { useEffect } from 'react'
 import { X } from 'lucide-react'
-import { isPending } from '@reduxjs/toolkit'
 
 function Modal({ isOpen, onClose, children }) {
     useEffect(() => {

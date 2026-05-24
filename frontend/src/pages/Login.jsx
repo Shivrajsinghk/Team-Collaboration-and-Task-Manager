@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import api from '../api/axios'
+import { getUserProfile, login } from '../api/auth'
 import { useDispatch } from 'react-redux'
 import { loginSuccess } from '../Features/authslice'
 import { Lock, User, ArrowRight, Sparkles, ShieldCheck, Users, Layers3 } from "lucide-react"
@@ -17,13 +17,13 @@ function Login() {
     const handleSubmit = async (e) => {
         e.preventDefault()
         try{
-            const tokenResponse = await api.post("api/token/", {
+            const tokenResponse = await login({
                 username: formData.username,
                 password: formData.password
             })
             localStorage.setItem("access", tokenResponse.data.access)
             localStorage.setItem("refresh", tokenResponse.data.refresh)
-            const profileResponse = await api.get("api/user_profile/")
+            const profileResponse = await getUserProfile()
             dispatch(loginSuccess({
                 user: profileResponse.data,
                 access: tokenResponse.data.access,

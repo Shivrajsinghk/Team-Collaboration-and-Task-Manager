@@ -5,7 +5,8 @@ from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from django.shortcuts import get_object_or_404
-from api.models import Team, Task
+from tasks.models import Task
+from teams.models import Team
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])

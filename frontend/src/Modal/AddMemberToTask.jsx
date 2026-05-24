@@ -1,18 +1,18 @@
-import { useNavigate, useParams } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
 import Modal from './Modal'
-import api from '../api/axios'
 import { useContext, useEffect, useState } from 'react'
 import UserProfilePfp from '../components/UserProfilePfp'
 import { Plus, UserPlus } from 'lucide-react'
 import { TaskActivityContext } from '../context/TaskActivityContext'
+import { listMembers } from '../api/teams'
+import { addMemberToTask } from '../api/tasks'
 
 function AddMemberToTask({
     isAddMemberOpen,
     setIsAddMemberOpen,
     fetchtask,
 }) {
-    const navigate = useNavigate()
-    const { id, task_id } = useParams()   
+    const { team_id, task_id } = useParams()
     const { fetchTaskActivities } = useContext(TaskActivityContext)
     const [members, setMembers] = useState(null)     
     const [confirmAddId, setConfirmAddId] = useState(null)
@@ -21,9 +21,7 @@ function AddMemberToTask({
     useEffect(() => {
         const fetchTeamMembers = async () => {
             try{
-                const response = await api.get(
-                    `api/teams/${id}/members`
-                )  
+                const response = await listMembers(team_id)
                 setMembers(response.data)
             }   
             catch(err){
@@ -31,16 +29,14 @@ function AddMemberToTask({
             }
         }
         fetchTeamMembers()
-    }, [])
+    }, [team_id])
 
-    const handleSubmit = async (e) => {
+    const handleSubmit = async () => {
         try{
-            await api.post(
-                `api/teams/${id}/tasks/${task_id}/members/${selectedMember.id}/add/`
-            )  
+            await addMemberToTask(team_id, task_id, selectedMember.id)
             setIsAddMemberOpen(false)
             fetchtask()
-            fetchTaskActivities(id, task_id)
+            fetchTaskActivities(team_id, task_id)
         }   
         catch(err){
             alert(err?.response?.data?.error || err)

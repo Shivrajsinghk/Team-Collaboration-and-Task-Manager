@@ -1,6 +1,5 @@
 import React from 'react'
 import Modal from './Modal'
-import api from '../api/axios'
 import { Copy } from 'lucide-react'
 
 function TeamInviteCode({isInviteOpen, setIsInviteOpen, team}) {

@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
-from api.models import Team, Task
+from tasks.models import Task
+from teams.models import Team
 
 class Activity(models.Model):
     ACTION_CHOICES = [

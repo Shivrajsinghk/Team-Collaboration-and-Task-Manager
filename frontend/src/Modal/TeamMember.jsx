@@ -1,7 +1,5 @@
 import React from 'react'
 import { ShieldCheck, UserX } from 'lucide-react'
-import api from '../api/axios'
-import { useParams } from 'react-router-dom'
 import Modal from './Modal'
 import UserProfilePfp from '../components/UserProfilePfp'
 
@@ -10,16 +8,11 @@ function TeamMember({
     setIsMemberOpen,
     team,
     loading,
-    setLoading,
     setIsKickAYSOpen,
     setIsPromoteAYSOpen,
     setIsDemoteAYSOpen,
     selectedMember,
-    setSelectedMember
 }) {
-
-    const { id } = useParams()
-
     return (
         <Modal
             isOpen={isMemberOpen}

@@ -1,28 +1,27 @@
 import React from 'react'
 import Modal from './Modal'
-import api from '../api/axios'
 import { useParams } from 'react-router-dom'
 import UserProfilePfp from '../components/UserProfilePfp'
+import { removeUserFromTeam } from '../api/teams'
 
 function KickFromTeam({
     isKickAYSOpen, 
     setIsKickAYSOpen, 
     loading, 
     setLoading, 
-    selectedMember, 
-    setSelectedMember,
+    selectedMember,
     setIsMemberOpen,
     fetchapi
 }) {
 
-    const {id} = useParams()
+    const { team_id } = useParams()
 
     const handleKickSubmit = async (e) => {
         e.preventDefault()
         if (loading) return; 
         setLoading(true);
         try{
-            const response = await api.delete(`api/teams/${id}/remove-user/${selectedMember.user__id}`)
+            await removeUserFromTeam(team_id, selectedMember.user__id)
         }
         catch(error){
             console.log(error.response?.data?.error || error)

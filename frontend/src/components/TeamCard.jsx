@@ -26,7 +26,7 @@ function TeamCard({ team }) {
         .map((part) => part[0]?.toUpperCase())
         .join('') || 'TM'
 
-    const handleClick = (e) => {
+    const handleClick = () => {
         navigate(`/team/${team.team_id}`)
     }
 

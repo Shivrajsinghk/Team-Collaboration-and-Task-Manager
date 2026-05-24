@@ -1,10 +1,10 @@
 import React from 'react'
 import Modal from './Modal'
-import api from '../api/axios'
 import { useNavigate, useParams } from 'react-router-dom'
+import { deleteTeam } from '../api/teams'
 
 function DeleteTeam({isDeleteOpen, setIsDeleteOpen, loading, setLoading, team}) {
-    const { id } = useParams()
+    const { team_id } = useParams()
     const navigate = useNavigate()
 
     const handleDeleteSubmit = async (e) => {
@@ -12,7 +12,7 @@ function DeleteTeam({isDeleteOpen, setIsDeleteOpen, loading, setLoading, team}) 
         if (loading) return; 
         setLoading(true);
         try{
-            const response = await api.delete(`api/teams/${id}/delete/`)
+            await deleteTeam(team_id)
             navigate('/dashboard')
         }
         catch(error){

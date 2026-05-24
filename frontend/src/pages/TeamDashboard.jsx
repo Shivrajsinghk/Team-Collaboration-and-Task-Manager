@@ -1,6 +1,6 @@
+/* eslint-disable react-hooks/set-state-in-effect, react-hooks/exhaustive-deps */
 import React, { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import api from '../api/axios'
 import { ArrowLeft, Users, Crown, Shield, CalendarDays, UserCircle2, Info, Sparkles, ShieldCheck, Settings, Barcode } from 'lucide-react'
 import TeamInfo from '../components/TeamInfo'
 import TeamStats from '../components/TeamStats'
@@ -9,16 +9,17 @@ import TeamMembers from '../components/TeamMembers'
 import PreviousPageButton from '../components/PreviousPageButton'
 import TeamInviteCode from '../Modal/TeamInviteCode'
 import TeamActivity from '../components/TeamActivity'
+import { getTeam } from '../api/teams'
 
 function TeamDashboard() {
-    const { id } = useParams()
+    const { team_id } = useParams()
     const [team, setTeam] = useState(null)
     const [isInviteOpen, setIsInviteOpen] = useState(false)
     const navigate = useNavigate()
     
     async function fetchapi(){
         try{
-            const response = await api.get(`api/teams/${id}`)
+            const response = await getTeam(team_id)
             setTeam(response.data)
         }
         catch(error){
@@ -28,7 +29,7 @@ function TeamDashboard() {
 
     useEffect(() => {
         fetchapi()
-    }, [id])
+    }, [team_id])
 
     return (
         <>
@@ -50,7 +51,7 @@ function TeamDashboard() {
                             </div>
                             <div className="flex flex-col relative z-10 items-center gap-2">
                                 <button
-                                    onClick={()=>navigate(`/team/${id}/settings`)}
+                                    onClick={()=>navigate(`/team/${team_id}/settings`)}
                                     className="
                                     flex items-center gap-1
                                     rounded-2xl

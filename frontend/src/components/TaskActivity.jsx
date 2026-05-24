@@ -1,6 +1,5 @@
-import React, { useContext, useEffect, useState } from 'react'
-import { Clock3, Circle } from 'lucide-react'
-import api from '../api/axios'
+import React, { useContext, useEffect } from 'react'
+import { Clock3 } from 'lucide-react'
 import { useParams } from 'react-router-dom'
 import { formatDistanceToNow } from 'date-fns'
 import { TaskActivityContext } from '../context/TaskActivityContext' 
@@ -28,7 +27,6 @@ const formatActivityMessage = (activity) => {
             </p>
         </div>
     )
-
     switch(activity.activity_type){
         case 'TASK_STATUS_CHANGED':
             return messageWrapper(
@@ -148,12 +146,12 @@ const formatTime = (date) => {
     })
 }
 function TaskActivity() {
-    const { id, task_id } = useParams()
+    const { team_id, task_id } = useParams()
     const { activities, fetchTaskActivities } = useContext(TaskActivityContext)
 
     useEffect(() => {
-        fetchTaskActivities(id, task_id)
-    }, [id, task_id]) 
+        fetchTaskActivities(team_id, task_id)
+    }, [fetchTaskActivities, team_id, task_id])
 
     return (
         <div className="bg-[#071717] border border-green-500/20 rounded-3xl p-6 shadow-[0_0_40px_rgba(0,255,255,0.03)]">
@@ -180,9 +178,9 @@ function TaskActivity() {
                                         <div className="w-4 h-4 rounded-full bg-green-400 border-4 border-[#071717]"></div>
                                     </div>
                                     <div className="flex-1 bg-white/[0.03] border border-white/5 rounded-2xl p-4 transition-all duration-300 hover:bg-white/[0.05] hover:border-cyan-500/20">
-                                        <p className="text-[15px] text-gray-200 leading-relaxed">
+                                        <div className="text-[15px] text-gray-200 leading-relaxed">
                                             {formatActivityMessage(activity)}
-                                        </p>
+                                        </div>
                                         <div className="flex items-center gap-2 mt-3">
                                             <Clock3 size={14} className="text-gray-500" />
                                             <p className="text-xs text-gray-500">

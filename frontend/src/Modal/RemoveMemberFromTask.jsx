@@ -1,9 +1,9 @@
-import { useNavigate, useParams } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
 import Modal from './Modal'
-import api from '../api/axios'
-import { useContext, useState } from 'react'
+import { useContext } from 'react'
 import { UserMinus } from 'lucide-react'
 import { TaskActivityContext } from '../context/TaskActivityContext'
+import { removeMemberFromTask } from '../api/tasks'
 
 function RemoveMemberFromTask({
     isRemoveMemberOpen,
@@ -12,17 +12,14 @@ function RemoveMemberFromTask({
     fetchtask
 }) {
     
-    const navigate = useNavigate()
-    const { id, task_id, member_id } = useParams()   
+    const { team_id, task_id } = useParams()
     const { fetchTaskActivities } = useContext(TaskActivityContext)
 
-    const handleClick = async (e) => {
+    const handleClick = async () => {
         try{
-            await api.delete(
-                `api/teams/${id}/tasks/${task_id}/members/${selectedMember.id}/remove/`
-            )  
+            await removeMemberFromTask(team_id, task_id, selectedMember.id)
             fetchtask()
-            fetchTaskActivities(id, task_id)
+            fetchTaskActivities(team_id, task_id)
             setIsRemoveMemberOpen(false)
         }   
         catch(err){

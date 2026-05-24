@@ -1,19 +1,17 @@
 import React from 'react'
-import api from '../api/axios'
 import { useNavigate, useParams } from 'react-router-dom'
 import { UserMinus } from 'lucide-react'
 import Modal from './Modal'
+import { deleteTask } from '../api/tasks'
 
 function DeleteTask({isDeleteTaskOpen, setIsDeleteTaskOpen, setIsSlideDrawerOpen}) {
-    const { id, task_id } = useParams()
+    const { team_id, task_id } = useParams()
     const navigate = useNavigate()
 
     const handleDeleteTask = async () => {
         try{
-            await api.delete(
-                `api/teams/${id}/tasks/${task_id}/delete/`
-            )  
-            navigate(`/team/${id}/tasks`)
+            await deleteTask(team_id, task_id)
+            navigate(`/team/${team_id}/tasks`)
             setIsSlideDrawerOpen(false)
         }   
         catch(err){

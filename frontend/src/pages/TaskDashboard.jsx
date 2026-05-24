@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react'
-import api from '../api/axios'
 import { useNavigate, useParams } from 'react-router-dom'
 import UserProfilePfp from '../components/UserProfilePfp'
 import TeamMembers from '../components/TeamMembers'
@@ -7,6 +6,10 @@ import { Crown, ListTodo, MessagesSquare, SquareCheckBig, Users, CircleDot, Load
 import PreviousPageButton from '../components/PreviousPageButton'
 import RightSlideDrawer from '../components/RightSlideDrawer'
 import TaskActivity from '../components/TaskActivity'
+import { getTask } from '../api/tasks'
+import axios from 'axios'
+import api from '../api/axios'
+import { listMembers } from '../api/teams'
 
 function getStatusIcon(status) {
     switch(status) {
@@ -46,7 +49,7 @@ function getPriorityIcon(priority) {
 }
 
 function TaskDashboard() {
-    const { id, task_id, member_id } = useParams()
+    const { team_id, task_id } = useParams()
     const [task, setTask] = useState(null)
     const [loading, setLoading] = useState(true)
     const [isSlideDrawerOpen, setIsSlideDrawerOpen] = useState(false)
@@ -65,10 +68,21 @@ function TaskDashboard() {
 
     async function fetchTask() {
         try {
-            const response = await api.get(
-                `api/teams/${id}/tasks/${task_id}`
-            )
+            const response = await getTask(team_id, task_id)
             setTask(response.data)
+        } 
+        catch (err) {
+            console.log(err?.response || err)
+        }
+        finally {
+            setLoading(false)
+        }
+    }
+
+    async function fetchMembers() {
+        try {
+            // await api.get(`teams/${team_id}/members`)
+            await listMembers(team_id)
         } 
         catch (err) {
             console.log(err?.response || err)
@@ -80,7 +94,8 @@ function TaskDashboard() {
 
     useEffect(() => {
         fetchTask()
-    }, [id, task_id])
+        fetchMembers() 
+    }, [team_id, task_id])
 
     if (loading) {
         return (
@@ -195,7 +210,7 @@ function TaskDashboard() {
                             <div className="space-y-4">
                                 {task.assigned_to.map((member) => (
                                     <div
-                                        onClick={()=>{navigate(`/team/${id}/members/${member.id}`)}}
+                                        onClick={()=>{navigate(`/team/${team_id}/members/${member.id}`)}}
                                         key={member.id}
                                         className="cursor-pointer hover:scale-[1.01]
                                             flex items-center justify-between

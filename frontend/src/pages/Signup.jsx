@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import api from '../api/axios'
+import { registerUser } from '../api/auth'
 import { User, Mail, Lock, ArrowRight, Sparkles, ShieldCheck, Users, Layers3 } from "lucide-react"
 
 function Signup() {
@@ -22,7 +22,7 @@ function Signup() {
             setError("")
             setSuccessMessage("")
             localStorage.clear()
-            await api.post('api/user_register/', {
+            await registerUser({
                 first_name: formData.first_name,
                 last_name: formData.last_name,
                 username: formData.username,

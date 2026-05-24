@@ -1,13 +1,14 @@
 import React, { useEffect, useState } from 'react'
 import Teams from './Teams'
 import Sidebar from '../components/Sidebar'
-import api from '../api/axios'
 import { useNavigate } from 'react-router-dom';
 import UserProfilePfp from '../components/UserProfilePfp';
 import { LayoutDashboard, Users, PlusCircle, UserPlus, Sparkles, ArrowRight, Plus, Hash, CirclePlus } from "lucide-react"
 import CreateTeam from '../Modal/CreateTeam';
 import JoinTeam from '../Modal/JoinTeam';
 import AddTeam from '../Modal/AddTeam';
+import { getUserProfile } from '../api/auth';
+import { listTeams } from '../api/teams';
 
 function Dashboard() {
     const BASE_URL = import.meta.env.VITE_DJANGO_BASE_URL
@@ -25,7 +26,7 @@ function Dashboard() {
 
     async function fetchapi() {
         try {
-            const response = await api.get('api/teams/')
+            const response = await listTeams()
             setTeams(response.data)
         } catch (err) {
             console.log(err)
@@ -36,7 +37,7 @@ function Dashboard() {
     useEffect(() => {
         const fetchprofile = async () => {
             try {
-                const response = await api.get("api/user_profile/")
+                const response = await getUserProfile()
                 setProfile(response.data)
             } catch (error) {
                 console.log(error)

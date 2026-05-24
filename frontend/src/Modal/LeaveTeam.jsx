@@ -1,10 +1,10 @@
 import React from 'react'
 import Modal from './Modal'
-import api from '../api/axios'
 import { useNavigate, useParams } from 'react-router-dom'
+import { leaveTeam } from '../api/teams'
 
 function LeaveTeam({isLeaveOpen, setIsLeaveOpen, loading, setLoading}) {
-    const { id } = useParams()
+    const { team_id } = useParams()
     const navigate = useNavigate()
 
     const handleLeaveSubmit = async (e) => {
@@ -12,7 +12,7 @@ function LeaveTeam({isLeaveOpen, setIsLeaveOpen, loading, setLoading}) {
         if (loading) return; 
         setLoading(true);
         try{
-            const response = await api.delete(`api/teams/${id}/leave/`)
+            await leaveTeam(team_id)
             navigate('/dashboard')
         }
         catch(error){

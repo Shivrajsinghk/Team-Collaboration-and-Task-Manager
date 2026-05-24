@@ -1,8 +1,7 @@
 import React, { useState } from 'react'
 import Modal from './Modal'
-import api from '../api/axios'
-import { useNavigate, useParams } from 'react-router-dom'
-import { ChevronDown, User } from 'lucide-react'
+import { useParams } from 'react-router-dom'
+import { createTask } from '../api/tasks'
 
 function CreateTask({
     isCreateOpen, 
@@ -13,7 +12,7 @@ function CreateTask({
     team,
 }) {
         
-    const { id } = useParams()
+    const { team_id } = useParams()
     const [isDropdownOpen, setIsDropdownOpen] = useState(false)
     const [selectedMembers, setSelectedMembers] = useState([])
     const BASE_URL = import.meta.env.VITE_DJANGO_BASE_URL
@@ -35,7 +34,7 @@ function CreateTask({
             return
         }
         try{
-            const response = await api.post(`api/teams/${id}/tasks/create/`, data)
+            await createTask(team_id, data)
             fetchTask()
         }
         catch(error){

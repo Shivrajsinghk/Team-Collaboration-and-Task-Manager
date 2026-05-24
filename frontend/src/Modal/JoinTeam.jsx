@@ -1,6 +1,6 @@
 import React from 'react'
 import Modal from './Modal'
-import api from '../api/axios'
+import { joinTeam } from '../api/teams'
 
 function JoinTeam({isJoinOpen, setIsJoinOpen, fetchapi, loading, setLoading, setIsAddTeamOpen}) {
 
@@ -18,7 +18,7 @@ function JoinTeam({isJoinOpen, setIsJoinOpen, fetchapi, loading, setLoading, set
             return
         }
         try{
-            const response = await api.post('api/teams/join/', data)
+            await joinTeam(data)
             fetchapi()
         }
         catch(error){

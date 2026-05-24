@@ -1,13 +1,15 @@
-import React, { use, useEffect, useState } from 'react'
+/* eslint-disable react-hooks/set-state-in-effect, react-hooks/exhaustive-deps */
+import React, { useEffect, useState } from 'react'
 import Column from '../components/Column'
-import api from '../api/axios'
 import { useParams } from 'react-router-dom'
 import { DragDropContext } from '@hello-pangea/dnd'
 import { ClipboardList, Plus } from 'lucide-react'
 import CreateTask from '../Modal/CreateTask'
+import { getTeam } from '../api/teams'
+import { listTasks, updateTaskStatus } from '../api/tasks'
 
 function TeamTasks() {
-    const { id } = useParams()
+    const { team_id } = useParams()
     const [tasks, setTasks] = useState([])
     const [team, setTeam] = useState([])
     const [isCreateOpen, setIsCreateOpen] = useState(false)
@@ -15,7 +17,7 @@ function TeamTasks() {
 
     const fetchTask = async () => {
         try {
-            const response = await api.get(`api/teams/${id}/tasks`)
+            const response = await listTasks(team_id)
             setTasks(response.data)
         }
         catch (error) {
@@ -25,7 +27,7 @@ function TeamTasks() {
 
     const fetchTeam = async () => {
         try {
-            const response = await api.get(`api/teams/${id}`)
+            const response = await getTeam(team_id)
             setTeam(response.data)
         }
         catch (error) {
@@ -36,7 +38,7 @@ function TeamTasks() {
     useEffect(() => {
         fetchTask()
         fetchTeam()
-    }, [id])
+    }, [team_id])
 
     const todoTasks = tasks.filter(
         (task) => task.status === 'todo'
@@ -58,12 +60,9 @@ function TeamTasks() {
         )
         setTasks(updatedTasks)
         try {
-            await api.patch(
-                `api/teams/${id}/tasks/${taskId}/update/status/`,
-                {
-                    status: newStatus
-                }
-            )
+            await updateTaskStatus(team_id, taskId, {
+                status: newStatus
+            })
         }
         catch (error) {
             console.log(error?.response?.data || error)

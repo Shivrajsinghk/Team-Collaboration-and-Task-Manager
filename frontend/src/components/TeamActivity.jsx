@@ -1,6 +1,5 @@
-import React, { useContext, useEffect, useState } from 'react'
-import { Clock3, Circle } from 'lucide-react'
-import api from '../api/axios'
+import React, { useContext, useEffect } from 'react'
+import { Clock3 } from 'lucide-react'
 import { useParams } from 'react-router-dom'
 import { formatDistanceToNow } from 'date-fns'
 import ActivityMessage from './ActivityMessage'
@@ -12,12 +11,12 @@ const formatTime = (date) => {
     })
 }
 function TeamActivity() {
-    const { id } = useParams()
+    const { team_id } = useParams()
     const { activities, fetchTeamActivities } = useContext(TeamActivityContext)
 
     useEffect(() => {
-        fetchTeamActivities(id)
-    }, [id]) 
+        fetchTeamActivities(team_id)
+    }, [fetchTeamActivities, team_id])
 
     return (
         <div className="bg-[#071717] border border-green-500/20 rounded-3xl p-6 shadow-[0_0_40px_rgba(0,255,255,0.03)]">

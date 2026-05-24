@@ -1,9 +1,8 @@
-import React, { useContext } from 'react'
+import React from 'react'
 import Modal from './Modal'
-import api from '../api/axios'
 import { useParams } from 'react-router-dom'
 import UserProfilePfp from '../components/UserProfilePfp'
-import { TeamActivityContext } from '../context/TeamActivityContext'
+import { demoteMember } from '../api/teams'
 
 function DemoteMember({
     isDemoteAYSOpen,
@@ -15,15 +14,13 @@ function DemoteMember({
     setIsMemberOpen,
     fetchapi,
 }) {
-    const {id} = useParams()
+    const { team_id } = useParams()
 
     const handleDemoteSubmit = async () => {
         if (loading) return
         setLoading(true)
         try {
-            await api.patch(
-                `api/teams/${id}/demote/${selectedMember.user__id}`
-            )
+            await demoteMember(team_id, selectedMember.user__id)
             setIsMemberOpen(false)
             setSelectedMember(null)
         }

@@ -1,22 +1,13 @@
 import React, { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import api from '../api/axios'
 import UserProfilePfp from './UserProfilePfp'
-import { LayoutDashboard, CheckSquare, Users, LogOut, Trash2, Pencil, Copy, Barcode, UserCircle2, Settings } from "lucide-react"
-import LeaveTeam from '../Modal/LeaveTeam'
-import DeleteTeam from '../Modal/DeleteTeam'
-import TeamInviteCode from '../Modal/TeamInviteCode'
-import TeamSettings from '../pages/TeamSettings'
+import { LayoutDashboard, CheckSquare, Users } from "lucide-react"
+import { getUserProfile } from '../api/auth'
 
 function Sidebar() {
-    const BASE_URL = import.meta.env.VITE_DJANGO_BASE_URL
-    const { id } = useParams()
+    const { team_id } = useParams()
     const [profile, setProfile] = useState('')
     const navigate = useNavigate()
-    const [team, setTeam] = useState(false)
-    const [isInviteOpen, setIsInviteOpen] = useState(false)
-    const [loading, setLoading] = useState(false);
-    const [data, setData] = useState('')
 
     const sidebarBtn =
     "flex w-full items-center gap-3 rounded-2xl px-5 py-3 text-sm font-medium text-[var(--color-cool-steel)] transition-all duration-300 hover:bg-white/[0.05] hover:text-white"
@@ -24,7 +15,7 @@ function Sidebar() {
     useEffect(() => {
         const fetchprofile = async () => {
             try {
-                const response = await api.get("api/user_profile/")
+                const response = await getUserProfile()
                 setProfile(response.data)
             } catch (error) {
                 console.log(error)
@@ -32,19 +23,6 @@ function Sidebar() {
         }
         fetchprofile()
     }, [])
-
-    useEffect(() => {
-        async function fetchapi(){
-            try{
-                const response = await api.get(`api/teams/${id}`)
-                setTeam(response.data)
-            }
-            catch(error){
-                console.log(error.response?.data)
-            }
-        }
-        fetchapi()
-    }, [id])
 
     return (
         <>
@@ -54,7 +32,7 @@ function Sidebar() {
                     <ul className="space-y-2">
                         <li>
                             <button
-                                onClick={() => navigate(`/team/${id}`)}
+                                onClick={() => navigate(`/team/${team_id}`)}
                                 className={sidebarBtn}
                             >
                                 <LayoutDashboard size={18} />
@@ -63,7 +41,7 @@ function Sidebar() {
                         </li>
                         <li>
                             <button
-                                onClick={() => navigate(`/team/${id}/tasks`)}
+                                onClick={() => navigate(`/team/${team_id}/tasks`)}
                                 className={sidebarBtn}
                             >
                                 <CheckSquare size={18} />
@@ -72,7 +50,7 @@ function Sidebar() {
                         </li>
                         <li>
                             <button
-                                onClick={() => navigate(`/team/${id}/members`)}
+                                onClick={() => navigate(`/team/${team_id}/members`)}
                                 className={sidebarBtn}
                             >
                                 <Users size={18} />

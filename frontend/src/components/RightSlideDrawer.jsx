@@ -1,16 +1,16 @@
+/* eslint-disable react-hooks/set-state-in-effect, react-hooks/exhaustive-deps */
 import React, { useContext, useEffect, useState } from 'react'
-import { HeadphoneOff, Plus, X } from 'lucide-react'
-import api from '../api/axios'
-import { useNavigate, useParams } from 'react-router-dom'
+import { Plus, X } from 'lucide-react'
+import { useParams } from 'react-router-dom'
 import UserProfilePfp from './UserProfilePfp'
 import RemoveMemberFromTask from '../Modal/RemoveMemberFromTask'
 import AddMemberToTask from '../Modal/AddMemberToTask'
 import DeleteTask from '../Modal/DeleteTask'
 import { TaskActivityContext } from '../context/TaskActivityContext'
+import { getTask, updateTask as saveTask } from '../api/tasks'
 
 function RightSlideDrawer({isSlideDrawerOpen, setIsSlideDrawerOpen, taskfetch}) {
-    const navigate = useNavigate()
-    const { id, task_id } = useParams()
+    const { team_id, task_id } = useParams()
     const { fetchTaskActivities } = useContext(TaskActivityContext)
     const [isRemoveMemberOpen, setIsRemoveMemberOpen] = useState(false)
     const [isAddMemberOpen, setIsAddMemberOpen] = useState(false)
@@ -39,7 +39,7 @@ function RightSlideDrawer({isSlideDrawerOpen, setIsSlideDrawerOpen, taskfetch}) 
 
     async function fetchtask(){
         try{
-            const response = await api.get(`api/teams/${id}/tasks/${task_id}`)
+            const response = await getTask(team_id, task_id)
             setFormData({
                 title: response.data.title,
                 description: response.data.description,
@@ -62,16 +62,13 @@ function RightSlideDrawer({isSlideDrawerOpen, setIsSlideDrawerOpen, taskfetch}) 
     async function updateTask(){
         try{
             setIsSaving(true)
-            await api.patch(
-                `api/teams/${id}/tasks/${task_id}/update/`,
-                {
-                    title: formData.title,
-                    description: formData.description,
-                    priority: formData.priority,
-                    due_date: formData.due_date
-                }
-            )
-            fetchTaskActivities(id, task_id)
+            await saveTask(team_id, task_id, {
+                title: formData.title,
+                description: formData.description,
+                priority: formData.priority,
+                due_date: formData.due_date
+            })
+            fetchTaskActivities(team_id, task_id)
         }
         catch(error){
             console.log(error?.response || error)
@@ -80,6 +77,7 @@ function RightSlideDrawer({isSlideDrawerOpen, setIsSlideDrawerOpen, taskfetch}) 
             setIsSaving(false)
         }
     }
+    
     useEffect(() => {
         if(isInitialLoad) return
         const timeout = setTimeout(() => {

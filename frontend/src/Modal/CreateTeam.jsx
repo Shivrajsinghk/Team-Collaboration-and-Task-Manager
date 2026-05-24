@@ -1,8 +1,7 @@
 import React, { useContext } from 'react'
 import Modal from './Modal'
-import api from '../api/axios'
-import { useNavigate } from 'react-router-dom'
 import { TeamActivityContext } from '../context/TeamActivityContext'
+import { createTeam } from '../api/teams'
 
 function CreateTeam({isCreateOpen, setIsCreateOpen, fetchapi, loading, setLoading, setIsAddTeamOpen}) {
 
@@ -23,7 +22,7 @@ function CreateTeam({isCreateOpen, setIsCreateOpen, fetchapi, loading, setLoadin
             return
         }
         try{
-            const response = await api.post('api/teams/create/', data)
+            await createTeam(data)
             fetchapi()
             fetchTeamActivities()
         }

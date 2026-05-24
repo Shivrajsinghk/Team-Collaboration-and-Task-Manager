@@ -1,25 +1,15 @@
 import React, { useEffect } from 'react'	
 import Navbar from './components/Navbar'
 import Profile from './pages/Profile' 
-import Home from './pages/Home'
-import Signup from './pages/Signup'
-import Login from './pages/Login'
 import ProtectedRoute from './components/ProtectedRoute'
 import EditProfile from './pages/EditProfile'
-import Teams from './pages/Teams'
-import Team from './pages/Team'
-import Members from './pages/Members'
 import Dashboard from './pages/Dashboard'
 import { Route, Routes } from 'react-router-dom'
-import api from './api/axios'
 import { useDispatch, useSelector } from 'react-redux'
 import { loginSuccess, logout, setAuthResolved } from './Features/authslice'
-import TeamDashboard from './pages/TeamDashboard'
-import TeamSettings from './pages/TeamSettings'
-import TeamTasks from './pages/TeamTasks'
-import TaskDashboard from './pages/TaskDashboard'
-import MemberProfile from './pages/MemberProfile'
-import RightSlideDrawer from './components/RightSlideDrawer'
+import { getUserProfile, refreshToken } from './api/auth'
+import { publicRoutes } from './routes/PublicRoutes'
+import { teamRoutes } from './routes/TeamRoutes'
 
 function App() {
 	const dispatch = useDispatch()
@@ -34,12 +24,12 @@ function App() {
 				return
 			}
 			try {
-				const refreshResponse = await api.post("api/token/refresh/", {
+				const refreshResponse = await refreshToken({
 					refresh: storedRefresh,
 				})
 				const access = refreshResponse.data.access
 				localStorage.setItem("access", access)
-				const profileResponse = await api.get("api/user_profile/")
+				const profileResponse = await getUserProfile()
 				dispatch(loginSuccess({
 					user: profileResponse.data,
 					access,
@@ -59,23 +49,12 @@ function App() {
 		<div>
 			{isAuthenticated && <Navbar />}
 			<Routes>
-				<Route path='/' element={<Home />} />
-				<Route path='/signup' element={<Signup />} />
-				<Route path='/login' element={<Login />} />
+				{publicRoutes}
 				<Route element={<ProtectedRoute />}>
 					<Route path='/dashboard' element={<Dashboard />} />
 					<Route path='/profile' element={<Profile />} />
 					<Route path='/edit-profile' element={<EditProfile />} />
-					<Route path='/teams' element={<Teams />} />
-					<Route path='/team/:id' element={<Team />}>
-						<Route index element={<TeamDashboard />} />
-						<Route path='members' element={<Members />} />
-						<Route path='members/:member_id' element={<MemberProfile />} />
-						<Route path='settings' element={<TeamSettings />} />
-						<Route path='tasks' element={<TeamTasks />} />
-						<Route path='tasks/:task_id' element={<TaskDashboard />}>
-						</Route>
-					</Route>
+					{teamRoutes}
 				</Route>
 			</Routes>
 		</div>

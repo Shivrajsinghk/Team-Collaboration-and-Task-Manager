@@ -37,7 +37,7 @@ function formatDate(date){
 }
 function TaskCard({ task, index }) {
     const navigate = useNavigate()
-    const { id } = useParams()
+    const { team_id } = useParams()
     const BASE_URL = import.meta.env.VITE_DJANGO_BASE_URL
 
     
@@ -48,7 +48,7 @@ function TaskCard({ task, index }) {
     }
 
     const handleClick = () =>{
-        navigate(`/team/${id}/tasks/${task.id}`)
+        navigate(`/team/${team_id}/tasks/${task.id}`)
     }
 
     return (

@@ -1,20 +1,18 @@
 import React, { useEffect, useState } from 'react'
-import api from '../api/axios'
 import { useParams } from 'react-router-dom'
 import { Mail, ShieldCheck, Clock3, Activity, User2 } from 'lucide-react'
 import PreviousPageButton from '../components/PreviousPageButton'
+import { getMemberDetails } from '../api/teams'
 
 function MemberProfile() {
-    const { id, member_id } = useParams()
+    const { team_id, member_id } = useParams()
     const [member, setMember] = useState(null)
     const [loading, setLoading] = useState(true)
 
     useEffect(() => {
         async function fetchMember() {
             try {
-                const response = await api.get(
-                    `api/teams/${id}/members/${member_id}`
-                )
+                const response = await getMemberDetails(team_id, member_id)
                 setMember(response.data)
             }
             catch (err) {
@@ -25,7 +23,7 @@ function MemberProfile() {
             }
         }
         fetchMember()
-    }, [id, member_id])
+    }, [team_id, member_id])
 
     if (loading) {
         return (

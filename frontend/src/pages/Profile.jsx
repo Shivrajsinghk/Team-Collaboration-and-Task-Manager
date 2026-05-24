@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react'
-import api from '../api/axios'
 import Loading from '../components/Loading'
 import { useDispatch, useSelector } from 'react-redux'
 import { logout, setUser } from '../Features/authslice'
 import { useNavigate } from 'react-router-dom'
 import { User, Mail, AtSign, Pencil, LogOut, ShieldCheck } from "lucide-react"
 import PreviousPageButton from '../components/PreviousPageButton'
+import { getUserProfile } from '../api/auth'
 
 const BASE_URL = import.meta.env.VITE_DJANGO_BASE_URL
 
@@ -21,7 +21,7 @@ function Profile() {
     const [user, setLocalUser] = useState(authUser)
     const dispatch = useDispatch()
 
-    const handleClick = ((e) => {
+    const handleClick = (() => {
         dispatch(logout())
         navigate('/')
     })
@@ -33,7 +33,7 @@ function Profile() {
     useEffect(() => {
         const fetchprofile = async () => {
             try {
-                const response = await api.get("api/user_profile/")
+                const response = await getUserProfile()
                 setLocalUser(response.data)
                 dispatch(setUser(response.data))
             } catch (error) {

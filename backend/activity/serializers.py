@@ -1,7 +1,8 @@
 from .models import Activity
 from rest_framework import serializers
 from django.contrib.auth.models import User
-from api.models import Team, Task
+from tasks.models import Task
+from teams.models import Team
 
 class UserActivitySerializer(serializers.ModelSerializer):
     profile_picture = serializers.ImageField(read_only=True, source='profile.profile_picture')

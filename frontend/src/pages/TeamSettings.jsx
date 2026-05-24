@@ -1,16 +1,16 @@
 import React, { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { Save, ArrowLeft, Trash2, LogOut, Barcode } from 'lucide-react'
-import api from '../api/axios'
 import Loading from '../components/Loading'
 import TeamInfo from '../components/TeamInfo'
 import LeaveTeam from '../Modal/LeaveTeam'
 import DeleteTeam from '../Modal/DeleteTeam'
 import TeamInviteCode from '../Modal/TeamInviteCode'
 import PreviousPageButton from '../components/PreviousPageButton'
+import { getTeam, updateTeam } from '../api/teams'
 
 function UpdateTeam() {
-    const { id } = useParams()
+    const { team_id } = useParams()
     const [team, setTeam] = useState(null)
     const [loading, setLoading] = useState(true)
     const navigate = useNavigate()
@@ -26,7 +26,7 @@ function UpdateTeam() {
     useEffect(() => {
         const fetchTeam = async () => {
             try{
-                const response = await api.get(`api/teams/${id}`)
+                const response = await getTeam(team_id)
                 setTeam(response.data)
                 setFormData({
                     name: response.data?.team?.name || '',
@@ -41,7 +41,7 @@ function UpdateTeam() {
             }
         }
         fetchTeam()
-    }, [id])
+    }, [team_id])
 
     const handleChange = (e) => {
         setFormData((prev) => ({
@@ -53,9 +53,9 @@ function UpdateTeam() {
     const handleSave = () => {
         async function fetchsave(){
             try{
-                const response = await api.patch(`api/teams/${id}/update/`, formData)
+                const response = await updateTeam(team_id, formData)
                 setTeam(response.data)
-                navigate(`/team/${id}`)
+                navigate(`/team/${team_id}`)
             }
             catch(error){
                 console.log(error.response?.data || error)

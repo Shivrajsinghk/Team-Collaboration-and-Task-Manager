@@ -5,13 +5,13 @@ import { useLocation, useNavigate, useParams } from 'react-router-dom';
 
 function MemberCard({onClick, member}) {
     const navigate = useNavigate()
-    const { id, member_id } = useParams()
+    const { team_id } = useParams()
     const location = useLocation()
     const isMembersPage = location.pathname.includes("/members")
 
     return (
         <div
-        onClick={()=>{navigate(`/team/${id}/members/${member.user__id}`)}}
+        onClick={()=>{navigate(`/team/${team_id}/members/${member.user__id}`)}}
         className="flex items-center justify-between p-4 rounded-2xl border border-white/5 bg-white/[0.02] hover:bg-white/[0.035] hover:border-cyan-500/10 transition-all"
         >
             <div 
