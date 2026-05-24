@@ -1,9 +1,10 @@
 import { useNavigate, useParams } from 'react-router-dom'
 import Modal from './Modal'
 import api from '../api/axios'
-import { useEffect, useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import UserProfilePfp from '../components/UserProfilePfp'
 import { Plus, UserPlus } from 'lucide-react'
+import { TaskActivityContext } from '../context/TaskActivityContext'
 
 function AddMemberToTask({
     isAddMemberOpen,
@@ -12,6 +13,7 @@ function AddMemberToTask({
 }) {
     const navigate = useNavigate()
     const { id, task_id } = useParams()   
+    const { fetchTaskActivities } = useContext(TaskActivityContext)
     const [members, setMembers] = useState(null)     
     const [confirmAddId, setConfirmAddId] = useState(null)
     const [selectedMember, setSelectedMember] = useState("")
@@ -38,6 +40,7 @@ function AddMemberToTask({
             )  
             setIsAddMemberOpen(false)
             fetchtask()
+            fetchTaskActivities(id, task_id)
         }   
         catch(err){
             alert(err?.response?.data?.error || err)

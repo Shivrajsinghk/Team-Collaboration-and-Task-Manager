@@ -1,5 +1,4 @@
 import React from 'react'
-
 import { CheckCircle2, Trash2, Flag, UserPlus, UserMinus, Pencil, CalendarDays, Rocket, BadgePlus, LogOut, ShieldCheck, ShieldX, FolderKanban, ArrowRightLeft } from 'lucide-react'
 
 const activityIcons = {
@@ -39,10 +38,8 @@ const Highlight = ({ children, color = "text-green-400" }) => (
 )
 
 function ActivityMessage({ activity }) {
-
     const actor = activity.actor.username
     const metadata = activity.metadata || {}
-
     const taskTitle =
         activity.task?.title ||
         metadata.task_title
@@ -277,12 +274,14 @@ function ActivityMessage({ activity }) {
         default:
             return (
                 <div className="flex items-center gap-3">
-                    <span className="text-lg">📍</span>
                     <span className="text-gray-400">
-                        Unknown activity
+                        📍
+                    </span>
+                    <span className="text-gray-300">
+                        No Team Activity
                     </span>
                 </div>
-            )
+            )  
     }
 }
 

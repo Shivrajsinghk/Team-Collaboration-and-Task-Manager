@@ -1,113 +1,144 @@
-import React, { useEffect, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import { Clock3, Circle } from 'lucide-react'
 import api from '../api/axios'
 import { useParams } from 'react-router-dom'
 import { formatDistanceToNow } from 'date-fns'
+import { TaskActivityContext } from '../context/TaskActivityContext' 
+import { ArrowRightLeft, Flag, Pencil, CalendarDays, UserPlus, UserMinus } from 'lucide-react'
 
 const formatActivityMessage = (activity) => {
     const actor = activity.actor.username
-    const metadata = activity.metadata
+    const metadata = activity.metadata || {}
+    const activityIcons = {
+        TASK_STATUS_CHANGED: <ArrowRightLeft size={18} className="text-cyan-400 mt-0.5" />,
+        TASK_PRIORITY_CHANGED: <Flag size={18} className="text-orange-400 mt-0.5" />,
+        TASK_TITLE_CHANGED: <Pencil size={18} className="text-yellow-400 mt-0.5" />,
+        TASK_DUE_DATE_CHANGED: <CalendarDays size={18} className="text-blue-400 mt-0.5" />,
+        TASK_ASSIGNED: <UserPlus size={18} className="text-purple-400 mt-0.5" />,
+        TASK_UNASSIGNED: <UserMinus size={18} className="text-pink-400 mt-0.5" />,
+    }
+    const icon = activityIcons[activity.activity_type]
+    const messageWrapper = (message) => (
+        <div className="flex items-start gap-3">
+            <span className="text-lg">
+                {icon}
+            </span>
+            <p className="text-gray-200 leading-relaxed">
+                {message}
+            </p>
+        </div>
+    )
 
     switch(activity.activity_type){
         case 'TASK_STATUS_CHANGED':
-            return (
+            return messageWrapper(
                 <>
                     <span className="font-semibold capitalize text-cyan-400">
                         {actor}
                     </span>{" "}
                     updated the status from{" "}
-                    <span className="text-yellow-400 capitalize">
-                        {metadata.old_status.replace("_"," ")}
+                    <span className="text-yellow-400 capitalize font-medium">
+                        {metadata.old_status?.replace("_"," ")}
                     </span>{" "}
                     to{" "}
-                    <span className="text-green-400 capitalize">
-                        {metadata.new_status.replace("_"," ")}
+                    <span className="text-green-400 capitalize font-medium">
+                        {metadata.new_status?.replace("_"," ")}
                     </span>
                 </>
             )
         case 'TASK_PRIORITY_CHANGED':
-            return (
+            return messageWrapper(
                 <>
                     <span className="font-semibold capitalize text-cyan-400">
                         {actor}
                     </span>{" "}
                     changed the priority from{" "}
-                    <span className="text-orange-400 capitalize">
+                    <span className="text-orange-400 capitalize font-medium">
                         {metadata.old_priority}
                     </span>{" "}
                     to{" "}
-                    <span className="text-red-400 capitalize">
+                    <span className="text-red-400 capitalize font-medium">
                         {metadata.new_priority}
                     </span>
                 </>
             )
         case 'TASK_TITLE_CHANGED':
-            return (
+            return messageWrapper(
                 <>
                     <span className="font-semibold capitalize text-cyan-400">
                         {actor}
                     </span>{" "}
                     changed the title from{" "}
-                    <span className="text-yellow-400 capitalize">
+                    <span className="text-yellow-400 capitalize font-medium">
                         {metadata.old_title}
                     </span>{" "}
                     to{" "}
-                    <span className="text-green-400 capitalize">
+                    <span className="text-green-400 capitalize font-medium">
                         {metadata.new_title}
                     </span>
                 </>
             )
         case 'TASK_DUE_DATE_CHANGED':
-            return (
+            return messageWrapper(
                 <>
                     <span className="font-semibold capitalize text-cyan-400">
                         {actor}
                     </span>{" "}
                     {metadata.old_due_date > metadata.new_due_date ? (
-                        <span className='font-semibold'>reduced</span>
+                        <span className='font-semibold text-orange-400'>
+                            reduced
+                        </span>
                     ) : (
-                        <span className='font-semibold'>extended</span>
-                    )
-                    }{" "}
-                    the date from{" "}
-                    <span className="text-yellow-400 capitalize">
-                        {metadata.old_due_date.split(" ")[0]}
+                        <span className='font-semibold text-green-400'>
+                            extended
+                        </span>
+                    )}{" "}
+                    the deadline from{" "}
+                    <span className="text-yellow-400 capitalize font-medium">
+                        {metadata.old_due_date?.split(" ")[0]}
                     </span>{" "}
                     to{" "}
-                    <span className="text-green-400 capitalize">
-                        {metadata.new_due_date.split(" ")[0]}
+                    <span className="text-green-400 capitalize font-medium">
+                        {metadata.new_due_date?.split(" ")[0]}
                     </span>
                 </>
             )
         case 'TASK_ASSIGNED':
-            return (
+            return messageWrapper(
                 <>
                     <span className="font-semibold capitalize text-cyan-400">
                         {actor}
                     </span>{" "}
                     assigned{" "}
-                    <span className="capitalize text-purple-400">
-                        {metadata.assigned_member.username}
+                    <span className="capitalize text-purple-400 font-medium">
+                        {metadata.assigned_member?.username}
                     </span>
+                    to this task
                 </>
             )
         case 'TASK_UNASSIGNED':
-            return (
+            return messageWrapper(
                 <>
                     <span className="capitalize font-semibold text-cyan-400">
                         {actor}
                     </span>{" "}
                     removed{" "}
-                    <span className="text-purple-400 capitalize">
-                        {metadata.unassigned_member.username}
+                    <span className="text-pink-400 capitalize font-medium">
+                        {metadata.unassigned_member?.username}
                     </span>
+                    from this task
                 </>
             )
         default:
             return (
-                <span className="text-gray-300">
-                    Unknown activity
-                </span>
+                <div className="flex items-center gap-3">
+                    <span className="text-gray-400">
+                        📍
+                    </span>
+                    <span className="text-gray-300">
+                        No Task Activity
+                    </span>
+                </div>
             )
     }
 }
@@ -118,21 +149,11 @@ const formatTime = (date) => {
 }
 function TaskActivity() {
     const { id, task_id } = useParams()
-    const [taskActivity, setTaskActivity] = useState([])
+    const { activities, fetchTaskActivities } = useContext(TaskActivityContext)
 
-    const fetchTaskActivity = async () => {
-        try{
-            const response = await api.get(`activity/teams/${id}/tasks/${task_id}/activities/`)
-            console.log('Task Activity', response.data)
-            setTaskActivity(response.data)
-        }
-        catch(err){
-            console.log(err?.response || err)
-        }
-    } 
     useEffect(() => {
-        fetchTaskActivity()
-    }, []) 
+        fetchTaskActivities(id, task_id)
+    }, [id, task_id]) 
 
     return (
         <div className="bg-[#071717] border border-green-500/20 rounded-3xl p-6 shadow-[0_0_40px_rgba(0,255,255,0.03)]">
@@ -144,13 +165,13 @@ function TaskActivity() {
             </div>
             <div className="relative max-h-[400px] overflow-y-auto pr-2 scrollbar-thin scrollbar-track-transparent scrollbar-thumb-teal-500/40 hover:scrollbar-thumb-teal-400/60">
                 <div className="relative">
-                    {taskActivity.length > 0 &&
+                    {activities.length > 0 &&
                         <div className="absolute left-[7px] top-0 bottom-0 w-[2px] bg-cyan-500/20"></div>
                     }
                     {/* Activities */}
                     <div className="space-y-8">
-                        {taskActivity.length > 0 ? (
-                            taskActivity.map((activity) => (
+                        {activities.length > 0 ? (
+                            activities.map((activity) => (
                                 <div
                                     key={activity.id}
                                     className="relative flex gap-4 group"

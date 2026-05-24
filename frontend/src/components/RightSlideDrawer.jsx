@@ -1,15 +1,17 @@
+import React, { useContext, useEffect, useState } from 'react'
 import { HeadphoneOff, Plus, X } from 'lucide-react'
-import React, { useEffect, useState } from 'react'
 import api from '../api/axios'
 import { useNavigate, useParams } from 'react-router-dom'
 import UserProfilePfp from './UserProfilePfp'
 import RemoveMemberFromTask from '../Modal/RemoveMemberFromTask'
 import AddMemberToTask from '../Modal/AddMemberToTask'
 import DeleteTask from '../Modal/DeleteTask'
+import { TaskActivityContext } from '../context/TaskActivityContext'
 
 function RightSlideDrawer({isSlideDrawerOpen, setIsSlideDrawerOpen, taskfetch}) {
     const navigate = useNavigate()
     const { id, task_id } = useParams()
+    const { fetchTaskActivities } = useContext(TaskActivityContext)
     const [isRemoveMemberOpen, setIsRemoveMemberOpen] = useState(false)
     const [isAddMemberOpen, setIsAddMemberOpen] = useState(false)
     const [isDeleteTaskOpen, setIsDeleteTaskOpen] = useState(false)
@@ -57,7 +59,7 @@ function RightSlideDrawer({isSlideDrawerOpen, setIsSlideDrawerOpen, taskfetch}) 
         fetchtask()
     }, [])
 
-    async function  updateTask(){
+    async function updateTask(){
         try{
             setIsSaving(true)
             await api.patch(
@@ -69,6 +71,7 @@ function RightSlideDrawer({isSlideDrawerOpen, setIsSlideDrawerOpen, taskfetch}) 
                     due_date: formData.due_date
                 }
             )
+            fetchTaskActivities(id, task_id)
         }
         catch(error){
             console.log(error?.response || error)

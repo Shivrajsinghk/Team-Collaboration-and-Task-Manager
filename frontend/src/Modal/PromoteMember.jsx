@@ -1,8 +1,9 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import Modal from './Modal'
 import api from '../api/axios'
 import { useParams } from 'react-router-dom'
 import UserProfilePfp from '../components/UserProfilePfp'
+import { TeamActivityContext } from '../context/TeamActivityContext'
 
 function PromoteMember({
     isPromoteAYSOpen,
@@ -14,7 +15,6 @@ function PromoteMember({
     setIsMemberOpen,
     fetchapi,
 }) {
-
     const {id} = useParams()
 
     const handlePromoteSubmit = async () => {
@@ -24,7 +24,6 @@ function PromoteMember({
             const response = await api.patch(
                 `api/teams/${id}/promote/${selectedMember.user__id}`
             )
-            console.log(response.data)
             setIsMemberOpen(false)
             setSelectedMember(null)
         }

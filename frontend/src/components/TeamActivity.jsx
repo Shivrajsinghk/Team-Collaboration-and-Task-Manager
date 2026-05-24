@@ -1,9 +1,10 @@
-import React, { useEffect, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import { Clock3, Circle } from 'lucide-react'
 import api from '../api/axios'
 import { useParams } from 'react-router-dom'
 import { formatDistanceToNow } from 'date-fns'
 import ActivityMessage from './ActivityMessage'
+import { TeamActivityContext } from '../context/TeamActivityContext'
 
 const formatTime = (date) => {
     return formatDistanceToNow(new Date(date), {
@@ -12,21 +13,11 @@ const formatTime = (date) => {
 }
 function TeamActivity() {
     const { id } = useParams()
-    const [teamActivity, setTeamActivity] = useState([])
+    const { activities, fetchTeamActivities } = useContext(TeamActivityContext)
 
-    const fetchTeamActivity = async () => {
-        try{
-            const response = await api.get(`activity/teams/${id}/activities/`)
-            console.log('Team Activity', response.data)
-            setTeamActivity(response.data)
-        }
-        catch(err){
-            console.log(err?.response || err)
-        }
-    } 
     useEffect(() => {
-        fetchTeamActivity()
-    }, []) 
+        fetchTeamActivities(id)
+    }, [id]) 
 
     return (
         <div className="bg-[#071717] border border-green-500/20 rounded-3xl p-6 shadow-[0_0_40px_rgba(0,255,255,0.03)]">
@@ -38,13 +29,13 @@ function TeamActivity() {
             </div>
             <div className="relative max-h-[400px] overflow-y-auto pr-2 scrollbar-thin scrollbar-track-transparent scrollbar-thumb-teal-500/40 hover:scrollbar-thumb-teal-400/60">
                 <div className="relative">
-                    {teamActivity.length > 0 &&
+                    {activities.length > 0 &&
                         <div className="absolute left-[7px] top-0 bottom-0 w-[2px] bg-cyan-500/20"></div>
                     }
                     {/* Activities */}
                     <div className="space-y-8">
-                        {teamActivity.length > 0 ? (
-                            teamActivity.map((activity) => (
+                        {activities.length > 0 ? (
+                            activities.map((activity) => (
                                 <div
                                     key={activity.id}
                                     className="relative flex gap-4 group"

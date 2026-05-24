@@ -1,8 +1,9 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import Modal from './Modal'
 import api from '../api/axios'
 import { useParams } from 'react-router-dom'
 import UserProfilePfp from '../components/UserProfilePfp'
+import { TeamActivityContext } from '../context/TeamActivityContext'
 
 function DemoteMember({
     isDemoteAYSOpen,
@@ -14,7 +15,6 @@ function DemoteMember({
     setIsMemberOpen,
     fetchapi,
 }) {
-
     const {id} = useParams()
 
     const handleDemoteSubmit = async () => {

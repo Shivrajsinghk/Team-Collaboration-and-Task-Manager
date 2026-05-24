@@ -1,10 +1,13 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import Modal from './Modal'
 import api from '../api/axios'
 import { useNavigate } from 'react-router-dom'
+import { TeamActivityContext } from '../context/TeamActivityContext'
 
 function CreateTeam({isCreateOpen, setIsCreateOpen, fetchapi, loading, setLoading, setIsAddTeamOpen}) {
 
+    const { fetchTeamActivities } = useContext(TeamActivityContext)
+    
     const handleCreateSubmit = async (e) => {
         e.preventDefault()
         if (loading) return; 
@@ -22,6 +25,7 @@ function CreateTeam({isCreateOpen, setIsCreateOpen, fetchapi, loading, setLoadin
         try{
             const response = await api.post('api/teams/create/', data)
             fetchapi()
+            fetchTeamActivities()
         }
         catch(error){
             console.log("ERROR", error.response || error);
