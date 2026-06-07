@@ -10,7 +10,7 @@ function TeamStats({team}) {
         <div className="mt-8 grid gap-6 md:grid-cols-3">
             <div className="group rounded-[2rem] border border-white/10 bg-white/[0.03] p-6 backdrop-blur-xl transition duration-300 hover:-translate-y-1 hover:border-teal-400/30">
                 <div className="flex items-center justify-between">
-                    <div>
+                    <div className="min-w-0">
                         <p className="text-sm text-[var(--color-cool-steel)]">
                             Total Members
                         </p>
@@ -25,7 +25,7 @@ function TeamStats({team}) {
             </div>
             <div className="rounded-[2rem] border border-white/10 bg-white/[0.03] p-6 backdrop-blur-xl transition duration-300 hover:-translate-y-1 hover:border-indigo-400/30">
                 <div className="flex items-center justify-between">
-                    <div>
+                    <div className="min-w-0">
                         <p className="text-sm text-[var(--color-cool-steel)]">
                             Total Tasks
                         </p>
@@ -42,13 +42,20 @@ function TeamStats({team}) {
             </div>
             <div className="rounded-[2rem] border border-white/10 bg-white/[0.03] p-6 backdrop-blur-xl transition duration-300 hover:-translate-y-1 hover:border-yellow-400/30">
                 <div className="flex items-center justify-between">
-                    <div>
+                    <div className="min-w-0">
                         <p className="text-sm text-[var(--color-cool-steel)]">
                             Team Admins
                         </p>
-                        <h2 className="mt-3 text-xl font-semibold text-white">
-                            {admin?.map((member) => member.user__username).join(', ')}
-                        </h2>
+                        <div className="mt-3 flex flex-wrap gap-2">
+                            {admin?.map((member) => (
+                                <span
+                                    key={member.id}
+                                    className="rounded-full capitalize bg-yellow-500/10 px-3 py-1 text-sm text-lime-500"
+                                >
+                                    {member.user__username}
+                                </span>
+                            ))}
+                        </div>
                     </div>
                     <div className="rounded-2xl bg-yellow-500/10 p-4 text-yellow-300">
                         <Crown size={28} />

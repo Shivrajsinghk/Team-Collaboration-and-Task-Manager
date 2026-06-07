@@ -1,7 +1,8 @@
 from rest_framework import serializers
 from django.contrib.auth.models import User
 from .models import UserProfile
-    
+from PIL import Image
+
 class UserProfileSerializer(serializers.ModelSerializer):
     first_name = serializers.CharField(source='user.first_name', required=True)
     last_name = serializers.CharField(source='user.last_name', required=False)
@@ -17,6 +18,20 @@ class UserProfileSerializer(serializers.ModelSerializer):
     def get_full_name(self, obj):
         name = f"{obj.user.first_name} {obj.user.last_name}".strip()
         return name if name else obj.user.username
+    
+    def validate_profile_picture(self, file):
+        max_size = 5 * 1024 * 1024
+        if file.size > max_size:
+            raise serializers.ValidationError(
+                "File too large"
+            )
+        try:
+            image = Image.open(file)
+            image.verify()
+        except Exception:
+            raise serializers.ValidationError("Invalid image")
+        file.seek(0)
+        return file
 
     class Meta:
         model = UserProfile
