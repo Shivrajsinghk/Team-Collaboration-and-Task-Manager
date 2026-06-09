@@ -6,6 +6,7 @@ import TeamDashboard from "../pages/TeamDashboard";
 import Teams from "../pages/Teams";
 import TeamSettings from "../pages/TeamSettings";
 import { taskRoutes } from "./TaskRoutes";
+import TeamChats from '../pages/TeamChats'
 
 export const teamRoutes = (
     <>
@@ -15,6 +16,7 @@ export const teamRoutes = (
             <Route path="members" element={<Members />} />
             <Route path="members/:member_id" element={<MemberProfile />} />
             <Route path="settings" element={<TeamSettings />} />
+            <Route path="chats" element={<TeamChats />} />
             {taskRoutes}
         </Route>
     </>

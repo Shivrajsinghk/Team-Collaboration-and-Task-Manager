@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import UserProfilePfp from './UserProfilePfp'
-import { LayoutDashboard, CheckSquare, Users } from "lucide-react"
+import { LayoutDashboard, CheckSquare, Users, MessageCircle } from "lucide-react"
 import { getUserProfile } from '../api/auth'
 
 function Sidebar() {
@@ -55,6 +55,15 @@ function Sidebar() {
                             >
                                 <Users size={18} />
                                 Members
+                            </button>
+                        </li>
+                        <li>
+                            <button
+                                onClick={() => navigate(`/team/${team_id}/chats`)}
+                                className={sidebarBtn}
+                            >
+                                <MessageCircle size={18} />
+                                Chats
                             </button>
                         </li>
                     </ul>

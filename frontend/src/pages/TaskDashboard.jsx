@@ -1,15 +1,16 @@
 import React, { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
+import { getTask } from '../api/tasks'
+import { listMembers } from '../api/teams'
+import axios from 'axios'
+import api from '../api/axios'
+import Loading from '../components/Loading'
 import UserProfilePfp from '../components/UserProfilePfp'
 import TeamMembers from '../components/TeamMembers'
-import { Crown, ListTodo, MessagesSquare, SquareCheckBig, Users, CircleDot, LoaderCircle, BadgeCheck, Flame, Minus, ArrowDown, AlertTriangle, ChevronDown, Settings, X } from 'lucide-react'
 import PreviousPageButton from '../components/PreviousPageButton'
 import RightSlideDrawer from '../components/RightSlideDrawer'
 import TaskActivity from '../components/TaskActivity'
-import { getTask } from '../api/tasks'
-import axios from 'axios'
-import api from '../api/axios'
-import { listMembers } from '../api/teams'
+import { Crown, ListTodo, MessagesSquare, SquareCheckBig, Users, CircleDot, LoaderCircle, BadgeCheck, Flame, Minus, ArrowDown, AlertTriangle, ChevronDown, Settings, X } from 'lucide-react'
 
 function getStatusIcon(status) {
     switch(status) {
@@ -81,7 +82,6 @@ function TaskDashboard() {
 
     async function fetchMembers() {
         try {
-            // await api.get(`teams/${team_id}/members`)
             await listMembers(team_id)
         } 
         catch (err) {
@@ -99,9 +99,7 @@ function TaskDashboard() {
 
     if (loading) {
         return (
-            <div className="flex h-full items-center justify-center text-zinc-400">
-                Loading task...
-            </div>
+            <Loading />
         )
     }
 

@@ -3,7 +3,6 @@ from django.db import models
 from tasks.models import Task
 from teams.models import Team, TeamMembership
 
-
 class UserProfile(models.Model):
     STATUS_CHOICES = [
         ("active", "Active"),

@@ -43,9 +43,9 @@ function TeamActivity() {
                                         <div className="w-4 h-4 rounded-full bg-green-400 border-4 border-[#071717]"></div>
                                     </div>
                                     <div className="flex-1 bg-white/[0.03] border border-white/5 rounded-2xl p-4 transition-all duration-300 hover:bg-white/[0.05] hover:border-cyan-500/20">
-                                        <p className="text-[15px] text-gray-200 leading-relaxed">
+                                        <div className="text-[15px] text-gray-200 leading-relaxed">
                                             <ActivityMessage activity={activity} />
-                                        </p>
+                                        </div>
                                         <div className="flex items-center gap-2 mt-3">
                                             <Clock3 size={14} className="text-gray-500" />
                                             <p className="text-xs text-gray-500">

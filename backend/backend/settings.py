@@ -34,6 +34,7 @@ INTERNAL_IPS = [
 # Application definition
 
 INSTALLED_APPS = [
+    'daphne',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -48,6 +49,8 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt',
     'activity',
     "debug_toolbar",
+    'channels',
+    'sockets',
 ]   
 
 MIDDLEWARE = [
@@ -79,7 +82,8 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'backend.wsgi.application'
+# WSGI_APPLICATION = 'backend.wsgi.application'
+ASGI_APPLICATION = 'backend.asgi.application'
 
 
 # Database
@@ -161,3 +165,18 @@ SIMPLE_JWT = {
     'AUTH_HEADER_TYPES': ('Bearer',),
 }
 
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [
+                {
+                    "host": "127.0.0.1",
+                    "port": 6379,
+                    # redis-py 8 defaults socket_timeout to 5s, which clashes with channels' blocking receive loop and causes false timeout errors.
+                    "socket_timeout": None,
+                }
+            ],
+        },
+    },
+}

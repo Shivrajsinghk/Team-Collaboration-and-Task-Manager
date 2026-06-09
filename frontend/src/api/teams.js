@@ -47,3 +47,15 @@ export function listMembers(teamId) {
 export function getMemberDetails(teamId, memberId) {
     return api.get(`teams/${teamId}/members/${memberId}`);
 }
+
+export function teamChats(teamId) {
+    return api.get(`sockets/${teamId}/chats/`);
+}
+
+export function uploadTeamChatAttachment(teamId, data) {
+    return api.post(`sockets/${teamId}/chats/upload/`, data, {
+        headers: {
+            'Content-Type': 'multipart/form-data',
+        },
+    });
+}

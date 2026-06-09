@@ -14,6 +14,7 @@ function MemberProfile() {
             try {
                 const response = await getMemberDetails(team_id, member_id)
                 setMember(response.data)
+                console.log(response.data)
             }
             catch (err) {
                 console.log(err?.response || err)
@@ -57,7 +58,7 @@ function MemberProfile() {
                                 shadow-[0_0_40px_rgba(0,255,255,0.12)]">
                                     {member.profile.profile_picture ? (
                                         <img
-                                            src={`http://127.0.0.1:8000/${member.profile.profile_picture}`}
+                                            src={`http://127.0.0.1:8000${member.profile.profile_picture}`}
                                             alt={member.profile.full_name}
                                             className="h-full w-full object-cover hover:scale-110 transition-all"
                                         />
