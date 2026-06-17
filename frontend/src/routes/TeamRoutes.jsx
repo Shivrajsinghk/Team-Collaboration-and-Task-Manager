@@ -5,10 +5,10 @@ import Team from "../pages/Team";
 import TeamDashboard from "../pages/TeamDashboard";
 import Teams from "../pages/Teams";
 import TeamSettings from "../pages/TeamSettings";
-import { taskRoutes } from "./TaskRoutes";
+import { TaskRoutes } from "./TaskRoutes";
 import TeamChats from '../pages/TeamChats'
 
-export const teamRoutes = (
+export const TeamRoutes = () => (
     <>
         <Route path="/teams" element={<Teams />} />
         <Route path="/team/:team_id" element={<Team />}>
@@ -17,7 +17,7 @@ export const teamRoutes = (
             <Route path="members/:member_id" element={<MemberProfile />} />
             <Route path="settings" element={<TeamSettings />} />
             <Route path="chats" element={<TeamChats />} />
-            {taskRoutes}
+            {TaskRoutes()}
         </Route>
     </>
 );

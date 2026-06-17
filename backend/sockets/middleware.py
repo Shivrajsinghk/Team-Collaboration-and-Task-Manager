@@ -11,28 +11,21 @@ class JWTAuthMiddleware:
 
     async def __call__(self, scope, receive, send):
         query_string = scope["query_string"].decode()
-
         params = parse_qs(query_string)
-
         token = params.get("token")
-
         if token:
             token = token[0]
-
             try:
                 payload = decode(
                     token,
                     settings.SECRET_KEY,
                     algorithms=["HS256"]
                 )
-
                 user = await User.objects.aget(
                     id=payload["user_id"]
                 )
-
                 scope["user"] = user
-
             except Exception:
-                pass
-
+                raise Exception
         return await self.inner(scope, receive, send)
+    

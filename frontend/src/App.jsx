@@ -8,8 +8,10 @@ import { Route, Routes } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import { loginSuccess, logout, setAuthResolved } from './Features/authslice'
 import { getUserProfile, refreshToken } from './api/auth'
-import { publicRoutes } from './routes/PublicRoutes'
-import { teamRoutes } from './routes/TeamRoutes'
+import { PublicRoutes } from './routes/PublicRoutes'
+import { TeamRoutes } from './routes/TeamRoutes'
+import { ChatRoutes } from './routes/ChatRoutes'
+import { ProfileRoutes } from './routes/ProfileRoutes'
 
 function App() {
 	const dispatch = useDispatch()
@@ -49,12 +51,14 @@ function App() {
 		<div>
 			{isAuthenticated && <Navbar />}
 			<Routes>
-				{publicRoutes}
+				{ChatRoutes()}
+				{PublicRoutes()}
 				<Route element={<ProtectedRoute />}>
 					<Route path='/dashboard' element={<Dashboard />} />
 					<Route path='/profile' element={<Profile />} />
 					<Route path='/edit-profile' element={<EditProfile />} />
-					{teamRoutes}
+					{ProfileRoutes()}
+					{TeamRoutes()}
 				</Route>
 			</Routes>
 		</div>

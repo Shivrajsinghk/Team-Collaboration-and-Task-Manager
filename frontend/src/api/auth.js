@@ -19,3 +19,11 @@ export function getUserProfile() {
 export function updateUserProfile(data) {
     return api.patch("api/user_profile/update/", data);
 }
+
+export function getPublicUserProfile(username) {
+    return api.get(`api/profile/${username}/`);
+}
+
+export function search(query) {
+    return api.get(`api/search/?query=${query}`);
+}

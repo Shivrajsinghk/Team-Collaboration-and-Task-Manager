@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/set-state-in-effect, react-hooks/exhaustive-deps */
 import React, { useContext, useEffect, useState } from 'react'
 import { Plus, X } from 'lucide-react'
 import { useParams } from 'react-router-dom'

@@ -1,11 +1,13 @@
-import React from 'react'
+import React, { useState } from 'react'
 import Logo from './Logo'
 import Searchbar from './Searchbar'
 import UserProfilePfp from './UserProfilePfp'
 import { Link } from 'react-router-dom'
-import { Bell, Settings } from 'lucide-react'
+import { Bell, Settings, MessageCircle } from 'lucide-react'
+import ChatDropdown from './ChatDropDown'
 
 function Navbar() {
+    const [open, setOpen] = useState(false)
     return (
         <nav className="sticky top-0 z-50 border-b border-white/10 bg-[#020404]/70 backdrop-blur-2xl">
             <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(34,211,238,0.03),transparent,rgba(99,102,241,0.03))]" />
@@ -18,19 +20,21 @@ function Navbar() {
                         <Logo />
                     </Link>
                 </div>
-                <div className="hidden w-full max-w-xl px-8 lg:block">
+                <div className="hidden w-full max-w-xl lg:block">
                     <Searchbar />
                 </div>
                 <div className="flex items-center gap-3">
                     <button
+                        onClick={() => setOpen(!open)}
                         className="flex h-11 w-11 items-center justify-center rounded-2xl border border-white/10 bg-white/[0.03] text-gray-300 transition duration-300 hover:bg-white/[0.06] hover:text-white"
                     >
-                        <Bell size={18} />
+                        <MessageCircle size={18} />
                     </button>
+                    {open && <ChatDropdown open={open} setOpen={setOpen} />}
                     <button
                         className="flex h-11 w-11 items-center justify-center rounded-2xl border border-white/10 bg-white/[0.03] text-gray-300 transition duration-300 hover:bg-white/[0.06] hover:text-white"
                     >
-                        <Settings size={18} />
+                        <Bell size={18} />
                     </button>
                     <Link
                         to="/profile"

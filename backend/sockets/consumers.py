@@ -2,8 +2,8 @@ from channels.generic.websocket import AsyncWebsocketConsumer
 from channels.exceptions import StopConsumer
 from channels.db import database_sync_to_async
 import json
-from .models import Chats
-from .serializer import ChatsSerializer
+from .models import Chats, PersonalConversation, PersonalMessage
+from .serializer import ChatsSerializer, PersonalMessageSerializer
 from teams.models import TeamMembership
 
 class TeamChatsConsumer(AsyncWebsocketConsumer):
@@ -15,7 +15,6 @@ class TeamChatsConsumer(AsyncWebsocketConsumer):
         if not is_member:
             await self.close()
             return 
-        
         await self.channel_layer.group_add(self.group_name, self.channel_name)
         await self.accept()
 
@@ -47,15 +46,69 @@ class TeamChatsConsumer(AsyncWebsocketConsumer):
             team_id=self.team_id,
             message=message
         )
-        return ChatsSerializer(chat).data
+        return ChatsSerializer(chat).data   
+        # We return ChatsSerializer(chat).data because WebSockets, Redis channel layers, and APIs need plain serializable data (dict/JSON). A Django model instance (chat) cannot be safely transmitted directly. 
     
     @database_sync_to_async
     def is_team_member(self):
         user = self.scope['user']
-        print(user)
-        print(type(user))
-        print(user.id) 
         return TeamMembership.objects.filter(
             user_id=user.id,
             team_id=self.team_id
+        ).exists()
+
+class PersonalChatsConsumer(AsyncWebsocketConsumer):
+    async def connect(self):
+        print("Connected")
+        user = self.scope['user']
+        if not user.is_authenticated:
+            await self.close()
+            return 
+        self.conversation_id = self.scope['url_route']['kwargs']['conversation_id']
+        is_participant = await self.is_participant()
+        if not is_participant:
+            await self.close()
+            return
+        self.group_name = f'conversation_{self.conversation_id}'
+        await self.channel_layer.group_add(self.group_name, self.channel_name)
+        await self.accept()
+
+    async def receive(self, text_data=None, bytes_data=None):
+        data = json.loads(text_data)
+        message = data['message']
+        chat = await self.save_chat(message)
+        await self.channel_layer.group_send(
+            self.group_name,
+            {
+                'type': 'chat_message',
+                'chat': chat
+            }
+        )
+        print("Message received from Client to Server")
+    
+    async def chat_message(self, event):
+        await self.send(text_data=json.dumps(event['chat']))
+
+    async def disconnect(self, close_code):
+        print('Disconnected')
+        await self.channel_layer.group_discard(self.group_name, self.channel_name)
+        raise StopConsumer()
+
+    @database_sync_to_async
+    def save_chat(self, message):
+        user = self.scope['user']
+        conversation = PersonalConversation.objects.get(id=self.conversation_id)
+        chat = PersonalMessage.objects.create(
+            sender=user,
+            message=message,
+            personal_conversation=conversation
+        )
+        return PersonalMessageSerializer(chat).data
+    
+    @database_sync_to_async
+    def is_participant(self):
+        user = self.scope["user"]
+        return PersonalConversation.objects.filter(
+            id=self.conversation_id,
+            participant=user
         ).exists()

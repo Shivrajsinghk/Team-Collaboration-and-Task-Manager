@@ -3,8 +3,11 @@ import Loading from '../components/Loading'
 import { useNavigate } from 'react-router-dom'
 import { useDispatch } from 'react-redux'
 import { setUser as setAuthUser } from '../Features/authslice'
-import { ArrowLeft, Camera, Mail, User, BadgeInfo, PencilLine, ImagePlus, Trash2, Save, X } from "lucide-react"
-import PreviousPageButton from '../components/PreviousPageButton'
+import {
+    Camera, Mail, User, BadgeInfo, PencilLine,
+    ImagePlus, Trash2, Save, X, MapPin, GitBranch,
+    Link, Briefcase, Code2, ArrowLeft
+} from "lucide-react"
 import { getUserProfile, updateUserProfile } from '../api/auth'
 
 const BASE_URL = import.meta.env.VITE_DJANGO_BASE_URL
@@ -30,20 +33,22 @@ function EditProfile() {
         email: "",
         first_name: "",
         last_name: "",
-        full_name: "",
         bio: "",
-        status: "active"
+        status: "active",
+        job_title: "",
+        location: "",
+        github_url: "",
+        linkedin_url: "",
+        skills: "",
     })
 
     useEffect(() => {
         return () => {
-            if (previewUrl) {
-                URL.revokeObjectURL(previewUrl)
-            }
+            if (previewUrl) URL.revokeObjectURL(previewUrl)
         }
     }, [previewUrl])
 
-    const handleSubmit = (async (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault()
         setSubmitting(true)
         setErrorMessage('')
@@ -53,142 +58,126 @@ function EditProfile() {
             formDataToSend.append("last_name", formData.last_name)
             formDataToSend.append("bio", formData.bio)
             formDataToSend.append("status", formData.status)
+            formDataToSend.append("job_title", formData.job_title)
+            formDataToSend.append("location", formData.location)
+            formDataToSend.append("github_url", formData.github_url)
+            formDataToSend.append("linkedin_url", formData.linkedin_url)
+            formDataToSend.append("skills", formData.skills)
             formDataToSend.append("remove_profile_picture", String(removeProfilePicture))
-            if (selectedFile) {
-                formDataToSend.append("profile_picture", selectedFile)
-            }
+            if (selectedFile) formDataToSend.append("profile_picture", selectedFile)
             const response = await updateUserProfile(formDataToSend)
             setLocalUser(response.data)
             dispatch(setAuthUser(response.data))
             navigate("/profile")
-        }
-        catch (error) {
-            console.log(error)
+        } catch (error) {
             console.log(error.response?.data)
-            setErrorMessage("We couldn't save your profile right now. Please try again.")
-        }
-        finally {
+            setErrorMessage("Couldn't save your profile. Please try again.")
+        } finally {
             setSubmitting(false)
         }
-    })
+    }
 
-    const handleChange = ((e) => {
-        setFormData((prev) => ({
-            ...prev,
-            [e.target.name] : e.target.value
-        }))
-    })
+    const handleChange = (e) => {
+        setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }))
+    }
 
     const handleFileChange = (e) => {
         const file = e.target.files?.[0] || null
         setSelectedFile(file)
         setRemoveProfilePicture(false)
-        if (previewUrl) {
-            URL.revokeObjectURL(previewUrl)
-        }
-        if (file) {
-            setPreviewUrl(URL.createObjectURL(file))
-        } else {
-            setPreviewUrl('')
-        }
+        if (previewUrl) URL.revokeObjectURL(previewUrl)
+        setPreviewUrl(file ? URL.createObjectURL(file) : '')
     }
 
     const handleRemoveProfilePicture = () => {
         setSelectedFile(null)
         setRemoveProfilePicture(true)
-        if (previewUrl) {
-            URL.revokeObjectURL(previewUrl)
-        }
+        if (previewUrl) URL.revokeObjectURL(previewUrl)
         setPreviewUrl('')
         setLocalUser((prev) => prev ? { ...prev, profile_picture: null } : prev)
     }
 
     useEffect(() => {
-        const fetchprofile = async () => {
+        const fetchProfile = async () => {
             try {
                 const response = await getUserProfile()
+                const d = response.data
                 setFormData({
-                    username: response.data.username || "",
-                    email: response.data.email || "",
-                    first_name: response.data.first_name || "",
-                    last_name: response.data.last_name || "",
-                    full_name: `${response.data.first_name || ""} ${response.data.last_name || ""}`.trim(),
-                    bio: response.data.bio || "",
-                    status: response.data.status || "active"
+                    username: d.username || "",
+                    email: d.email || "",
+                    first_name: d.first_name || "",
+                    last_name: d.last_name || "",
+                    bio: d.bio || "",
+                    status: d.status || "active",
+                    job_title: d.job_title || "",
+                    location: d.location || "",
+                    github_url: d.github_url || "",
+                    linkedin_url: d.linkedin_url || "",
+                    skills: d.skills || "",
                 })
-                setLocalUser(response.data)
-            } 
-            catch (error) {
+                setLocalUser(d)
+            } catch (error) {
                 console.log(error)
-            }
-            finally {
+            } finally {
                 setLoading(false)
             }
         }
-        fetchprofile()
+        fetchProfile()
     }, [])
 
     if (loading) return <Loading />
 
     const currentPreview = removeProfilePicture ? '' : (previewUrl || getMediaUrl(BASE_URL, user?.profile_picture))
-    const displayName = formData.full_name || formData.username || "User"
+    const displayName = `${formData.first_name} ${formData.last_name}`.trim() || formData.username || "User"
 
     return (
-        <main className="min-h-[calc(100vh-4rem)] bg-[radial-gradient(circle_at_top,#163532_0%,#071714_40%,#020404_100%)] px-4 py-8 sm:px-6 lg:px-8">
-            <div className="mx-auto max-w-6xl">
-                <div className="mb-8 flex items-center justify-between">
+        <div className="min-h-screen bg-black p-4 md:p-8">
+            <div className="mx-auto max-w-5xl space-y-5">
+                <div className="flex items-center justify-between">
                     <div>
-                        <p className="text-xs uppercase tracking-[0.35em] text-[var(--color-cool-steel)]">
-                            Profile Settings
-                        </p>
-                        <h1 className="mt-3 text-4xl font-bold text-[var(--color-mint-cream)]">
-                            Edit Profile
-                        </h1>
-                        <p className="mt-3 max-w-2xl text-sm text-[var(--color-cool-steel)]">
-                            Manage your personal information and customize your profile.
-                        </p>
+                        <p className="text-[11px] uppercase tracking-widest text-zinc-600">Profile Settings</p>
+                        <h1 className="mt-1 text-2xl font-semibold text-white">Edit Profile</h1>
                     </div>
-                    <PreviousPageButton />
+                    <button
+                        type="button"
+                        onClick={() => navigate('/profile')}
+                        className="flex items-center gap-2 rounded-xl border border-white/[0.06] bg-zinc-950 px-4 py-2 text-xs text-zinc-400 hover:text-zinc-200 transition-colors"
+                    >
+                        <ArrowLeft size={13} />
+                        Back
+                    </button>
                 </div>
-                <form
-                    onSubmit={handleSubmit}
-                    className="grid gap-6 lg:grid-cols-[0.9fr_1.4fr]"
-                >
-                    <section className="rounded-[2rem] border border-white/10 bg-white/[0.03] p-6 shadow-[0_24px_70px_rgba(0,0,0,0.28)] backdrop-blur-xl">
-                        <div className="flex flex-col items-center text-center">
+                <form onSubmit={handleSubmit} className="grid gap-5 lg:grid-cols-[280px_1fr]">
+                    <div className="space-y-4">
+                        <div className="rounded-2xl border border-white/[0.06] bg-zinc-950 p-6 flex flex-col items-center text-center">
                             {currentPreview ? (
                                 <img
                                     src={currentPreview}
                                     alt={displayName}
-                                    className="h-36 w-36 rounded-[2rem] border border-white/10 object-cover shadow-2xl transition duration-300 hover:scale-105"
+                                    className="h-24 w-24 rounded-2xl border-2 border-zinc-900 object-cover shadow-xl"
                                 />
                             ) : (
-                                <div className="flex h-36 w-36 items-center justify-center rounded-[2rem] bg-gradient-to-br from-teal-400 to-indigo-500 text-5xl font-bold text-white shadow-2xl">
+                                <div className="h-24 w-24 rounded-2xl border-2 border-zinc-900 bg-gradient-to-br from-teal-600 to-emerald-800 flex items-center justify-center text-3xl font-semibold text-white shadow-xl">
                                     {displayName.slice(0, 1).toUpperCase()}
                                 </div>
                             )}
-                            <h2 className="mt-5 text-3xl font-bold text-white">
-                                {displayName}
-                            </h2>
-                            <p className="mt-2 rounded-full border border-white/10 bg-white/5 px-4 py-1 text-xs uppercase tracking-[0.25em] text-teal-300">
+                            <h2 className="mt-4 text-base font-semibold capitalize text-white">{displayName}</h2>
+                            <p className="text-xs text-zinc-500 mt-0.5">@{formData.username}</p>
+                            <span className="mt-2 rounded-full border border-emerald-500/20 bg-emerald-500/10 px-3 py-0.5 text-[10px] uppercase tracking-wider text-emerald-400">
                                 {formData.status}
-                            </p>
+                            </span>
                         </div>
-                        <div className="mt-8">
-                            <label className="mb-2 flex items-center gap-2 text-sm font-medium text-white">
-                                <Camera size={16} />
-                                Profile Picture
-                            </label>
-                            <label className="mt-3 flex cursor-pointer flex-col items-center justify-center rounded-[1.5rem] border border-dashed border-white/10 bg-white/[0.03] px-4 py-8 text-center transition hover:border-teal-400 hover:bg-white/[0.05]">
-                                <div className="mb-4 rounded-2xl bg-white/5 p-4">
-                                    <ImagePlus className="text-teal-300" size={28} />
-                                </div>
-                                <span className="text-sm font-semibold text-white">
-                                    {selectedFile ? selectedFile.name : "Upload Profile Picture"}
+                        <div className="rounded-2xl border border-white/[0.06] bg-zinc-950 p-5">
+                            <div className="mb-3 flex items-center gap-2">
+                                <Camera size={14} className="text-zinc-600" />
+                                <p className="text-[12px] uppercase tracking-wider text-zinc-600">Profile Picture</p>
+                            </div>
+                            <label className="flex cursor-pointer flex-col items-center justify-center rounded-xl border border-dashed border-white/[0.06] bg-white/[0.02] px-4 py-6 text-center hover:border-teal-500/30 hover:bg-white/[0.03] transition-all">
+                                <ImagePlus size={22} className="text-zinc-600 mb-2" />
+                                <span className="text-xs font-medium text-zinc-400">
+                                    {selectedFile ? selectedFile.name : "Click to upload"}
                                 </span>
-                                <span className="mt-2 text-xs text-gray-400">
-                                    PNG, JPG, JPEG or WEBP
-                                </span>
+                                <span className="mt-1 text-[11px] text-zinc-700">PNG, JPG, WEBP</span>
                                 <input
                                     type="file"
                                     accept="image/png,image/jpeg,image/jpg,image/webp"
@@ -200,120 +189,197 @@ function EditProfile() {
                                 <button
                                     type="button"
                                     onClick={handleRemoveProfilePicture}
-                                    className="mt-3 flex w-full items-center justify-center gap-2 rounded-xl border border-red-400/20 bg-red-500/10 px-4 py-3 text-sm font-semibold text-red-100 transition hover:bg-red-500/20"
+                                    className="mt-2 flex w-full items-center justify-center gap-2 rounded-xl border border-red-500/20 bg-red-500/[0.07] px-4 py-2.5 text-xs text-red-400 hover:bg-red-500/10 transition-colors"
                                 >
-                                    <Trash2 size={16} />
+                                    <Trash2 size={13} />
                                     Remove Picture
                                 </button>
                             )}
                         </div>
-                        <div className="mt-8 grid gap-4">
-                            <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
-                                <div className="flex items-center gap-2 text-teal-300">
-                                    <User size={16} />
-                                    <p className="text-xs uppercase tracking-[0.2em]">
-                                        Username
-                                    </p>
+                        <div className="rounded-2xl border border-white/[0.06] bg-zinc-950 p-5 space-y-3">
+                            <div className="flex items-center justify-between text-[12px]">
+                                <div className="flex items-center gap-1.5 text-zinc-600">
+                                    <User size={12} />
+                                    Username
                                 </div>
-                                <p className="mt-3 text-sm text-white">
-                                    @{formData.username}
-                                </p>
+                                <span className="text-zinc-400">@{formData.username}</span>
                             </div>
-                            <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
-                                <div className="flex items-center gap-2 text-indigo-300">
-                                    <Mail size={16} />
-                                    <p className="text-xs uppercase tracking-[0.2em]">
-                                        Email
-                                    </p>
+                            <div className="border-t border-white/[0.04]" />
+                            <div className="flex items-center justify-between text-[12px]">
+                                <div className="flex items-center gap-1.5 text-zinc-600">
+                                    <Mail size={12} />
+                                    Email
                                 </div>
-                                <p className="mt-3 break-all text-sm text-white">
-                                    {formData.email}
-                                </p>
+                                <span className="text-zinc-400 truncate max-w-[160px]">{formData.email}</span>
                             </div>
                         </div>
-                    </section>
-                    <section className="rounded-[2rem] border border-white/10 bg-[#071714]/80 p-6 shadow-[0_24px_70px_rgba(0,0,0,0.28)] backdrop-blur-xl sm:p-8">
-                        <div className="grid gap-5 sm:grid-cols-2">
-                            <div>
-                                <label className="mb-2 flex items-center gap-2 text-sm font-medium text-white">
-                                    <User size={16} />
-                                    First Name
-                                </label>
-                                <input
-                                    type="text"
-                                    name="first_name"
-                                    value={formData.first_name}
-                                    onChange={handleChange}
-                                    className="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white placeholder:text-gray-400 focus:border-teal-400 focus:outline-none"
-                                />
+                    </div>
+                    <div className="space-y-4">
+                        <div className="rounded-2xl border border-white/[0.06] bg-zinc-950 p-6">
+                            <h3 className="text-[12px] uppercase tracking-wider text-zinc-600 mb-5">Basic Info</h3>
+                            <div className="grid gap-4 sm:grid-cols-2">
+                                <div>
+                                    <label className="mb-2 flex items-center gap-1.5 text-[12px] text-zinc-500">
+                                        <User size={12} /> First Name
+                                    </label>
+                                    <input
+                                        type="text"
+                                        name="first_name"
+                                        value={formData.first_name}
+                                        onChange={handleChange}
+                                        className="w-full rounded-xl border border-white/[0.06] bg-white/[0.03] px-4 py-2.5 text-sm text-white placeholder:text-zinc-700 focus:border-teal-500/40 focus:outline-none transition-colors"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="mb-2 flex items-center gap-1.5 text-[12px] text-zinc-500">
+                                        <User size={12} /> Last Name
+                                    </label>
+                                    <input
+                                        type="text"
+                                        name="last_name"
+                                        value={formData.last_name}
+                                        onChange={handleChange}
+                                        className="w-full rounded-xl border border-white/[0.06] bg-white/[0.03] px-4 py-2.5 text-sm text-white placeholder:text-zinc-700 focus:border-teal-500/40 focus:outline-none transition-colors"
+                                    />
+                                </div>
+                                <div className="sm:col-span-2">
+                                    <label className="mb-2 flex items-center gap-1.5 text-[12px] text-zinc-500">
+                                        <PencilLine size={12} /> Full Name
+                                    </label>
+                                    <input
+                                        type="text"
+                                        disabled
+                                        value={`${formData.first_name} ${formData.last_name}`.trim()}
+                                        className="w-full cursor-not-allowed rounded-xl border border-white/[0.04] bg-white/[0.01] px-4 py-2.5 text-sm text-zinc-600 focus:outline-none"
+                                    />
+                                </div>
+                                <div className="sm:col-span-2">
+                                    <label className="mb-2 flex items-center gap-1.5 text-[12px] text-zinc-500">
+                                        <BadgeInfo size={12} /> Bio
+                                    </label>
+                                    <textarea
+                                        name="bio"
+                                        rows="4"
+                                        value={formData.bio}
+                                        onChange={handleChange}
+                                        placeholder="Tell your team a bit about yourself..."
+                                        className="w-full rounded-xl border border-white/[0.06] bg-white/[0.03] px-4 py-2.5 text-sm text-white placeholder:text-zinc-700 focus:border-teal-500/40 focus:outline-none transition-colors resize-none"
+                                    />
+                                </div>
                             </div>
-                            <div>
-                                <label className="mb-2 flex items-center gap-2 text-sm font-medium text-white">
-                                    <User size={16} />
-                                    Last Name
-                                </label>
-                                <input
-                                    type="text"
-                                    name="last_name"
-                                    value={formData.last_name}
-                                    onChange={handleChange}
-                                    className="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white placeholder:text-gray-400 focus:border-teal-400 focus:outline-none"
-                                />
+                        </div>
+                        <div className="rounded-2xl border border-white/[0.06] bg-zinc-950 p-6">
+                            <h3 className="text-[12px] uppercase tracking-wider text-zinc-600 mb-5">Professional</h3>
+                            <div className="grid gap-4 sm:grid-cols-2">
+                                <div>
+                                    <label className="mb-2 flex items-center gap-1.5 text-[12px] text-zinc-500">
+                                        <Briefcase size={12} /> Job Title
+                                    </label>
+                                    <input
+                                        type="text"
+                                        name="job_title"
+                                        value={formData.job_title}
+                                        onChange={handleChange}
+                                        placeholder="e.g. Backend Developer"
+                                        className="w-full rounded-xl border border-white/[0.06] bg-white/[0.03] px-4 py-2.5 text-sm text-white placeholder:text-zinc-700 focus:border-teal-500/40 focus:outline-none transition-colors"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="mb-2 flex items-center gap-1.5 text-[12px] text-zinc-500">
+                                        <MapPin size={12} /> Location
+                                    </label>
+                                    <input
+                                        type="text"
+                                        name="location"
+                                        value={formData.location}
+                                        onChange={handleChange}
+                                        placeholder="e.g. Indore, India"
+                                        className="w-full rounded-xl border border-white/[0.06] bg-white/[0.03] px-4 py-2.5 text-sm text-white placeholder:text-zinc-700 focus:border-teal-500/40 focus:outline-none transition-colors"
+                                    />
+                                </div>
+                                <div className="sm:col-span-2">
+                                    <label className="mb-2 flex items-center gap-1.5 text-[12px] text-zinc-500">
+                                        <Code2 size={12} /> Skills
+                                        <span className="text-zinc-700">(comma separated)</span>
+                                    </label>
+                                    <input
+                                        type="text"
+                                        name="skills"
+                                        value={formData.skills}
+                                        onChange={handleChange}
+                                        placeholder="Python, Django, React, JavaScript..."
+                                        className="w-full rounded-xl border border-white/[0.06] bg-white/[0.03] px-4 py-2.5 text-sm text-white placeholder:text-zinc-700 focus:border-teal-500/40 focus:outline-none transition-colors"
+                                    />
+                                    {formData.skills && (
+                                        <div className="mt-2 flex flex-wrap gap-1.5">
+                                            {formData.skills.split(',').map(s => s.trim()).filter(Boolean).map((skill) => (
+                                                <span key={skill} className="rounded-lg border border-white/[0.06] bg-white/[0.03] px-2.5 py-0.5 text-[11px] text-zinc-400">
+                                                    {skill}
+                                                </span>
+                                            ))}
+                                        </div>
+                                    )}
+                                </div>
                             </div>
-                            <div className="sm:col-span-2">
-                                <label className="mb-2 flex items-center gap-2 text-sm font-medium text-white">
-                                    <PencilLine size={16} />
-                                    Full Name
-                                </label>
-                                <input
-                                    type="text"
-                                    disabled
-                                    value={`${formData.first_name} ${formData.last_name}`.trim()}
-                                    className="w-full cursor-not-allowed rounded-2xl border border-white/10 bg-black/20 px-4 py-3 text-sm text-gray-400 focus:outline-none"
-                                />
-                            </div>
-                            <div className="sm:col-span-2">
-                                <label className="mb-2 flex items-center gap-2 text-sm font-medium text-white">
-                                    <BadgeInfo size={16} />
-                                    Bio
-                                </label>
-                                <textarea
-                                    name="bio"
-                                    rows="5"
-                                    value={formData.bio}
-                                    onChange={handleChange}
-                                    placeholder="Tell your team a bit about yourself..."
-                                    className="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white placeholder:text-gray-400 focus:border-teal-400 focus:outline-none"
-                                />
+                        </div>
+                        <div className="rounded-2xl border border-white/[0.06] bg-zinc-950 p-6">
+                            <h3 className="text-[12px] uppercase tracking-wider text-zinc-600 mb-5">Links</h3>
+                            <div className="grid gap-4 sm:grid-cols-2">
+                                <div>
+                                    <label className="mb-2 flex items-center gap-1.5 text-[12px] text-zinc-500">
+                                        <GitBranch size={12} /> GitHub URL
+                                    </label>
+                                    <input
+                                        type="url"
+                                        name="github_url"
+                                        value={formData.github_url}
+                                        onChange={handleChange}
+                                        placeholder="https://github.com/username"
+                                        className="w-full rounded-xl border border-white/[0.06] bg-white/[0.03] px-4 py-2.5 text-sm text-white placeholder:text-zinc-700 focus:border-teal-500/40 focus:outline-none transition-colors"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="mb-2 flex items-center gap-1.5 text-[12px] text-zinc-500">
+                                        <Link size={12} /> LinkedIn URL
+                                    </label>
+                                    <input
+                                        type="url"
+                                        name="linkedin_url"
+                                        value={formData.linkedin_url}
+                                        onChange={handleChange}
+                                        placeholder="https://linkedin.com/in/username"
+                                        className="w-full rounded-xl border border-white/[0.06] bg-white/[0.03] px-4 py-2.5 text-sm text-white placeholder:text-zinc-700 focus:border-teal-500/40 focus:outline-none transition-colors"
+                                    />
+                                </div>
                             </div>
                         </div>
                         {errorMessage && (
-                            <div className="mt-5 rounded-2xl border border-red-400/20 bg-red-500/10 px-4 py-3 text-sm text-red-100">
+                            <div className="rounded-xl border border-red-500/20 bg-red-500/[0.07] px-4 py-3 text-sm text-red-400">
                                 {errorMessage}
                             </div>
                         )}
-                        <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+                        <div className="flex gap-3">
                             <button
                                 type="button"
-                                onClick={() => navigate("/profile")}
-                                className="flex w-full items-center justify-center gap-2 rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm font-semibold text-white transition hover:bg-white/10"
+                                onClick={() => navigate('/profile')}
+                                className="flex items-center justify-center gap-2 rounded-xl border border-white/[0.06] bg-zinc-950 px-5 py-2.5 text-sm text-zinc-400 hover:text-zinc-200 transition-colors"
                             >
-                                <X size={18} />
+                                <X size={14} />
                                 Cancel
                             </button>
                             <button
                                 type="submit"
                                 disabled={submitting}
-                                className="flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-teal-400 to-cyan-500 px-4 py-3 text-sm font-semibold text-black transition duration-300 hover:scale-[1.02] hover:shadow-lg hover:shadow-cyan-500/20 disabled:cursor-not-allowed disabled:opacity-70"
+                                className="flex flex-1 items-center justify-center gap-2 rounded-xl border border-teal-500/20 bg-teal-500/10 px-5 py-2.5 text-sm font-medium text-teal-400 hover:bg-teal-500/15 transition-colors disabled:cursor-not-allowed disabled:opacity-50"
                             >
-                                <Save size={18} />
+                                <Save size={14} />
                                 {submitting ? "Saving..." : "Save Changes"}
                             </button>
                         </div>
-                    </section>
+                    </div>
                 </form>
             </div>
-        </main>
+        </div>
     )
 }
 

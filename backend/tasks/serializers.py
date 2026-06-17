@@ -14,7 +14,10 @@ class TaskSerializer(serializers.ModelSerializer):
         source="assigned_to",
         write_only=True,
     )
-
+    team_id = serializers.IntegerField(
+        source="team.id",
+        read_only=True
+    )
     def get_created_by(self, obj):
         return SimpleUserSerializer(obj.created_by, context={"team": obj.team}).data
 
@@ -32,6 +35,7 @@ class TaskSerializer(serializers.ModelSerializer):
             "title",
             "description",
             "team",
+            "team_id",
             "created_by",
             "assigned_to",
             "assigned_to_ids",
