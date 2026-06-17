@@ -112,3 +112,30 @@ class PersonalChatsConsumer(AsyncWebsocketConsumer):
             id=self.conversation_id,
             participant=user
         ).exists()
+
+class NotificationsConsumer(AsyncWebsocketConsumer):
+    async def connect(self):
+        print("Connected")
+        user = self.scope['user']
+        if not user.is_authenticated:
+            await self.close()
+            return
+        self.group_name = f'notifications_{user.id}'
+        await self.channel_layer.group_add(self.group_name, self.channel_name)  
+        await self.accept()
+    
+    async def receive(self, text_data=None, bytes_data=None):
+        print("Message received from Client to Server")
+        await self.channel_layer.group_send(self.group_name, {
+            'type': 'send_notification', 
+            'message': text_data
+        })
+    
+    async def send_notification(self, event):
+        await self.send(text_data=json.dumps(event['notification']))
+
+    async def disconnect(self, close_code):
+        print("Disconnected")
+        if hasattr(self, 'group_name'):
+            await self.channel_layer.group_discard(self.group_name, self.channel_name)
+        raise StopConsumer()

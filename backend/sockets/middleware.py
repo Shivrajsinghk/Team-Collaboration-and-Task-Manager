@@ -1,7 +1,7 @@
 from urllib.parse import parse_qs
-from jwt import decode
-from django.conf import settings
 from django.contrib.auth import get_user_model
+from django.contrib.auth.models import AnonymousUser
+from rest_framework_simplejwt.tokens import AccessToken
 
 User = get_user_model()
 
@@ -13,19 +13,16 @@ class JWTAuthMiddleware:
         query_string = scope["query_string"].decode()
         params = parse_qs(query_string)
         token = params.get("token")
+        scope["user"] = AnonymousUser()
         if token:
-            token = token[0]
             try:
-                payload = decode(
-                    token,
-                    settings.SECRET_KEY,
-                    algorithms=["HS256"]
-                )
-                user = await User.objects.aget(
-                    id=payload["user_id"]
-                )
+                raw_token = token[0]
+                print(f"DEBUG raw token: {raw_token}")
+                validated = AccessToken(raw_token)
+                user = await User.objects.aget(id=validated["user_id"])
                 scope["user"] = user
-            except Exception:
-                raise Exception
+                print(f"DEBUG user: {user}")
+            except Exception as e:
+                print(f"DEBUG auth failed: {e}")  
         return await self.inner(scope, receive, send)
     

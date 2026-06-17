@@ -6,6 +6,7 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from activity.services import create_activity
+from sockets.utils import create_notification
 from teams.models import Team, TeamMembership
 from .models import Task
 from .serializers import TaskSerializer, TaskStatusSerializer
@@ -24,12 +25,26 @@ def create_task(request, team_id):
     serializer = TaskSerializer(data=request.data, context={"request": request, "team": team})
     if serializer.is_valid():
         serializer.save(created_by=request.user, team=team)
+        task = serializer.instance
         create_activity(
             actor=request.user,
             team=team,
-            task=serializer.instance,
+            task=task,
             activity_type="TASK_CREATED",
         )
+        for user in task.assigned_to.all():
+            if user == request.user:
+                continue
+            print(f"Sending notification to: {user.id} - {user.username}") 
+            create_notification(
+                user=user,
+                notification_type="task_assigned",
+                title="New Task Assigned",
+                message=f"You have been assigned a new task: {task.title}",
+                extra_data={"task_id": task.id, "team_id": team.id},
+            )
+            print("Notification Created")
+            print(request.data)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 

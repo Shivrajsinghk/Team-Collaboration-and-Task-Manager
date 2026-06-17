@@ -12,6 +12,7 @@ import { PublicRoutes } from './routes/PublicRoutes'
 import { TeamRoutes } from './routes/TeamRoutes'
 import { ChatRoutes } from './routes/ChatRoutes'
 import { ProfileRoutes } from './routes/ProfileRoutes'
+import { NotificationRoutes } from './routes/NotificationRoutes'
 
 function App() {
 	const dispatch = useDispatch()
@@ -52,6 +53,7 @@ function App() {
 			{isAuthenticated && <Navbar />}
 			<Routes>
 				{ChatRoutes()}
+				{NotificationRoutes()}
 				{PublicRoutes()}
 				<Route element={<ProtectedRoute />}>
 					<Route path='/dashboard' element={<Dashboard />} />

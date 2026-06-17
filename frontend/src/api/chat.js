@@ -15,3 +15,12 @@ export function uploadPersonalChatAttachment(conversationId, data) {
         },
     });
 }
+
+export function list_notifications() {
+    return api.get(`sockets/notifications/`);
+}
+
+export function mark_notification_read(notificationId) {
+    return api.patch(`sockets/notifications/${notificationId}/`);
+}
+

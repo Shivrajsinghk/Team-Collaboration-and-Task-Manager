@@ -41,4 +41,17 @@ urlpatterns = [
         upload_personal_attachments,
         name="upload_personal_attachments"
     ),
+
+
+    # Notification views
+    path(
+        'notifications/',
+        list_notifications,
+        name="list_notifications"
+    ),
+    path(
+        'notifications/<int:notification_id>/',
+        mark_notification_read,
+        name="mark_notification_read"
+    ),
 ]

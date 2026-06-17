@@ -2,12 +2,16 @@ import React, { useState } from 'react'
 import Logo from './Logo'
 import Searchbar from './Searchbar'
 import UserProfilePfp from './UserProfilePfp'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { Bell, Settings, MessageCircle } from 'lucide-react'
 import ChatDropdown from './ChatDropDown'
+import { useNotifications } from '../context/NotificationContext'
 
 function Navbar() {
     const [open, setOpen] = useState(false)
+    const navigate = useNavigate()
+    const { unreadCount } = useNotifications()
+
     return (
         <nav className="sticky top-0 z-50 border-b border-white/10 bg-[#020404]/70 backdrop-blur-2xl">
             <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(34,211,238,0.03),transparent,rgba(99,102,241,0.03))]" />
@@ -32,9 +36,15 @@ function Navbar() {
                     </button>
                     {open && <ChatDropdown open={open} setOpen={setOpen} />}
                     <button
-                        className="flex h-11 w-11 items-center justify-center rounded-2xl border border-white/10 bg-white/[0.03] text-gray-300 transition duration-300 hover:bg-white/[0.06] hover:text-white"
+                        className="relative flex h-11 w-11 items-center justify-center rounded-2xl border border-white/10 bg-white/[0.03] text-gray-300 transition duration-300 hover:bg-white/[0.06] hover:text-white"
+                        onClick={() => {navigate('notifications/')}}
                     >
                         <Bell size={18} />
+                        {unreadCount > 0 && (
+                            <span className="absolute -top-1 -right-1 min-w-5 h-5 px-1 rounded-full bg-red-500 text-white text-[10px] flex items-center justify-center">
+                                {unreadCount}
+                            </span>
+                        )}
                     </button>
                     <Link
                         to="/profile"

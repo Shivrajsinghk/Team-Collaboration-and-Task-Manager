@@ -2,8 +2,8 @@ from django.shortcuts import render
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
-from .models import Chats, PersonalConversation, PersonalMessage
-from .serializer import ChatsSerializer, PersonalConversationSerializer, PersonalMessageSerializer
+from .models import Chats, Notification, PersonalConversation, PersonalMessage
+from .serializer import ChatsSerializer, NotificationSerializer, PersonalConversationSerializer, PersonalMessageSerializer
 from teams.models import Team, TeamMembership
 from django.shortcuts import get_object_or_404
 from rest_framework.permissions import IsAuthenticated
@@ -208,3 +208,31 @@ def upload_personal_attachments(request, conversation_id):
         }
     )
     return Response(payload, status=status.HTTP_201_CREATED)
+
+
+# Notification Views
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def list_notifications(request):
+    notifications = Notification.objects.filter(
+        user=request.user
+    ).order_by('-created_at')
+    serializer = NotificationSerializer(
+        notifications,
+        many=True,
+        context={'request': request}
+    )
+    return Response(serializer.data, status=status.HTTP_200_OK)
+
+@api_view(["PATCH"])
+@permission_classes([IsAuthenticated])
+def mark_notification_read(request, notification_id):
+    notification = get_object_or_404(
+        Notification,
+        id=notification_id,
+        user=request.user
+    )
+    notification.is_read = True
+    notification.save()
+    return Response({"message": "Read"})
+

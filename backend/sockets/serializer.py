@@ -1,4 +1,4 @@
-from .models import Chats, PersonalConversation, PersonalMessage
+from .models import Chats, Notification, PersonalConversation, PersonalMessage
 from rest_framework import serializers
 from api.serializers import UserProfileSerializer
 import os
@@ -112,3 +112,7 @@ class PersonalMessageSerializer(serializers.ModelSerializer):
         model = PersonalMessage
         fields = ['id', 'sender', 'attachment', 'attachment_url', 'attachment_name', 'attachment_is_image', 'message', 'is_read', 'created_at']
         
+class NotificationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Notification
+        fields = ['id', 'user', 'notification_type', 'title', 'message', 'is_read', 'created_at', 'extra_data']

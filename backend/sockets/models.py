@@ -60,3 +60,31 @@ class PersonalMessage(models.Model):
     def __str__(self):
         sender = self.sender.username if self.sender else 'Deleted User'
         return f'{sender} sent {self.message[:20]}'
+
+class Notification(models.Model):
+    NOTIFICATION_TYPES = [
+        ('task_assigned', 'Task Assigned'),
+        ('task_updated', 'Task Updated'),
+        ('team_new_message_received', 'Team New Message Received'),
+    ]
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='notifications'
+    )
+    notification_type = models.CharField(
+        max_length=50,
+        choices=NOTIFICATION_TYPES
+    )
+    title = models.CharField(max_length=255)
+    message = models.TextField()
+    is_read = models.BooleanField(default=False)    
+    created_at = models.DateTimeField(auto_now_add=True)
+    extra_data = models.JSONField(
+        default=dict,
+        blank=True
+    )
+
+    def __str__(self):
+        return self.title  
+    
