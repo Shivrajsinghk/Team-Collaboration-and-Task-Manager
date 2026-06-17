@@ -3,11 +3,13 @@ import { MoreVertical, Phone, Video } from 'lucide-react'
 import { listConversations } from '../api/chat'
 import Loading from './Loading'
 import { useSelector } from 'react-redux'
+import { useNavigate } from 'react-router-dom'
 
 function DMHeader({ selectedConversationId, setSelectedConversationId }) {
     const [conversations, setConversations] = useState([])
     const [loading, setLoading] = useState(true)
     const currentUser = useSelector((state) => state.auth.user)
+    const navigate = useNavigate()
 
     useEffect(() => {
         const fetchConversations = async () => {
@@ -45,7 +47,14 @@ function DMHeader({ selectedConversationId, setSelectedConversationId }) {
 
     return (
         <header className="flex items-center justify-between border-b border-white/10 bg-[#121a18]/95 px-5 py-3 backdrop-blur-xl">
-            <div className="flex items-center gap-3">
+            <div 
+            onClick={() =>
+                navigate(
+                    `/profile/${other_user.username}`
+                )
+            }
+            className="flex items-center gap-3"
+            >
                 <img
                     src={other_user?.profile_picture}
                     alt={other_user?.full_name}

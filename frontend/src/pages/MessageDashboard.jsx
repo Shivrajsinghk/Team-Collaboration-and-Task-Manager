@@ -8,18 +8,19 @@ import { useState } from 'react'
 import DM from '../components/DM'
 
 function MessageDashboard() {
-    const { participant_id } = useParams()
+    const { conversation_id } = useParams()
     const [conversations, setConversations] = useState([])
     const [loading, setLoading] = useState(true)
+    const [searchQuery, setSearchQuery] = useState("")
     const [selectedConversationId, setSelectedConversationId] = useState(null)
     const currentUser = useSelector((state) => state.auth.user)
     const navigate = useNavigate()
 
     useEffect(() => {
-        if (participant_id) {
-            setSelectedConversationId(Number(participant_id))
+        if (conversation_id) {
+            setSelectedConversationId(Number(conversation_id))
         }
-    }, [participant_id])
+    }, [conversation_id])
     
     useEffect(() => {
         const fetchConversations = async () => {
@@ -37,6 +38,18 @@ function MessageDashboard() {
         fetchConversations()
     }, [])
 
+    const filteredConversations = conversations.filter((convo) => {
+        const otherParticipant = convo.participant.find(
+            (participant) => participant.id !== currentUser.id
+        )
+        return (
+            otherParticipant?.full_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            otherParticipant?.first_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            otherParticipant?.last_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            otherParticipant?.username?.toLowerCase().includes(searchQuery.toLowerCase())
+        )
+    })
+
     return (
         <div className="min-h-screen overflow-x-hidden bg-[linear-gradient(180deg,#071714_0%,#020404_100%)] text-white">
             <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
@@ -45,13 +58,10 @@ function MessageDashboard() {
                     <div className="overflow-hidden rounded-[2rem] border border-white/10 bg-white/[0.03] backdrop-blur-xl">
                         <div className="flex flex-col md:flex-row md:items-center pt-3 px-4 md:justify-between">
                             <div>
-                                <h1 className="text-xl font-bold tracking-tight text-[var(--color-mint-cream)]">
+                                <h1 className="text-xl py-1 font-bold tracking-tight text-[var(--color-mint-cream)]">
                                     Direct Messages
                                 </h1>
                             </div>
-                            <button className="flex items-center gap-1.5 rounded-xl px-3 py-2 text-sm font-medium text-white transition-all hover:scale-[1.02]">
-                                <Plus size={20} />
-                            </button>
                         </div>
     
                         {/* Search Bar */}
@@ -63,6 +73,8 @@ function MessageDashboard() {
                                 />
                                 <input
                                     type="text"
+                                    value={searchQuery}
+                                    onChange={(e) => setSearchQuery(e.target.value)}
                                     placeholder="Search chats..."
                                     className="w-full bg-transparent text-sm text-white placeholder:text-gray-500 focus:outline-none"
                                 />
@@ -72,7 +84,7 @@ function MessageDashboard() {
                         {/* DM's */}
                         <div className="p-3">
                             <div className="space-y-2">
-                                {conversations.map((convo) => {
+                                {filteredConversations.map((convo) => {
                                     const otherParticipant = convo.participant.find(
                                         (participant) => participant.id !== currentUser.id
                                     )

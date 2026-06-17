@@ -104,7 +104,7 @@ function Searchbar() {
                     onChange={(e) => setQuery(e.target.value)}
                     onFocus={() => setFocused(true)}
                     type="text"
-                    placeholder="Search people..."
+                    placeholder="Search people, teams, tasks..."
                     className="w-full bg-transparent text-[13px] text-zinc-300 placeholder:text-zinc-600 focus:outline-none"
                 />
                 {query && (

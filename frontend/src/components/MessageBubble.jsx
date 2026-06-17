@@ -31,7 +31,7 @@ const MessageBubble = ({
                     className="shrink-0 cursor-pointer"
                     onClick={() =>
                         navigate(
-                            `/team/${teamId}/members/${chat.sender?.id}`
+                            `/profile/${chat.sender.username}`
                         )
                     }
                 >

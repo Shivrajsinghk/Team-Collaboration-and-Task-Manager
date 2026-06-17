@@ -4,6 +4,6 @@ import MessageDashboard from "../pages/MessageDashboard";
 export const ChatRoutes = () => (
     <>    
         <Route path="/messages" element={<MessageDashboard />} />
-        <Route path="/messages/:participant_id" element={<MessageDashboard />} />
+        <Route path="/messages/:conversation_id" element={<MessageDashboard />} />
     </>
 );

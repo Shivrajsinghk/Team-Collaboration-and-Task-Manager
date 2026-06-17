@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { useParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import {
     MapPin,
     Calendar,
@@ -13,15 +13,18 @@ import {
     Clock,
     ClipboardList,
     GitBranch,
-    Link 
+    Link, 
+    Send
 } from 'lucide-react'
 import Loading from '../components/Loading'
 import { getPublicUserProfile } from '../api/auth'
+import api from '../api/axios'
 
 function PublicProfile() {
     const { username } = useParams()
     const [user, setUser] = useState(null)
     const [loading, setLoading] = useState(true)
+    const navigate = useNavigate()
 
     useEffect(() => {
         const fetchProfile = async () => {
@@ -59,10 +62,19 @@ function PublicProfile() {
         )
     }
 
+    const handleMessageClick = async () => {
+        try{
+            const response = await api(`sockets/user/${user.id}/chats/`)
+            navigate(`/messages/${response.data.id}`)
+        }
+        catch (err) {
+            console.log(err)
+        }
+    }
+
     const skills = user['skills']
         ? user.skills.split(',').map(s => s.trim()).filter(Boolean)
         : []
-
 
     return (
         <div className="min-h-screen bg-black p-4 md:p-8">
@@ -120,9 +132,18 @@ function PublicProfile() {
                                         {user.location}
                                     </div>
                                 )}
+                                <div 
+                                onClick={() =>
+                                    handleMessageClick()
+                                }
+                                className="flex items-center gap-1.5 cursor-pointer rounded-full border border-white/[0.06] bg-white/[0.03] px-3 py-1.5 text-xs text-zinc-400"
+                                >
+                                    <Send size={12} className="text-zinc-600" />
+                                    <span className="text-sm">Message</span>
+                                </div>
                                 <div className="flex items-center gap-1.5 rounded-full border border-white/[0.06] bg-white/[0.03] px-3 py-1.5 text-xs text-zinc-400">
-                                    <Calendar size={11} className="text-zinc-600" />
-                                    Joined {new Date(user.last_seen).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
+                                    <Calendar size={12} className="text-zinc-600" />
+                                    Joined {new Date(user.joined_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
                                 </div>
                             </div>
                         </div>
