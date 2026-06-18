@@ -64,8 +64,10 @@ class PersonalMessage(models.Model):
 class Notification(models.Model):
     NOTIFICATION_TYPES = [
         ('task_assigned', 'Task Assigned'),
-        ('task_updated', 'Task Updated'),
-        ('team_new_message_received', 'Team New Message Received'),
+        ('teamchat_new_attachment_uploaded', 'Teamchat New Attachment Uploaded'),
+        ('team_member_joined', 'Team Member Joined'),
+        ('team_member_left', 'Team Member Left'),
+        ('team_member_removed', 'Team Member Removed'),
     ]
     user = models.ForeignKey(
         User,

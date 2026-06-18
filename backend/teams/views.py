@@ -14,6 +14,7 @@ from .serializers import (
     TeamMembershipSerializer,
     TeamSerializer,
 )
+from sockets.utils import create_notification
 
 @api_view(["GET"])
 @permission_classes([IsAuthenticated])
@@ -91,6 +92,15 @@ def join_team(request):
                 team=serializer.instance.team,
                 activity_type="NEW_MEMBER_JOINED_TEAM",
             )
+            members = TeamMembership.objects.filter(team=serializer.instance.team).exclude(user=request.user)
+            for member in members:
+                create_notification(
+                    user=member.user,
+                    notification_type="team_member_joined",
+                    title="New Team Member",
+                    message=f"{request.user.username.title()} joined team {serializer.instance.team.name}",
+                    extra_data={"team_id": serializer.instance.team.id},
+                )
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         except IntegrityError:
             return Response(
@@ -122,6 +132,15 @@ def leave_team(request, team_id):
         task.assigned_to.remove(request.user)
     create_activity(actor=request.user, team=team, activity_type="MEMBER_LEFT_TEAM")
     membership.delete()
+    members = TeamMembership.objects.filter(team=team).exclude(user=request.user)
+    for member in members:
+        create_notification(
+            user=member.user,
+            notification_type="team_member_left",
+            title="Team Member Left",
+            message=f"{request.user.username.title()} left team {team.name}",
+            extra_data={"team_id": team.id, "user_id": request.user.id,},
+        )
     return Response({"message": "You left the team"}, status=status.HTTP_200_OK)
 
 @api_view(["DELETE"])
@@ -152,6 +171,16 @@ def remove_user_from_team(request, team_id, user_id):
     )
     for task in tasks:
         task.assigned_to.remove(user)
+    # This notification is for the member who's removed from the team
+    create_notification(
+        user=user,
+        notification_type="team_member_removed",
+        title="Removed From Team",
+        message=f"You were removed from {team.name} by {request.user.username.title()}",
+        extra_data={
+            "team_id": team.id,
+        }
+    )
     membership.delete()
     create_activity(
         actor=request.user,
@@ -166,6 +195,19 @@ def remove_user_from_team(request, team_id, user_id):
             }
         },
     )
+    # This notification is for remaining members of the team
+    members = TeamMembership.objects.filter(team=team)
+    for member in members:
+        create_notification(
+            user=member.user,
+            notification_type="team_member_removed",
+            title="Team Member Removed",
+            message=f"{user.username.title()} has been kicked out of the team {team.name} by {request.user.username.title()}",
+            extra_data={
+                "team_id": team.id, 
+                "removed_member_id": user.id,
+            }
+        )
     return Response({"message": "User removed successfully"}, status=status.HTTP_200_OK)
 
 @api_view(["PATCH"])

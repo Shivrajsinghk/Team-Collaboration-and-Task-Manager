@@ -35,7 +35,6 @@ def create_task(request, team_id):
         for user in task.assigned_to.all():
             if user == request.user:
                 continue
-            print(f"Sending notification to: {user.id} - {user.username}") 
             create_notification(
                 user=user,
                 notification_type="task_assigned",
@@ -43,8 +42,6 @@ def create_task(request, team_id):
                 message=f"You have been assigned a new task: {task.title}",
                 extra_data={"task_id": task.id, "team_id": team.id},
             )
-            print("Notification Created")
-            print(request.data)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
