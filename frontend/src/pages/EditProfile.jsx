@@ -34,7 +34,7 @@ function EditProfile() {
         first_name: "",
         last_name: "",
         bio: "",
-        status: "active",
+        about: "",
         job_title: "",
         location: "",
         github_url: "",
@@ -57,7 +57,7 @@ function EditProfile() {
             formDataToSend.append("first_name", formData.first_name)
             formDataToSend.append("last_name", formData.last_name)
             formDataToSend.append("bio", formData.bio)
-            formDataToSend.append("status", formData.status)
+            formDataToSend.append("about", formData.about)
             formDataToSend.append("job_title", formData.job_title)
             formDataToSend.append("location", formData.location)
             formDataToSend.append("github_url", formData.github_url)
@@ -108,7 +108,7 @@ function EditProfile() {
                     first_name: d.first_name || "",
                     last_name: d.last_name || "",
                     bio: d.bio || "",
-                    status: d.status || "active",
+                    about: d.about || "",
                     job_title: d.job_title || "",
                     location: d.location || "",
                     github_url: d.github_url || "",
@@ -163,9 +163,6 @@ function EditProfile() {
                             )}
                             <h2 className="mt-4 text-base font-semibold capitalize text-white">{displayName}</h2>
                             <p className="text-xs text-zinc-500 mt-0.5">@{formData.username}</p>
-                            <span className="mt-2 rounded-full border border-emerald-500/20 bg-emerald-500/10 px-3 py-0.5 text-[10px] uppercase tracking-wider text-emerald-400">
-                                {formData.status}
-                            </span>
                         </div>
                         <div className="rounded-2xl border border-white/[0.06] bg-zinc-950 p-5">
                             <div className="mb-3 flex items-center gap-2">
@@ -255,19 +252,35 @@ function EditProfile() {
                                 </div>
                                 <div className="sm:col-span-2">
                                     <label className="mb-2 flex items-center gap-1.5 text-[12px] text-zinc-500">
-                                        <BadgeInfo size={12} /> Bio
+                                        <BadgeInfo size={12} /> Short Bio
+                                        <span className="text-zinc-700">(max 100 characters)</span>
+                                    </label>
+                                    <input
+                                        type="text"
+                                        name="bio"
+                                        maxLength={100}
+                                        value={formData.bio}
+                                        onChange={handleChange}
+                                        placeholder="A short tagline about yourself..."
+                                        className="w-full rounded-xl border border-white/[0.06] bg-white/[0.03] px-4 py-2.5 text-sm text-white placeholder:text-zinc-700 focus:border-teal-500/40 focus:outline-none transition-colors"
+                                    />
+                                    <p className="mt-1 text-right text-[11px] text-zinc-700">{(formData.bio || '').length}/100</p>
+                                </div>
+                                <div className="sm:col-span-2">
+                                    <label className="mb-2 flex items-center gap-1.5 text-[12px] text-zinc-500">
+                                        <PencilLine size={12} /> About
                                     </label>
                                     <textarea
-                                        name="bio"
+                                        name="about"
                                         rows="4"
-                                        value={formData.bio}
+                                        value={formData.about}
                                         onChange={handleChange}
                                         placeholder="Tell your team a bit about yourself..."
                                         className="w-full rounded-xl border border-white/[0.06] bg-white/[0.03] px-4 py-2.5 text-sm text-white placeholder:text-zinc-700 focus:border-teal-500/40 focus:outline-none transition-colors resize-none"
                                     />
                                 </div>
+                                </div>
                             </div>
-                        </div>
                         <div className="rounded-2xl border border-white/[0.06] bg-zinc-950 p-6">
                             <h3 className="text-[12px] uppercase tracking-wider text-zinc-600 mb-5">Professional</h3>
                             <div className="grid gap-4 sm:grid-cols-2">

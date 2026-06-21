@@ -2,6 +2,7 @@ from urllib.parse import parse_qs
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import AnonymousUser
 from rest_framework_simplejwt.tokens import AccessToken
+from rest_framework_simplejwt.exceptions import TokenError, InvalidToken
 
 User = get_user_model()
 
@@ -17,12 +18,15 @@ class JWTAuthMiddleware:
         if token:
             try:
                 raw_token = token[0]
-                print(f"DEBUG raw token: {raw_token}")
                 validated = AccessToken(raw_token)
                 user = await User.objects.aget(id=validated["user_id"])
                 scope["user"] = user
-                print(f"DEBUG user: {user}")
+            except (TokenError, InvalidToken):
+                pass 
+            except User.DoesNotExist:
+                pass  
             except Exception as e:
-                print(f"DEBUG auth failed: {e}")  
-        return await self.inner(scope, receive, send)
+                print(f"Unexpected middleware error: {e}")
+
+            return await self.inner(scope, receive, send)
     

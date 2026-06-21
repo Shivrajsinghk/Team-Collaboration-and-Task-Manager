@@ -99,6 +99,7 @@ function TeamDashboard() {
                         {/* Team Members */}
                         <TeamMembers 
                         team={team} 
+                        filteredMembers={team?.team?.all_members || []}
                         />
                     </div>
                     <div className='mt-8'>

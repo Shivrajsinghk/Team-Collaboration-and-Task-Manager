@@ -4,36 +4,18 @@ import { listConversations } from '../api/chat'
 import Loading from './Loading'
 import { useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
+import { useChat } from '../context/ChatContext'
+
 
 function DMHeader({ selectedConversationId, setSelectedConversationId }) {
-    const [conversations, setConversations] = useState([])
-    const [loading, setLoading] = useState(true)
     const currentUser = useSelector((state) => state.auth.user)
     const navigate = useNavigate()
-
-    useEffect(() => {
-        const fetchConversations = async () => {
-            try{
-                const response = await listConversations()
-                setConversations(response.data)
-            }
-            catch(err){
-                console.log(err)
-            }
-            finally{
-                setLoading(false)
-            }
-        }
-        fetchConversations()
-    }, [])
-
-    if(loading){
-        return <Loading />
-    }
+    const { conversations } = useChat()
 
     const convo = conversations.find(
         convo => convo.id === selectedConversationId
-    ) 
+    )
+    
     if (!convo) {
         return (
             <header className="flex items-center px-5 py-3">
@@ -41,9 +23,21 @@ function DMHeader({ selectedConversationId, setSelectedConversationId }) {
             </header>
         )
     }
+
     const other_user = convo?.participant.find(
         user => user?.id !== currentUser?.id
     )
+
+    const formatLastSeen = (iso) => {
+        if (!iso) return null
+        const date = new Date(iso)
+        const now = new Date()
+        const diff = Math.floor((now - date) / 1000)
+        if (diff < 60) return 'Just now'
+        if (diff < 3600) return `${Math.floor(diff / 60)}m ago`
+        if (diff < 86400) return `${Math.floor(diff / 3600)}h ago`
+        return date.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })
+    }
 
     return (
         <header className="flex items-center justify-between border-b border-white/10 bg-[#121a18]/95 px-5 py-3 backdrop-blur-xl">
@@ -70,14 +64,20 @@ function DMHeader({ selectedConversationId, setSelectedConversationId }) {
                         {other_user?.full_name}
                     </h2>
                 <p className="truncate text-sm text-[var(--color-cool-steel)]">
-                        {other_user?.username}
+                        @{other_user?.username}
                     </p>
                 </div>
             </div>
-            <div className="px-3">
-                <p className='text-sm text-emerald-400'>
-                    Online
-                </p>
+            <div className="px-3 text-right">
+                {other_user?.is_online ? (
+                    <p className="text-sm text-emerald-400">Online</p>
+                ) : (
+                    <p className="text-sm text-zinc-500">
+                        {other_user?.last_seen
+                            ? `Last seen ${formatLastSeen(other_user.last_seen)}`
+                            : 'Offline'}
+                    </p>
+                )}
             </div>
         </header>
     )

@@ -28,6 +28,8 @@ class TeamSerializer(serializers.ModelSerializer):
             "user__id",
             "user__username",
             "role",
+            "user__profile__is_online",  
+            "user__profile__last_seen",
         )
 
     def get_task_count(self, obj):

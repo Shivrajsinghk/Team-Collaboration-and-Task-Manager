@@ -9,7 +9,7 @@ function getMediaUrl(baseUrl, path) {
     return `${baseUrl}/${path}`.replace(/([^:]\/)\/+/g, '$1')
 }
 
-function UserProfilePfp({ memberUser }) {
+function UserProfilePfp({ memberUser, isOnline }) {
     const reduxUser = useSelector((state) => state.auth.user)
     const user = memberUser || reduxUser
     const [imgError, setImgError] = useState(false);
@@ -63,15 +63,11 @@ function UserProfilePfp({ memberUser }) {
                     </div>
                 )}
             </div>
-            <div
-                className="
-                absolute -bottom-1 -right-1
-                h-4 w-4 rounded-full
-                border-2 border-[#020404]
-                bg-emerald-400
-                shadow-[0_0_15px_rgba(74,222,128,0.4)]
-                "
-            />
+            {memberUser && isOnline !== undefined && (
+                <div className={`absolute bottom-0 right-0 h-4 w-4 rounded-full border-2 border-black
+                    ${isOnline ? 'bg-emerald-400' : 'bg-zinc-600'}`}
+                />
+            )}
         </div>
     )
 }

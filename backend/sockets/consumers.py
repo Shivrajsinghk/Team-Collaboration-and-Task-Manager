@@ -5,6 +5,8 @@ import json
 from .models import Chats, PersonalConversation, PersonalMessage
 from .serializer import ChatsSerializer, PersonalMessageSerializer
 from teams.models import TeamMembership
+from api.models import UserProfile
+from django.utils import timezone
 
 class TeamChatsConsumer(AsyncWebsocketConsumer):
     async def connect(self):
@@ -122,20 +124,23 @@ class NotificationsConsumer(AsyncWebsocketConsumer):
             return
         self.group_name = f'notifications_{user.id}'
         await self.channel_layer.group_add(self.group_name, self.channel_name)  
+        await self.set_online_status(True)
         await self.accept()
-    
-    async def receive(self, text_data=None, bytes_data=None):
-        print("Message received from Client to Server")
-        await self.channel_layer.group_send(self.group_name, {
-            'type': 'send_notification', 
-            'message': text_data
-        })
     
     async def send_notification(self, event):
         await self.send(text_data=json.dumps(event['notification']))
 
     async def disconnect(self, close_code):
         print("Disconnected")
+        await self.set_online_status(False)
         if hasattr(self, 'group_name'):
             await self.channel_layer.group_discard(self.group_name, self.channel_name)
         raise StopConsumer()
+
+    @database_sync_to_async
+    def set_online_status(self, status):
+        user = self.scope['user']
+        UserProfile.objects.filter(user_id=user.id).update(
+            last_seen = timezone.now(),
+            is_online = status
+        )

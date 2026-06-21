@@ -40,9 +40,13 @@ function TeamCard({ team }) {
                 <div className="relative flex h-12 w-12 items-center justify-center overflow-hidden rounded-2xl bg-[linear-gradient(135deg,#2dd4bf,#06b6d4,#6366f1)] shadow-lg shadow-cyan-500/10 transition duration-300 group-hover:scale-105">
                         {initials}
                     </div>
-                    <div className="flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-4 py-2 text-[11px] uppercase tracking-[0.25em] text-cyan-300 backdrop-blur-xl">
-                        <Sparkles size={12} />
-                        Workspace
+                    <div className="relative flex flex-col items-center justify-center">
+                        <span className="text-sm font-black tracking-wider leading-none text-white">
+                            OO
+                        </span>
+                        <span className="text-[10px] leading-none text-white/90">
+                            ⌣
+                        </span>
                     </div>
                 </div>
                 <div className="relative mt-8">

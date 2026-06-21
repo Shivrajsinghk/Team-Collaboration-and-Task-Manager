@@ -14,7 +14,8 @@ import {
     ClipboardList,
     GitBranch,
     Link, 
-    Send
+    Send,
+    Beaker
 } from 'lucide-react'
 import Loading from '../components/Loading'
 import { getPublicUserProfile } from '../api/auth'
@@ -25,13 +26,14 @@ function PublicProfile() {
     const [user, setUser] = useState(null)
     const [loading, setLoading] = useState(true)
     const navigate = useNavigate()
+    const BASE_URL = import.meta.env.VITE_DJANGO_BASE_URL
 
     useEffect(() => {
         const fetchProfile = async () => {
             try{
                 const response = await getPublicUserProfile(username)
                 setUser(response.data)
-                console.log(response.data)
+                console.log("user", response.data)
             } 
             catch(err){
                 console.log(err)
@@ -42,8 +44,6 @@ function PublicProfile() {
         }
         fetchProfile()
     }, [username])
-
-    const isOnline = user?.status === 'active'
 
     const formatLastSeen = (iso) => {
         if (!iso) return null
@@ -64,7 +64,7 @@ function PublicProfile() {
 
     const handleMessageClick = async () => {
         try{
-            const response = await api(`sockets/user/${user.id}/chats/`)
+            const response = await api.get(`sockets/user/${user.id}/chats/`)
             navigate(`/messages/${response.data.id}`)
         }
         catch (err) {
@@ -88,7 +88,7 @@ function PublicProfile() {
                                 <div className="relative flex-shrink-0">
                                     {user.profile_picture ? (
                                         <img
-                                            src={`http://127.0.0.1:8000${user.profile_picture}`}
+                                            src={`${BASE_URL}${user.profile_picture}`}
                                             alt={user.full_name}
                                             className="h-24 w-24 rounded-2xl border-2 border-zinc-900 object-cover shadow-xl"
                                         />
@@ -97,7 +97,7 @@ function PublicProfile() {
                                             {(user.full_name || user.username).slice(0,1)}
                                         </div>
                                     )}
-                                    <span className={`absolute -bottom-1 -right-1 h-4 w-4 rounded-full border-2 border-zinc-950 ${isOnline ? 'bg-emerald-400' : 'bg-zinc-600'}`} />
+                                    <span className={`absolute -bottom-1 -right-1 h-4 w-4 rounded-full border-2 border-zinc-950 ${user?.is_online ? 'bg-emerald-400' : 'bg-zinc-600'}`} />
                                 </div>
                                 <div className="pb-1">
                                     <h1 className="text-2xl font-semibold capitalize text-white leading-tight">
@@ -111,7 +111,7 @@ function PublicProfile() {
                                         </div>
                                     )}
                                     <div className="mt-2 flex items-center gap-1.5 text-xs text-zinc-600">
-                                        {isOnline ? (
+                                        {user?.is_online ? (
                                             <>
                                                 <CheckCircle2 size={12} className="text-emerald-500" />
                                                 <span className="text-emerald-600">Active now</span>
@@ -159,7 +159,7 @@ function PublicProfile() {
                 <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
                     {[
                         { label: 'Tasks', value: user.total_tasks ?? 0, color: 'text-cyan-400' },
-                        { label: 'Status', value: user.status ?? '—', color: 'text-emerald-400' },
+                        { label: 'Status', value: user.is_online ? 'Active' : 'Offline' },
                         { label: 'Skills', value: skills.length || '—', color: 'text-violet-400' },
                         { label: 'Links', value: [user.github_url, user.linkedin_url].filter(Boolean).length, color: 'text-amber-400' },
                     ].map(({ label, value, color }) => (
@@ -176,10 +176,10 @@ function PublicProfile() {
                                 <User2 size={16} className="text-zinc-600" />
                                 <h2 className="text-sm font-medium text-zinc-300">About</h2>
                             </div>
-                            {user.bio ? (
-                                <p className="text-sm text-zinc-500 leading-relaxed">{user.bio}</p>
+                            {user.about ? (
+                                <p className="text-sm text-zinc-500 leading-relaxed">{user.about}</p>
                             ) : (
-                                <p className="text-sm text-zinc-700 italic">This user hasn't written a bio yet.</p>
+                                <p className="text-sm text-zinc-700 italic">This user hasn't written anything yet.</p>
                             )}
                         </div>
                         <div className="rounded-2xl border border-white/[0.06] bg-zinc-950 p-6">
@@ -257,7 +257,7 @@ function PublicProfile() {
                                     { label: 'Username', value: `@${user.username}` },
                                     { label: 'Job title', value: user.job_title || '—' },
                                     { label: 'Location', value: user.location || '—' },
-                                    { label: 'Status', value: user.status || '—' },
+                                    { label: 'Status', value: user.is_online ? 'Active' : 'Offline' }
                                 ].map(({ label, value }) => (
                                     <div key={label} className="flex capitalize items-start justify-between gap-4 text-sm">
                                         <span className="text-zinc-600 flex-shrink-0">{label}</span>

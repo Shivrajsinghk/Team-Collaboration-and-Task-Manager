@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
-import { Users, ShieldCheck, Filter, UserPlus } from 'lucide-react'
+import { Users, ShieldCheck, Filter, UserPlus, Search } from 'lucide-react'
 import TeamMembers from '../components/TeamMembers'
 import Searchbar from '../components/Searchbar'
 import TeamInviteCode from '../Modal/TeamInviteCode'
@@ -20,6 +20,7 @@ function Members() {
     const [isKickAYSOpen, setIsKickAYSOpen] = useState(false)
     const [isInviteOpen, setIsInviteOpen] = useState(false)
     const [loading, setLoading] = useState(false)
+    const [searchQuery, setSearchQuery] = useState("")
     const isAdmin = team?.team?.is_admin
 
     async function fetchapi() {
@@ -36,6 +37,13 @@ function Members() {
         fetchapi()
     }, [team_id])
 
+    const filteredMembers = team?.team?.all_members?.filter(member => {
+        const name = `${member.user__first_name} ${member.user__last_name}`.toLowerCase()
+        const username = member.user__username?.toLowerCase()
+        const query = searchQuery.toLowerCase()
+        return name.includes(query) || username.includes(query)
+    }) || []
+
     return (
         <>
             <div className="ml-2 min-h-screen bg-[linear-gradient(180deg,#071714_0%,#020404_100%)] text-white">
@@ -50,9 +58,6 @@ function Members() {
                                     <h1 className="text-3xl font-bold tracking-tight">
                                         Team Members
                                     </h1>
-                                    <p className="mt-1 text-sm text-gray-400">
-                                        Manage team roles, permissions, and members.
-                                    </p>
                                 </div>
                             </div>
                         </div>
@@ -78,31 +83,28 @@ function Members() {
                         rounded-[2rem]
                         border border-white/[0.08]
                         bg-white/[0.03]
-                        p-5
+                        p-3
                         backdrop-blur-xl
                         lg:flex-row
                         lg:items-center
                         lg:justify-between
                     ">
-                        <div className="w-full lg:max-w-xl">
-                            <Searchbar />
+                        <div className="border-b border-white/10 p-3 min-w-[500px]">
+                            <div className="group flex items-center gap-3 rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-2 transition duration-300 focus-within:border-cyan-400/40 focus-within:bg-white/[0.05]">
+                                <Search
+                                    size={18}
+                                    className="text-gray-500 transition duration-300 group-focus-within:text-cyan-300"
+                                />
+                                <input
+                                    type="text"
+                                    value={searchQuery}
+                                    onChange={(e) => setSearchQuery(e.target.value)}
+                                    placeholder="Search members..."
+                                    className="w-full bg-transparent text-sm text-white placeholder:text-gray-500 focus:outline-none"
+                                />
+                            </div>
                         </div>
                         <div className="flex items-center gap-3">
-                            <button
-                                className="
-                                flex items-center gap-2
-                                rounded-2xl
-                                border border-white/[0.08]
-                                bg-white/[0.03]
-                                px-4 py-3
-                                text-sm
-                                transition
-                                hover:bg-white/[0.06]
-                                "
-                            >
-                                <Filter size={16} />
-                                Filter
-                            </button>
                             {isAdmin && (
                                 <button
                                     onClick={() => setIsInviteOpen(true)}
@@ -118,7 +120,7 @@ function Members() {
                                     hover:bg-cyan-500/20
                                     "
                                 >
-                                    <UserPlus size={27} />
+                                    <UserPlus size={18} />
                                     Invite Member
                                 </button>
                             )}
@@ -137,12 +139,13 @@ function Members() {
                                     Members
                                 </h2>
                                 <p className="mt-1 text-sm text-gray-400">
-                                    {team?.team?.all_members?.length || 0} total members
+                                    {searchQuery ? `${filteredMembers.length} of ${team?.team?.all_members?.length} members` : `${team?.team?.all_members?.length || 0} total members`}
                                 </p>
                             </div>
                         </div>
                         <TeamMembers
                             team={team}
+                            filteredMembers={filteredMembers}
                             setSelectedMember={setSelectedMember}
                             setIsMemberOpen={setIsMemberOpen}
                         />

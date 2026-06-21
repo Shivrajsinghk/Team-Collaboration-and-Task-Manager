@@ -67,7 +67,8 @@ def get_search_results(request):
         Q(user__first_name__icontains=query) |
         Q(user__last_name__icontains=query) |
         Q(job_title__icontains=query) |
-        Q(location__icontains=query) 
+        Q(location__icontains=query) |
+        Q(skills__icontains=query) 
     ).exclude(
         user=request.user
     ).select_related('user')[:10]

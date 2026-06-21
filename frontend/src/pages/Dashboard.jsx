@@ -39,6 +39,7 @@ function Dashboard() {
             try {
                 const response = await getUserProfile()
                 setProfile(response.data)
+                console.log("hn", response.data)
             } catch (error) {
                 console.log(error)
             }

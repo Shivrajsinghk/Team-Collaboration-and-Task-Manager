@@ -111,16 +111,6 @@ function TeamTasks() {
                             >
                                 Team Tasks
                             </h1>
-                            <p
-                                className="
-                                    mt-1
-                                    text-sm
-                                    text-gray-400
-                                "
-                            >
-                                Organize, manage, and track your
-                                team's progress.
-                            </p>
                         </div>
                     </div>
                     <button

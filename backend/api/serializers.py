@@ -52,7 +52,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = UserProfile
-        fields = ['id', "username", "email", 'first_name', 'joined_at', 'last_name', "profile_picture", 'bio', 'status', 'last_seen', "full_name", "remove_profile_picture", 'total_tasks', 'github_url', 'linkedin_url', 'resume', 'skills', 'job_title', 'location', 'total_teams', 'completed_tasks', 'phone_number']
+        fields = ['id', "username", "email", 'first_name', 'joined_at', 'last_name', "profile_picture", 'bio', 'about', 'last_seen', 'is_online', "full_name", "remove_profile_picture", 'total_tasks', 'github_url', 'linkedin_url', 'resume', 'skills', 'job_title', 'location', 'total_teams', 'completed_tasks', 'phone_number']
 
     def update(self, instance, validated_data):
         user_data = validated_data.pop('user', {})
@@ -80,7 +80,7 @@ class PublicUserProfileSerializer(serializers.ModelSerializer):
     joined_at = serializers.DateTimeField(format="%d %b %Y")
 
     def get_total_tasks(self, obj):
-            return obj.user.tasks_assigned.count()
+        return obj.user.tasks_assigned.count()
 
     def get_full_name(self, obj):
         name = f"{obj.user.first_name} {obj.user.last_name}".strip()
@@ -102,7 +102,7 @@ class PublicUserProfileSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = UserProfile
-        fields = ['id', 'joined_at', 'username', 'first_name', 'last_name', 'profile_picture', 'bio', 'status', 'last_seen', 'full_name', 'total_tasks', 'github_url', 'linkedin_url', 'skills', 'job_title', 'location']
+        fields = ['id', 'joined_at', 'username', 'first_name', 'last_name', 'profile_picture', 'bio', 'about', 'last_seen', 'is_online', 'full_name', 'total_tasks', 'github_url', 'linkedin_url', 'skills', 'job_title', 'location']
 
 class UserSerializer(serializers.ModelSerializer):
     profile = UserProfileSerializer(read_only = True) 

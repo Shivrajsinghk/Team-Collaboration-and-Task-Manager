@@ -8,6 +8,7 @@ function MemberProfile() {
     const { team_id, member_id } = useParams()
     const [member, setMember] = useState(null)
     const [loading, setLoading] = useState(true)
+    const BASE_URL = import.meta.env.VITE_DJANGO_BASE_URL
 
     useEffect(() => {
         async function fetchMember() {
@@ -58,7 +59,7 @@ function MemberProfile() {
                                 shadow-[0_0_40px_rgba(0,255,255,0.12)]">
                                     {member.profile.profile_picture ? (
                                         <img
-                                            src={`http://127.0.0.1:8000${member.profile.profile_picture}`}
+                                            src={`${BASE_URL}${member.profile.profile_picture}`}
                                             alt={member.profile.full_name}
                                             className="h-full w-full object-cover hover:scale-110 transition-all"
                                         />
@@ -67,14 +68,8 @@ function MemberProfile() {
                                             {(member.profile.first_name || "U").slice(0,1)}
                                         </div>
                                     )}
-                                <div
-                                    className="
-                                        absolute bottom-2 right-2
-                                        h-5 w-5
-                                        rounded-full
-                                        border-2 border-black
-                                        bg-emerald-400
-                                    "
+                                <div className={`absolute bottom-1 right-1 h-5 w-5 rounded-full border-2 border-black
+                                    ${member.profile.is_online ? 'bg-emerald-400' : 'bg-zinc-600'}`}
                                 />
                             </div>
                             <div className="space-y-3">
@@ -93,7 +88,7 @@ function MemberProfile() {
                                     </div>
                                     <div className="flex items-center gap-2 rounded-full border border-emerald-500/20 bg-emerald-500/10 px-4 py-2 text-sm text-emerald-300">
                                         <Activity className="h-4 w-4" />
-                                        {member.profile.status?.charAt(0).toUpperCase() + member.profile.status?.slice(1)}
+                                        {member.profile.is_online ? 'Active' : 'Offline'}
                                     </div>
                                 </div>
                             </div>
@@ -152,7 +147,7 @@ function MemberProfile() {
                                 </h2>
                             </div>
                             <p className="leading-relaxed text-zinc-400">
-                                {member.profile.bio || 'No bio added yet.'}
+                                {member.profile.about || 'No about added yet.'}
                             </p>
                         </div>
                         <div className="rounded-[28px] border border-white/5 bg-white/[0.02] p-7">
@@ -274,20 +269,16 @@ function MemberProfile() {
                                             Last Seen
                                         </p>
                                         <p className="mt-2 text-white">
-                                            {new Date(member.profile.last_seen).toLocaleString()}
+                                            {new Date(member.profile.last_seen).toLocaleDateString()}
                                         </p>
                                     </div>
-                                    <div
-                                        className={`
-                                            rounded-full px-3 py-1 text-xs font-medium
-                                            ${member.profile.status === 'active'
-                                                ? 'bg-emerald-500/10 text-emerald-300 border border-emerald-500/20'
-                                                : 'bg-zinc-500/10 text-zinc-300 border border-zinc-500/20'
-                                            }
-                                        `}
+                                    <div className={`rounded-full px-3 py-1 text-xs font-medium
+                                        ${member.profile.is_online
+                                            ? 'bg-emerald-500/10 text-emerald-300 border border-emerald-500/20'
+                                            : 'bg-zinc-500/10 text-zinc-300 border border-zinc-500/20'
+                                        }`}
                                     >
-                                        {member.profile.status?.charAt(0).toUpperCase() +
-                                            member.profile.status?.slice(1)}
+                                        {member.profile.is_online ? 'Active' : 'Offline'}
                                     </div>
                                 </div>
                             </div>

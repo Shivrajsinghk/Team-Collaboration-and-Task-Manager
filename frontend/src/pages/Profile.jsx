@@ -50,7 +50,6 @@ function Profile() {
     if (!user) return <Loading />
 
     const initials = (user.full_name || user.username || 'U').slice(0, 1).toUpperCase()
-    const isOnline = user.status === 'active'
 
     const skills = user.skills
         ? user.skills.split(',').map(s => s.trim()).filter(Boolean)
@@ -77,7 +76,7 @@ function Profile() {
                                             {initials}
                                         </div>
                                     )}
-                                    <span className={`absolute -bottom-1 -right-1 h-4 w-4 rounded-full border-2 border-zinc-950 ${isOnline ? 'bg-emerald-400' : 'bg-zinc-600'}`} />
+                                    <span className={`absolute -bottom-1 -right-1 h-4 w-4 rounded-full border-2 border-zinc-950 ${user?.is_online ? 'bg-emerald-400' : 'bg-zinc-600'}`} />
                                 </div>
                                 <div className="pb-1">
                                     <div className="flex items-center gap-2 flex-wrap">
@@ -149,7 +148,7 @@ function Profile() {
                 <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
                     {[
                         { label: 'Tasks', value: user.total_tasks ?? 0, color: 'text-cyan-400' },
-                        { label: 'Status', value: user.status ?? '—', color: 'text-emerald-400' },
+                        { label: 'Status', value: user.is_online ? 'Active' : 'Offline', color: 'text-emerald-400' },
                         { label: 'Skills', value: skills.length || 0, color: 'text-violet-400' },
                         { label: 'Links', value: [user.github_url, user.linkedin_url].filter(Boolean).length, color: 'text-amber-400' },
                     ].map(({ label, value, color }) => (
@@ -166,10 +165,15 @@ function Profile() {
                                 <User2 size={16} className="text-zinc-600" />
                                 <h2 className="text-sm font-medium text-zinc-300">About</h2>
                             </div>
-                            {user.bio ? (
-                                <p className="text-sm text-zinc-500 leading-relaxed">{user.bio}</p>
+                            {user.about ? (
+                                <p className="text-sm text-zinc-500 leading-relaxed">{user.about}</p>
                             ) : (
-                                <p className="text-sm text-zinc-700 italic">You haven't written a bio yet.</p>
+                                <p className="text-sm text-zinc-700 italic">
+                                    You haven't written anything yet.{' '}
+                                    <button onClick={() => navigate('/edit-profile')} className="text-zinc-600 underline underline-offset-2 hover:text-zinc-400">
+                                        Add one
+                                    </button>
+                                </p>
                             )}
                         </div>
                         <div className="rounded-2xl border border-white/[0.06] bg-zinc-950 p-6">
@@ -280,7 +284,7 @@ function Profile() {
                                     { label: 'Email', value: user.email || '—' },
                                     { label: 'Job title', value: user.job_title || '—' },
                                     { label: 'Location', value: user.location || '—' },
-                                    { label: 'Status', value: user.status || '—', className: 'uppercase text-green-500 text-xs' },
+                                    { label: 'Status', value: user.is_online ? 'Active': 'Offline', className: 'uppercase text-green-500 text-xs' },
                                 ].map(({ label, value, className }) => (
                                     <div key={label} className="flex items-start justify-between gap-4 text-sm">
                                         <span className="text-zinc-600 flex-shrink-0">{label}</span>
@@ -289,10 +293,8 @@ function Profile() {
                                 ))}
                             </div>
                         </div>
-
                     </div>
                 </div>
-
             </div>
         </div>
     )

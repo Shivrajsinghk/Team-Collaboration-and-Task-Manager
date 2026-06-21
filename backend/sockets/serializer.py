@@ -74,6 +74,7 @@ class PersonalConversationSerializer(serializers.ModelSerializer):
             "message": message.message,
             "sender": message.sender.username,
             "created_at": message.created_at,
+            "is_read": message.is_read
         }
 
     class Meta:

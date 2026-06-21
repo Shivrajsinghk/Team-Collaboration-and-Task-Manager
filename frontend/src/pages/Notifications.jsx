@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef, useMemo } from 'react'
+import React, { useEffect, useState, useMemo } from 'react'
 import { list_notifications, mark_notification_read } from '../api/chat'
 import { useNotifications } from '../context/NotificationContext'
 
@@ -28,28 +28,6 @@ function Notifications() {
     const { notifications, setNotifications, loading } = useNotifications()
     const [filter, setFilter] = useState('all')
     const [removingIds, setRemovingIds] = useState(new Set())
-    const socketRef = useRef(null)
-
-    useEffect(() => {
-        const token = localStorage.getItem('access')
-        socketRef.current = new WebSocket(
-            `ws://127.0.0.1:8000/ws/notifications/?token=${encodeURIComponent(token)}`
-        )
-        socketRef.current.onmessage = (event) => {
-            const data = JSON.parse(event.data)
-            setNotifications((prev) =>
-                prev.some((n) => n.id === data.id) ? prev : [data, ...prev]
-            )
-        }
-        socketRef.current.onerror = (error) => {
-            console.error('WebSocket error:', error)
-        }
-        return () => {
-            if (socketRef.current) {
-                socketRef.current.close()
-            }
-        }
-    }, [])
 
     const unreadCount = useMemo(
         () => notifications.filter((n) => !n.is_read).length,

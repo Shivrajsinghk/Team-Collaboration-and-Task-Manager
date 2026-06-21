@@ -7,16 +7,19 @@ import { store } from './Features/store.js'
 import TeamActivityProviderFunction from './context/TeamActivityContext.jsx'
 import TaskActivityProviderFunction from './context/TaskActivityContext.jsx'
 import { NotificationProvider } from './context/NotificationContext.jsx'
+import { ChatProvider } from './context/ChatContext.jsx'
 
 createRoot(document.getElementById('root')).render(
     <Provider store={store}>
         <BrowserRouter>
             <NotificationProvider>
-                <TeamActivityProviderFunction>
-                    <TaskActivityProviderFunction>
-                        <App />
-                    </TaskActivityProviderFunction>
-                </TeamActivityProviderFunction>
+                <ChatProvider>
+                    <TeamActivityProviderFunction>
+                        <TaskActivityProviderFunction>
+                            <App />
+                        </TaskActivityProviderFunction>
+                    </TeamActivityProviderFunction>
+                </ChatProvider>
             </NotificationProvider>
         </BrowserRouter>
     </Provider>
