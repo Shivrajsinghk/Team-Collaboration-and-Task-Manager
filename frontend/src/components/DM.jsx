@@ -36,24 +36,50 @@ function DM({
             `ws://127.0.0.1:8000/ws/personal-chats/${selectedConversationId}/?token=${token}`
         )
         socketRef.current.onmessage = (event) => {
-            const data = JSON.parse(event.data)
+            const data = JSON.parse(event.data)            
+            console.log('seen received!', data)
+            console.log('TYPE:', data.type) 
+            if (data.type === 'seen') {
+                console.log('seen hit, currentUser.id:', currentUser?.id)
+                setChats(prev => {
+                    console.log('messages and their sender ids:', prev.map(m => ({ 
+                        senderId: m.sender?.id, 
+                        senderIdType: typeof m.sender?.id,
+                        currentUserId: currentUser?.id,
+                        currentUserIdType: typeof currentUser?.id,
+                        matches: String(m.sender?.id) === String(currentUser?.id)
+                    })))
+                    return prev.map(m =>
+                        String(m.sender?.id) === String(currentUser?.id)
+                            ? { ...m, is_read: true }
+                            : m
+                    )
+                })
+                return
+            }
             setChats((prev) => [...prev, data])
         }
         socketRef.current.onerror = (error) => {
             console.log(error)
         }
         return () => socketRef.current?.close()
-    }, [selectedConversationId])
+    }, [selectedConversationId, currentUser?.id])
 
     useEffect(() => {
         if (!selectedConversationId) {
             setLoading(false)
             return
         } 
+        let timer 
         const fetchChats = async () => {
             try {
                 const response = await list_personal_messages(selectedConversationId)
                 setChats(response.data)
+                timer = setTimeout(() => {
+                    if (socketRef.current?.readyState === WebSocket.OPEN) {
+                        socketRef.current.send(JSON.stringify({ type: 'seen' }))
+                    }
+                }, 300)
             }
             catch (error) {
                 console.log(error?.response?.data || error)
@@ -63,6 +89,7 @@ function DM({
             }
         }
         fetchChats()
+        return () => clearTimeout(timer)
     }, [selectedConversationId])
 
     if(loading){

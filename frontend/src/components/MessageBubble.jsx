@@ -107,10 +107,15 @@ const MessageBubble = ({
                             {chat.message}
                         </p>
                     )}
-                    <div className="mt-2 flex justify-end">
+                    <div className="mt-2 flex items-center justify-end gap-1.5">
                         <span className="whitespace-nowrap text-[11px] text-slate-400">
                             {formatMessageTime(chat.created_at)}
                         </span>
+                        {isMine && (
+                            <span className={`text-[11px] ${chat.is_read ? 'text-cyan-400' : 'text-zinc-600'}`}>
+                                {chat.is_read ? '✓✓' : '✓'}
+                            </span>
+                        )}
                     </div>
                 </div>
             </div>

@@ -250,3 +250,13 @@ def mark_notification_read(request, notification_id):
     notification.save()
     return Response({"message": "Read"})
 
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def mark_messages_read(request, conversation_id):
+    PersonalMessage.objects.filter(
+        personal_conversation_id=conversation_id,
+        is_read=False
+    ).exclude(
+        sender=request.user
+    ).update(is_read=True)
+    return Response({'status': 'ok'})

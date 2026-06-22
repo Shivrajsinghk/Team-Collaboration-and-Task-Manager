@@ -41,6 +41,11 @@ urlpatterns = [
         upload_personal_attachments,
         name="upload_personal_attachments"
     ),
+    path(
+        'conversation/<int:conversation_id>/mark-read/', 
+        mark_messages_read,
+        name='mark_messages_read'
+    ),
 
 
     # Notification views

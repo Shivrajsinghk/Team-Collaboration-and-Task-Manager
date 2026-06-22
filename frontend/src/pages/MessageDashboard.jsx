@@ -33,8 +33,7 @@ function MessageDashboard() {
             otherParticipant?.username?.toLowerCase().includes(searchQuery.toLowerCase())
         )
     })
-    console.log("saf", filteredConversations)
-    
+
     const formatLastSeen = (iso) => {
         if (!iso) return null
         const date = new Date(iso)

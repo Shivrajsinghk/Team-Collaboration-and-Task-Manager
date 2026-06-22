@@ -77,6 +77,16 @@ class PersonalChatsConsumer(AsyncWebsocketConsumer):
 
     async def receive(self, text_data=None, bytes_data=None):
         data = json.loads(text_data)
+        if data.get('type') == 'seen':
+            await self.mark_seen()
+            await self.channel_layer.group_send(
+                self.group_name,
+                {
+                    'type': 'messages_seen',
+                    'seen_by': self.scope['user'].id
+                }
+            )
+            return
         message = data['message']
         chat = await self.save_chat(message)
         await self.channel_layer.group_send(
@@ -88,6 +98,12 @@ class PersonalChatsConsumer(AsyncWebsocketConsumer):
         )
         print("Message received from Client to Server")
     
+    async def messages_seen(self, event):
+        await self.send(text_data=json.dumps({
+            'type': 'seen',
+            'seen_by': event['seen_by']
+        }))
+
     async def chat_message(self, event):
         await self.send(text_data=json.dumps(event['chat']))
 
@@ -114,6 +130,15 @@ class PersonalChatsConsumer(AsyncWebsocketConsumer):
             id=self.conversation_id,
             participant=user
         ).exists()
+
+    @database_sync_to_async
+    def mark_seen(self):
+        PersonalMessage.objects.filter(
+            personal_conversation_id=self.conversation_id,
+            is_read=False
+        ).exclude(
+            sender=self.scope['user']
+        ).update(is_read=True)
 
 class NotificationsConsumer(AsyncWebsocketConsumer):
     async def connect(self):
