@@ -16,15 +16,17 @@ function DM({
 }) {
     const bottomRef = useRef(null)
     const socketRef = useRef(null)
+    const typingTimeoutRef = useRef(null)
+    const fileInputRef = useRef(null)
     const navigate = useNavigate()
     const currentUser = useSelector((state) => state.auth.user)
     const [chats, setChats] = useState([])
     const [message, setMessage] = useState('')
     const [selectedFile, setSelectedFile] = useState(null)    
     const [loading, setLoading] = useState(true)
-    const fileInputRef = useRef(null)
     const [showEmojiPicker, setShowEmojiPicker] = useState(false)
     const [uploadingFile, setUploadingFile] = useState(false)
+    const [isTyping, setIsTyping] = useState(false)
 
     useEffect(() => {
         bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
@@ -36,33 +38,46 @@ function DM({
             `ws://127.0.0.1:8000/ws/personal-chats/${selectedConversationId}/?token=${token}`
         )
         socketRef.current.onmessage = (event) => {
-            const data = JSON.parse(event.data)            
-            console.log('seen received!', data)
-            console.log('TYPE:', data.type) 
+            const data = JSON.parse(event.data)  
+            if (data.type === 'typing') {
+                if (String(data.user_id) !== String(currentUser.id)) {
+                    setIsTyping(data.is_typing)
+                }
+                return
+            }         
             if (data.type === 'seen') {
-                console.log('seen hit, currentUser.id:', currentUser?.id)
                 setChats(prev => {
-                    console.log('messages and their sender ids:', prev.map(m => ({ 
-                        senderId: m.sender?.id, 
-                        senderIdType: typeof m.sender?.id,
-                        currentUserId: currentUser?.id,
-                        currentUserIdType: typeof currentUser?.id,
-                        matches: String(m.sender?.id) === String(currentUser?.id)
-                    })))
                     return prev.map(m =>
-                        String(m.sender?.id) === String(currentUser?.id)
+                        data.message_ids.includes(m.id)
                             ? { ...m, is_read: true }
                             : m
                     )
                 })
                 return
             }
-            setChats((prev) => [...prev, data])
+            if (data.id) {
+                setChats(prev => {
+                    const updated = [...prev, data]
+                    if (
+                        String(data.sender?.id) !== String(currentUser?.id) &&
+                        socketRef.current?.readyState === WebSocket.OPEN
+                    ) {
+                        socketRef.current.send(
+                            JSON.stringify({ type: 'seen' })
+                        )
+                    }
+                    return updated
+                })
+                return
+            }
         }
         socketRef.current.onerror = (error) => {
             console.log(error)
         }
-        return () => socketRef.current?.close()
+        return () => {
+            clearTimeout(typingTimeoutRef.current)
+            socketRef.current?.close()
+        }
     }, [selectedConversationId, currentUser?.id])
 
     useEffect(() => {
@@ -181,12 +196,25 @@ function DM({
         if (!file) return
         setSelectedFile(file)
     }
+    
+    const handleTyping = () => {
+        if (socketRef.current?.readyState === WebSocket.OPEN) {
+            socketRef.current.send(JSON.stringify({ type: 'typing', is_typing: true }))
+        }
+        clearTimeout(typingTimeoutRef.current)
+        typingTimeoutRef.current = setTimeout(() => {
+            if (socketRef.current?.readyState === WebSocket.OPEN) {
+                socketRef.current.send(JSON.stringify({ type: 'typing', is_typing: false }))
+            }
+        }, 2000)
+    }
 
     return (
         <section className="flex relative h-full w-full flex-1 min-h-0 flex-col overflow-hidden rounded-[2rem] border border-white/10 bg-white/[0.03] backdrop-blur-xl">
             <DMHeader 
                 selectedConversationId={selectedConversationId}
                 setSelectedConversationId={setSelectedConversationId}
+                isTyping={isTyping}
             />
             <div className="flex-1 min-h-0 overflow-hidden">
                 <MessageList
@@ -215,6 +243,7 @@ function DM({
                 showEmojiPicker={showEmojiPicker}
                 setShowEmojiPicker={setShowEmojiPicker}
                 uploadingFile={uploadingFile}
+                onTyping={handleTyping}
             />
         </section>
     )

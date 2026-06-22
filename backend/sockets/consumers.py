@@ -78,12 +78,23 @@ class PersonalChatsConsumer(AsyncWebsocketConsumer):
     async def receive(self, text_data=None, bytes_data=None):
         data = json.loads(text_data)
         if data.get('type') == 'seen':
-            await self.mark_seen()
+            seen_ids = await self.mark_seen()
             await self.channel_layer.group_send(
                 self.group_name,
                 {
                     'type': 'messages_seen',
-                    'seen_by': self.scope['user'].id
+                    'seen_by': self.scope['user'].id,
+                    'message_ids': seen_ids
+                }
+            )
+            return
+        if data.get('type') == 'typing':
+            await self.channel_layer.group_send(
+                self.group_name,
+                {
+                    'type': 'typing_indicator',
+                    'user_id': self.scope['user'].id,
+                    'is_typing': data.get('is_typing', False)
                 }
             )
             return
@@ -101,11 +112,19 @@ class PersonalChatsConsumer(AsyncWebsocketConsumer):
     async def messages_seen(self, event):
         await self.send(text_data=json.dumps({
             'type': 'seen',
-            'seen_by': event['seen_by']
+            'seen_by': event['seen_by'],
+            'message_ids': event['message_ids']
         }))
 
     async def chat_message(self, event):
         await self.send(text_data=json.dumps(event['chat']))
+
+    async def typing_indicator(self, event):
+        await self.send(text_data=json.dumps({
+            'type': 'typing',
+            'user_id': event['user_id'],
+            'is_typing': event['is_typing']
+        }))
 
     async def disconnect(self, close_code):
         print('Disconnected')
@@ -133,12 +152,16 @@ class PersonalChatsConsumer(AsyncWebsocketConsumer):
 
     @database_sync_to_async
     def mark_seen(self):
-        PersonalMessage.objects.filter(
+        messages = PersonalMessage.objects.filter(
             personal_conversation_id=self.conversation_id,
             is_read=False
         ).exclude(
             sender=self.scope['user']
-        ).update(is_read=True)
+        )
+        print("UNREAD:", list(messages.values('id', 'sender_id', 'is_read')))
+        ids = list(messages.values_list('id', flat=True))
+        messages.update(is_read=True)
+        return ids
 
 class NotificationsConsumer(AsyncWebsocketConsumer):
     async def connect(self):

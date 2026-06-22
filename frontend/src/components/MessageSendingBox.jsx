@@ -21,7 +21,8 @@ const MessageSendingBox = ({
     fileInputRef,
     showEmojiPicker,
     setShowEmojiPicker,
-    uploadingFile
+    uploadingFile,
+    onTyping
 }) => {
     const emojiRef = useRef(null)
 
@@ -112,7 +113,10 @@ const MessageSendingBox = ({
                         <input
                             type="text"
                             value={message}
-                            onChange={(e) => setMessage(e.target.value)}
+                            onChange={(e) => {
+                                setMessage(e.target.value) 
+                                onTyping()
+                            }}
                             placeholder={
                                 selectedFile
                                     ? 'Add a caption or send the file directly...'

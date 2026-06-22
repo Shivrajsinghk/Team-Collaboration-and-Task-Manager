@@ -7,7 +7,7 @@ import { useNavigate } from 'react-router-dom'
 import { useChat } from '../context/ChatContext'
 
 
-function DMHeader({ selectedConversationId, setSelectedConversationId }) {
+function DMHeader({ selectedConversationId, setSelectedConversationId, isTyping }) {
     const currentUser = useSelector((state) => state.auth.user)
     const navigate = useNavigate()
     const { conversations } = useChat()
@@ -63,9 +63,15 @@ function DMHeader({ selectedConversationId, setSelectedConversationId }) {
                     <h2 className="font-semibold capitalize text-white">
                         {other_user?.full_name}
                     </h2>
-                <p className="truncate text-sm text-[var(--color-cool-steel)]">
-                        @{other_user?.username}
-                    </p>
+                    {isTyping ? (
+                        <div className="px-5 py-1 text-xs text-zinc-500 italic">
+                            typing...
+                        </div>
+                    ) : ( 
+                        <p className="truncate text-sm text-[var(--color-cool-steel)]">
+                            @{other_user?.username}
+                        </p>
+                    )}
                 </div>
             </div>
             <div className="px-3 text-right">
