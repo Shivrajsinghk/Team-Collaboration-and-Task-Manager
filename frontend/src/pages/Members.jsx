@@ -1,48 +1,65 @@
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import { useParams } from 'react-router-dom'
-import { Users, ShieldCheck, Filter, UserPlus, Search } from 'lucide-react'
+import { Users, ShieldCheck, UserPlus, Search } from 'lucide-react'
 import TeamMembers from '../components/TeamMembers'
-import Searchbar from '../components/Searchbar'
 import TeamInviteCode from '../Modal/TeamInviteCode'
 import KickFromTeam from '../Modal/KickFromTeam'
 import TeamMember from '../Modal/TeamMember'
 import PromoteMember from '../Modal/PromoteMember'
 import DemoteMember from '../Modal/DemoteMember'
-import { getTeam } from '../api/teams'
+import { getTeam, teamMembersPresence } from '../api/teams'
+import { keepPreviousData, useQuery } from '@tanstack/react-query'
+import { teamKeys } from '../api/queryKeys'
 
 function Members() {
     const { team_id } = useParams()
-    const [team, setTeam] = useState(null)
     const [isMemberOpen, setIsMemberOpen] = useState(false)
     const [selectedMember, setSelectedMember] = useState(null)
     const [isPromoteAYSOpen, setIsPromoteAYSOpen] = useState(false)
     const [isDemoteAYSOpen, setIsDemoteAYSOpen] = useState(false)
     const [isKickAYSOpen, setIsKickAYSOpen] = useState(false)
     const [isInviteOpen, setIsInviteOpen] = useState(false)
-    const [loading, setLoading] = useState(false)
     const [searchQuery, setSearchQuery] = useState("")
+    const { data: team = null } = useQuery({
+        queryKey: teamKeys.detail(team_id),
+        queryFn: async () => {
+            const response = await getTeam(team_id)
+            return response.data
+        },
+        enabled: !!team_id,
+        staleTime: 2 * 60 * 1000,
+        placeholderData: keepPreviousData,
+    })
+    const { data: presenceMembers = [] } = useQuery({
+        queryKey: teamKeys.membersPresence(team_id),
+        queryFn: async () => {
+            const response = await teamMembersPresence(team_id)
+            return response.data
+        },
+        enabled: !!team_id,
+        refetchInterval: 30000,
+        refetchOnWindowFocus: true,
+    })
     const isAdmin = team?.team?.is_admin
 
-    async function fetchapi() {
-        try {
-            const response = await getTeam(team_id)
-            setTeam(response.data)
-        }
-        catch (error) {
-            console.log(error.response?.data)
-        }
-    }
+    const presenceByUserId = new Map(presenceMembers.map((member) => [member.id, member]))
 
-    useEffect(() => {
-        fetchapi()
-    }, [team_id])
+    const membersWithPresence = (team?.team?.all_members || []).map((member) => ({
+        ...member,
+        user__profile__is_online: presenceByUserId.has(member.user__id)
+            ? presenceByUserId.get(member.user__id).is_online
+            : member.user__profile__is_online,
+        user__profile__last_seen: presenceByUserId.has(member.user__id)
+            ? presenceByUserId.get(member.user__id).last_seen
+            : member.user__profile__last_seen,
+    }))
 
-    const filteredMembers = team?.team?.all_members?.filter(member => {
+    const filteredMembers = membersWithPresence.filter(member => {
         const name = `${member.user__first_name} ${member.user__last_name}`.toLowerCase()
         const username = member.user__username?.toLowerCase()
         const query = searchQuery.toLowerCase()
         return name.includes(query) || username.includes(query)
-    }) || []
+    })
 
     return (
         <>
@@ -139,7 +156,7 @@ function Members() {
                                     Members
                                 </h2>
                                 <p className="mt-1 text-sm text-gray-400">
-                                    {searchQuery ? `${filteredMembers.length} of ${team?.team?.all_members?.length} members` : `${team?.team?.all_members?.length || 0} total members`}
+                                    {searchQuery ? `${filteredMembers.length} of ${membersWithPresence.length} members` : `${membersWithPresence.length} total members`}
                                 </p>
                             </div>
                         </div>
@@ -148,6 +165,7 @@ function Members() {
                             filteredMembers={filteredMembers}
                             setSelectedMember={setSelectedMember}
                             setIsMemberOpen={setIsMemberOpen}
+                            isAdmin={isAdmin}
                         />
                     </section>
                 </div>
@@ -163,46 +181,33 @@ function Members() {
             isMemberOpen={isMemberOpen}
             setIsMemberOpen={setIsMemberOpen}
             team={team}
-            loading={loading}
-            setLoading={setLoading}
             setIsKickAYSOpen={setIsKickAYSOpen} 
             setIsPromoteAYSOpen={setIsPromoteAYSOpen}
             setIsDemoteAYSOpen={setIsDemoteAYSOpen}
             selectedMember={selectedMember}
-            setSelectedMember={setSelectedMember}
             />
 
             <PromoteMember
             isPromoteAYSOpen={isPromoteAYSOpen}
             setIsPromoteAYSOpen={setIsPromoteAYSOpen} 
-            loading={loading}
-            setLoading={setLoading}
             selectedMember={selectedMember}
             setSelectedMember={setSelectedMember}
             setIsMemberOpen={setIsMemberOpen}
-            fetchapi={fetchapi}
             />
 
             <DemoteMember
             isDemoteAYSOpen={isDemoteAYSOpen}
             setIsDemoteAYSOpen={setIsDemoteAYSOpen} 
-            loading={loading}
-            setLoading={setLoading}
             selectedMember={selectedMember}
             setSelectedMember={setSelectedMember}
             setIsMemberOpen={setIsMemberOpen}
-            fetchapi={fetchapi}
             />
 
             <KickFromTeam 
             isKickAYSOpen={isKickAYSOpen}
             setIsKickAYSOpen={setIsKickAYSOpen} 
-            loading={loading}
-            setLoading={setLoading}
             selectedMember={selectedMember}
-            setSelectedMember={setSelectedMember}
             setIsMemberOpen={setIsMemberOpen}
-            fetchapi={fetchapi}
             />
         </>
     )

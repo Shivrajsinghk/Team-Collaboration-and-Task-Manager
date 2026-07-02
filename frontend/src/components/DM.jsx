@@ -1,12 +1,14 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { useSelector } from 'react-redux'
-import { useNavigate, useParams } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import MessageList from './MessageList'
 import { list_personal_messages, uploadPersonalChatAttachment } from '../api/chat'
 import { format, isToday, isYesterday } from 'date-fns'
 import Loading from './Loading'
 import MessageSendingBox from './MessageSendingBox'
 import DMHeader from './DMHeader'
+import { useMutation, useQuery } from '@tanstack/react-query'
+import { chatKeys } from '../api/queryKeys'
 
 const IMAGE_EXTENSIONS = ['.png', '.jpg', '.jpeg', '.gif', '.webp', '.bmp', '.svg']
 
@@ -20,17 +22,33 @@ function DM({
     const fileInputRef = useRef(null)
     const navigate = useNavigate()
     const currentUser = useSelector((state) => state.auth.user)
-    const [chats, setChats] = useState([])
+    const [liveChats, setLiveChats] = useState([])
     const [message, setMessage] = useState('')
     const [selectedFile, setSelectedFile] = useState(null)    
-    const [loading, setLoading] = useState(true)
     const [showEmojiPicker, setShowEmojiPicker] = useState(false)
-    const [uploadingFile, setUploadingFile] = useState(false)
     const [isTyping, setIsTyping] = useState(false)
+    const { data: initialChats = [], isLoading: loading } = useQuery({
+        queryKey: chatKeys.personalMessages(selectedConversationId),
+        queryFn: async () => {
+            const response = await list_personal_messages(selectedConversationId)
+            return response.data
+        },
+        enabled: !!selectedConversationId,
+        staleTime: 15 * 1000,
+        refetchOnWindowFocus: true,
+    })
+    const chats = liveChats.length > 0 ? liveChats : initialChats
+    const uploadAttachmentMutation = useMutation({
+        mutationFn: (formData) => uploadPersonalChatAttachment(selectedConversationId, formData),
+    })
 
     useEffect(() => {
         bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
     }, [chats])
+
+    useEffect(() => {
+        setLiveChats(initialChats)
+    }, [initialChats, selectedConversationId])
 
     useEffect(() => {
         const token = localStorage.getItem('access')
@@ -46,7 +64,7 @@ function DM({
                 return
             }         
             if (data.type === 'seen') {
-                setChats(prev => {
+                setLiveChats(prev => {
                     return prev.map(m =>
                         data.message_ids.includes(m.id)
                             ? { ...m, is_read: true }
@@ -56,7 +74,7 @@ function DM({
                 return
             }
             if (data.id) {
-                setChats(prev => {
+                setLiveChats(prev => {
                     const updated = [...prev, data]
                     if (
                         String(data.sender?.id) !== String(currentUser?.id) &&
@@ -81,31 +99,14 @@ function DM({
     }, [selectedConversationId, currentUser?.id])
 
     useEffect(() => {
-        if (!selectedConversationId) {
-            setLoading(false)
-            return
-        } 
-        let timer 
-        const fetchChats = async () => {
-            try {
-                const response = await list_personal_messages(selectedConversationId)
-                setChats(response.data)
-                timer = setTimeout(() => {
-                    if (socketRef.current?.readyState === WebSocket.OPEN) {
-                        socketRef.current.send(JSON.stringify({ type: 'seen' }))
-                    }
-                }, 300)
+        if (!selectedConversationId || !initialChats.length) return
+        const timer = setTimeout(() => {
+            if (socketRef.current?.readyState === WebSocket.OPEN) {
+                socketRef.current.send(JSON.stringify({ type: 'seen' }))
             }
-            catch (error) {
-                console.log(error?.response?.data || error)
-            }
-            finally {
-                setLoading(false)
-            }
-        }
-        fetchChats()
+        }, 300)
         return () => clearTimeout(timer)
-    }, [selectedConversationId])
+    }, [initialChats, selectedConversationId])
 
     if(loading){
         return <Loading />
@@ -171,16 +172,12 @@ function DM({
         formData.append('file', selectedFile)
         formData.append('message', message.trim())
         try {
-            setUploadingFile(true)
-            await uploadPersonalChatAttachment(selectedConversationId, formData)
+            await uploadAttachmentMutation.mutateAsync(formData)
             setMessage('')
             resetSelectedFile()
         }
         catch (error) {
             console.log(error?.response?.data || error)
-        }
-        finally {
-            setUploadingFile(false)
         }
     }
 
@@ -220,7 +217,7 @@ function DM({
                 <MessageList
                     variant="dm"
                     chats={chats}
-                    setChats={setChats}
+                    setChats={setLiveChats}
                     currentUser={currentUser}
                     bottomRef={bottomRef}
                     getAttachmentUrl={getAttachmentUrl}
@@ -242,7 +239,7 @@ function DM({
                 fileInputRef={fileInputRef}
                 showEmojiPicker={showEmojiPicker}
                 setShowEmojiPicker={setShowEmojiPicker}
-                uploadingFile={uploadingFile}
+                uploadingFile={uploadAttachmentMutation.isPending}
                 onTyping={handleTyping}
             />
         </section>

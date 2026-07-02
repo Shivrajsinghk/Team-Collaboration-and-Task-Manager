@@ -1,9 +1,11 @@
-import React, { useContext, useEffect } from 'react'
+import React from 'react'
 import { Clock3 } from 'lucide-react'
 import { useParams } from 'react-router-dom'
 import { formatDistanceToNow } from 'date-fns'
 import ActivityMessage from './ActivityMessage'
-import { TeamActivityContext } from '../context/TeamActivityContext'
+import { useQuery } from '@tanstack/react-query'
+import { listTeamActivities } from '../api/activity'
+import { teamKeys } from '../api/queryKeys'
 
 const formatTime = (date) => {
     return formatDistanceToNow(new Date(date), {
@@ -12,11 +14,16 @@ const formatTime = (date) => {
 }
 function TeamActivity() {
     const { team_id } = useParams()
-    const { activities, fetchTeamActivities } = useContext(TeamActivityContext)
-
-    useEffect(() => {
-        fetchTeamActivities(team_id)
-    }, [fetchTeamActivities, team_id])
+    const { data: activities = [] } = useQuery({
+        queryKey: teamKeys.activities(team_id),
+        queryFn: async () => {
+            const response = await listTeamActivities(team_id)
+            return response.data
+        },
+        enabled: !!team_id,
+        staleTime: 30 * 1000,
+        refetchOnWindowFocus: true,
+    })
 
     return (
         <div className="bg-[#071717] border border-green-500/20 rounded-3xl p-6 shadow-[0_0_40px_rgba(0,255,255,0.03)]">

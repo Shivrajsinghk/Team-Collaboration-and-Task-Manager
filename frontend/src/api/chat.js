@@ -24,7 +24,10 @@ export function mark_notification_read(notificationId) {
     return api.patch(`sockets/notifications/${notificationId}/`);
 }
 
-const markAsSeen = async (conversationId) => {
-    await api.post(`sockets/conversation/${conversationId}/mark-read/`)
-    socket.send(JSON.stringify({ type: 'seen' }))
+export function getOrCreateDirectConversation(userId) {
+    return api.get(`sockets/user/${userId}/chats/`)
+}
+
+export function markConversationRead(conversationId) {
+    return api.post(`sockets/conversation/${conversationId}/mark-read/`)
 }

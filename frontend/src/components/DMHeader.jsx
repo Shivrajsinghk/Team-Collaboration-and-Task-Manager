@@ -5,7 +5,7 @@ import Loading from './Loading'
 import { useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 import { useChat } from '../context/ChatContext'
-
+import { isPresenceOnline } from '../utils/presence'
 
 function DMHeader({ selectedConversationId, setSelectedConversationId, isTyping }) {
     const currentUser = useSelector((state) => state.auth.user)
@@ -26,6 +26,10 @@ function DMHeader({ selectedConversationId, setSelectedConversationId, isTyping 
 
     const other_user = convo?.participant.find(
         user => user?.id !== currentUser?.id
+    )
+    const isOtherUserOnline = isPresenceOnline(
+        other_user?.is_online,
+        other_user?.last_seen
     )
 
     const formatLastSeen = (iso) => {
@@ -64,7 +68,7 @@ function DMHeader({ selectedConversationId, setSelectedConversationId, isTyping 
                         {other_user?.full_name}
                     </h2>
                     {isTyping ? (
-                        <div className="px-5 py-1 text-xs text-zinc-500 italic">
+                        <div className="py-1 text-xs text-zinc-500 italic">
                             typing...
                         </div>
                     ) : ( 
@@ -75,7 +79,7 @@ function DMHeader({ selectedConversationId, setSelectedConversationId, isTyping 
                 </div>
             </div>
             <div className="px-3 text-right">
-                {other_user?.is_online ? (
+                {isOtherUserOnline ? (
                     <p className="text-sm text-emerald-400">Online</p>
                 ) : (
                     <p className="text-sm text-zinc-500">

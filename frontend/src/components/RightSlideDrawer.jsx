@@ -7,8 +7,10 @@ import AddMemberToTask from '../Modal/AddMemberToTask'
 import DeleteTask from '../Modal/DeleteTask'
 import { TaskActivityContext } from '../context/TaskActivityContext'
 import { getTask, updateTask as saveTask } from '../api/tasks'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { taskKeys } from '../api/queryKeys'
 
-function RightSlideDrawer({isSlideDrawerOpen, setIsSlideDrawerOpen, taskfetch}) {
+function RightSlideDrawer({isSlideDrawerOpen, setIsSlideDrawerOpen}) {
     const { team_id, task_id } = useParams()
     const { fetchTaskActivities } = useContext(TaskActivityContext)
     const [isRemoveMemberOpen, setIsRemoveMemberOpen] = useState(false)
@@ -24,6 +26,30 @@ function RightSlideDrawer({isSlideDrawerOpen, setIsSlideDrawerOpen, taskfetch}) 
         due_date: '',
         assigned_to: []
     })
+    const queryClient = useQueryClient()
+    const { data: task } = useQuery({
+        queryKey: taskKeys.detail(team_id, task_id),
+        queryFn: async () => {
+            const response = await getTask(team_id, task_id)
+            return response.data
+        },
+        enabled: isSlideDrawerOpen && !!team_id && !!task_id,
+        staleTime: 30 * 1000,
+    })
+    const updateTaskMutation = useMutation({
+        mutationFn: (payload) => saveTask(team_id, task_id, payload),
+        onSuccess: (response) => {
+            queryClient.setQueryData(taskKeys.detail(team_id, task_id), response.data)
+            queryClient.invalidateQueries({ queryKey: taskKeys.list(team_id) })
+            fetchTaskActivities(team_id, task_id)
+        },
+        onError: (error) => {
+            console.log(error?.response || error)
+        },
+        onSettled: () => {
+            setIsSaving(false)
+        },
+    })
 
     useEffect(() => {
         if (isRemoveMemberOpen) {
@@ -36,45 +62,28 @@ function RightSlideDrawer({isSlideDrawerOpen, setIsSlideDrawerOpen, taskfetch}) 
         }
     }, [isRemoveMemberOpen])
 
-    async function fetchtask(){
-        try{
-            const response = await getTask(team_id, task_id)
-            setFormData({
-                title: response.data.title,
-                description: response.data.description,
-                priority: response.data.priority,
-                due_date: response.data.due_date
-                ? response.data.due_date.split('T')[0]
-                : '',
-                assigned_to: response.data.assigned_to,
-            })
-            setIsInitialLoad(false)
-        }   
-        catch(error){
-            console.log(error?.response || error)
-        }
-    }
     useEffect(() => {
-        fetchtask()
-    }, [])
+        if (!task) return
+        setFormData({
+            title: task.title,
+            description: task.description,
+            priority: task.priority,
+            due_date: task.due_date
+                ? task.due_date.split('T')[0]
+                : '',
+            assigned_to: task.assigned_to,
+        })
+        setIsInitialLoad(false)
+    }, [task])
 
     async function updateTask(){
-        try{
-            setIsSaving(true)
-            await saveTask(team_id, task_id, {
-                title: formData.title,
-                description: formData.description,
-                priority: formData.priority,
-                due_date: formData.due_date
-            })
-            fetchTaskActivities(team_id, task_id)
-        }
-        catch(error){
-            console.log(error?.response || error)
-        }
-        finally{
-            setIsSaving(false)
-        }
+        setIsSaving(true)
+        updateTaskMutation.mutate({
+            title: formData.title,
+            description: formData.description,
+            priority: formData.priority,
+            due_date: formData.due_date
+        })
     }
     
     useEffect(() => {
@@ -104,7 +113,6 @@ function RightSlideDrawer({isSlideDrawerOpen, setIsSlideDrawerOpen, taskfetch}) 
                 <div
                     onClick={() => {
                         setIsSlideDrawerOpen(false)
-                        taskfetch()
                     }}
                     className="absolute inset-0 bg-black/60 backdrop-blur-sm"
                 />
@@ -130,7 +138,6 @@ function RightSlideDrawer({isSlideDrawerOpen, setIsSlideDrawerOpen, taskfetch}) 
                             <button
                                 onClick={() => {
                                     setIsSlideDrawerOpen(false)
-                                    taskfetch()
                                 }}
                                 className="flex h-10 w-10 items-center justify-center rounded-xl border border-white/10 bg-white/[0.03] text-gray-400 transition-all duration-200 hover:border-white/20 hover:bg-white/[0.06] hover:text-white"
                             >
@@ -272,13 +279,12 @@ function RightSlideDrawer({isSlideDrawerOpen, setIsSlideDrawerOpen, taskfetch}) 
             isRemoveMemberOpen={isRemoveMemberOpen}
             setIsRemoveMemberOpen={setIsRemoveMemberOpen}
             selectedMember={selectedMember}
-            fetchtask={fetchtask}
             />
 
             <AddMemberToTask 
             isAddMemberOpen={isAddMemberOpen}
             setIsAddMemberOpen={setIsAddMemberOpen}
-            fetchtask={fetchtask}
+            isAssigned={task.assigned_to} 
             />
 
             <DeleteTask 

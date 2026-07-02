@@ -3,28 +3,27 @@ import Modal from './Modal'
 import { useParams } from 'react-router-dom'
 import UserProfilePfp from '../components/UserProfilePfp'
 import { promoteMember } from '../api/teams'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { teamKeys } from '../api/queryKeys'
 
 function PromoteMember({
     isPromoteAYSOpen,
     setIsPromoteAYSOpen, 
-    loading,
-    setLoading,
     selectedMember,
     setSelectedMember,
     setIsMemberOpen,
-    fetchapi,
 }) {
     const { team_id } = useParams()
-
-    const handlePromoteSubmit = async () => {
-        if (loading) return
-        setLoading(true)
-        try {
-            await promoteMember(team_id, selectedMember.user__id)
+    const queryClient = useQueryClient()
+    const promoteMutation = useMutation({
+        mutationFn: () => promoteMember(team_id, selectedMember.user__id),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: teamKeys.detail(team_id) })
+            queryClient.invalidateQueries({ queryKey: teamKeys.list })
             setIsMemberOpen(false)
             setSelectedMember(null)
-        }
-        catch (error) {
+        },
+        onError: (error) => {
             console.log(
                 "ERROR",
                 error.response?.data || error
@@ -33,13 +32,16 @@ function PromoteMember({
                 error.response?.data?.error ||
                 "Something went wrong"
             )
-        }
-        finally {
-            setLoading(false)
+        },
+        onSettled: () => {
             setIsPromoteAYSOpen(false);
             setIsMemberOpen(false)
-            fetchapi()
-        }
+        },
+    })
+
+    const handlePromoteSubmit = async () => {
+        if (promoteMutation.isPending) return
+        promoteMutation.mutate()
     }
 
     return (
@@ -57,7 +59,7 @@ function PromoteMember({
                 <div className="mt-6 flex flex-col gap-3">
                     <button
                         onClick={handlePromoteSubmit}
-                        disabled={loading}
+                        disabled={promoteMutation.isPending}
                         className="
                         px-4 py-2 rounded-xl
                         bg-cyan-500/90
@@ -67,7 +69,7 @@ function PromoteMember({
                         font-medium
                         "
                     >
-                        {loading ? "Promoting..." : "Promote to Admin"}
+                        {promoteMutation.isPending ? "Promoting..." : "Promote to Admin"}
                     </button>
                     <button
                         type="button"

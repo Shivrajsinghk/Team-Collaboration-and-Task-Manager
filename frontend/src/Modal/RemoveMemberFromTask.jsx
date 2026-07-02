@@ -4,27 +4,37 @@ import { useContext } from 'react'
 import { UserMinus } from 'lucide-react'
 import { TaskActivityContext } from '../context/TaskActivityContext'
 import { removeMemberFromTask } from '../api/tasks'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { taskKeys } from '../api/queryKeys'
 
 function RemoveMemberFromTask({
     isRemoveMemberOpen,
     setIsRemoveMemberOpen,
     selectedMember,
-    fetchtask
 }) {
     
     const { team_id, task_id } = useParams()
     const { fetchTaskActivities } = useContext(TaskActivityContext)
-
-    const handleClick = async () => {
-        try{
-            await removeMemberFromTask(team_id, task_id, selectedMember.id)
-            fetchtask()
+    const queryClient = useQueryClient()
+    const removeMemberMutation = useMutation({
+        mutationFn: () => removeMemberFromTask(team_id, task_id, selectedMember.id),
+        onSuccess: () => {
+            queryClient.invalidateQueries({
+                queryKey: taskKeys.detail(team_id, task_id),
+            })
+            queryClient.invalidateQueries({
+                queryKey: taskKeys.list(team_id),
+            })
             fetchTaskActivities(team_id, task_id)
             setIsRemoveMemberOpen(false)
-        }   
-        catch(err){
+        },
+        onError: (err) => {
             console.log(err?.response || err)
-        }
+        },
+    })
+
+    const handleClick = async () => {
+        removeMemberMutation.mutate()
     } 
 
     return (

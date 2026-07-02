@@ -2,25 +2,39 @@ import React, { useState } from 'react'
 import Modal from './Modal'
 import { useParams } from 'react-router-dom'
 import { createTask } from '../api/tasks'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { taskKeys } from '../api/queryKeys'
 
 function CreateTask({
     isCreateOpen, 
     setIsCreateOpen, 
-    fetchTask, 
-    loading, 
-    setLoading,
     team,
 }) {
-        
+    
     const { team_id } = useParams()
     const [isDropdownOpen, setIsDropdownOpen] = useState(false)
     const [selectedMembers, setSelectedMembers] = useState([])
     const BASE_URL = import.meta.env.VITE_DJANGO_BASE_URL
+    const queryClient = useQueryClient()
+
+    const createTaskMutation = useMutation({
+        mutationFn: (data) => createTask(team_id, data),
+        onSuccess: () => {
+            queryClient.invalidateQueries({
+                queryKey: taskKeys.list(team_id),
+            })
+            setSelectedMembers([])
+            setIsDropdownOpen(false)
+            setIsCreateOpen(false)
+        },
+        onError: (error) => {
+            console.log("ERROR", error.response || error)
+        },
+    })
 
     const handleCreateSubmit = async (e) => {
         e.preventDefault()
-        if (loading) return; 
-        setLoading(true);
+        if (createTaskMutation.isPending) return
         const formData = new FormData(e.target);
         const data = {
             title: formData.get("task_title"),   
@@ -30,20 +44,9 @@ function CreateTask({
         }
         if(!data.title || !data.title.trim()){
             alert("Task title is required");
-            setLoading(false)
             return
         }
-        try{
-            await createTask(team_id, data)
-            fetchTask()
-        }
-        catch(error){
-            console.log("ERROR", error.response || error);
-        }
-        finally {
-            setLoading(false)
-            setIsCreateOpen(false);
-        }
+        createTaskMutation.mutate(data)
     }
 
     return (
@@ -141,7 +144,7 @@ function CreateTask({
                             onWheel={(e) => e.stopPropagation()}
                             className="absolute left-full bottom-0 ml-3 z-[9999] w-80 max-h-80 overflow-y-auto rounded-2xl border border-white/10 bg-[#0B1120] p-2 shadow-2xl scrollbar-thin scrollbar-track-transparent scrollbar-thumb-teal-500/40 hover:scrollbar-thumb-teal-400/60"
                         >
-                            {team?.team?.all_members?.map((member) => (
+                    {team?.team?.all_members?.map((member) => (
                                 <button
                                     type="button"
                                     key={member.user__id}
@@ -193,14 +196,14 @@ function CreateTask({
                 </div>
                 <button
                     type="submit"
-                    disabled={loading}
+                    disabled={createTaskMutation.isPending}
                     className={`w-full rounded-2xl py-3 text-sm font-semibold transition duration-300 ${
-                    loading
+                    createTaskMutation.isPending
                     ? "cursor-not-allowed bg-gray-500"
                     : "bg-gradient-to-r from-teal-400 to-cyan-500 text-black hover:scale-[1.01]"
                     }`}
                 >
-                    {loading ? "Creating..." : "Create Task"}
+                    {createTaskMutation.isPending ? "Creating..." : "Create Task"}
                 </button>
             </form>
         </Modal>

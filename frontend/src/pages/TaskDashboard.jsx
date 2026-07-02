@@ -1,16 +1,14 @@
 import React, { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { getTask } from '../api/tasks'
-import { listMembers } from '../api/teams'
-import axios from 'axios'
-import api from '../api/axios'
 import Loading from '../components/Loading'
 import UserProfilePfp from '../components/UserProfilePfp'
-import TeamMembers from '../components/TeamMembers'
 import PreviousPageButton from '../components/PreviousPageButton'
 import RightSlideDrawer from '../components/RightSlideDrawer'
 import TaskActivity from '../components/TaskActivity'
-import { Crown, ListTodo, MessagesSquare, SquareCheckBig, Users, CircleDot, LoaderCircle, BadgeCheck, Flame, Minus, ArrowDown, AlertTriangle, ChevronDown, Settings, X } from 'lucide-react'
+import { Crown, SquareCheckBig, Users, CircleDot, LoaderCircle, BadgeCheck, Flame, AlertTriangle, ChevronDown, Settings } from 'lucide-react'
+import { keepPreviousData, useQuery } from '@tanstack/react-query'
+import { taskKeys } from '../api/queryKeys'
 
 function getStatusIcon(status) {
     switch(status) {
@@ -30,6 +28,7 @@ function getStatusIcon(status) {
             return null
     }
 }
+
 function getPriorityIcon(priority) {
     switch(priority) {
         case 'low':
@@ -51,10 +50,19 @@ function getPriorityIcon(priority) {
 
 function TaskDashboard() {
     const { team_id, task_id } = useParams()
-    const [task, setTask] = useState(null)
-    const [loading, setLoading] = useState(true)
     const [isSlideDrawerOpen, setIsSlideDrawerOpen] = useState(false)
     const navigate = useNavigate()
+    const { data: task = null, isLoading: loading } = useQuery({
+        queryKey: taskKeys.detail(team_id, task_id),
+        queryFn: async () => {
+            const response = await getTask(team_id, task_id)
+            return response.data
+        },
+        enabled: !!team_id && !!task_id,
+        staleTime: 30 * 1000,
+        placeholderData: keepPreviousData,
+        refetchOnWindowFocus: true,
+    })
 
     useEffect(() => {
         if (isSlideDrawerOpen) {
@@ -66,36 +74,6 @@ function TaskDashboard() {
             document.body.style.overflow = 'auto'
         }
     }, [isSlideDrawerOpen])
-
-    async function fetchTask() {
-        try {
-            const response = await getTask(team_id, task_id)
-            setTask(response.data)
-        } 
-        catch (err) {
-            console.log(err?.response || err)
-        }
-        finally {
-            setLoading(false)
-        }
-    }
-
-    async function fetchMembers() {
-        try {
-            await listMembers(team_id)
-        } 
-        catch (err) {
-            console.log(err?.response || err)
-        }
-        finally {
-            setLoading(false)
-        }
-    }
-
-    useEffect(() => {
-        fetchTask()
-        fetchMembers() 
-    }, [team_id, task_id])
 
     if (loading) {
         return (
@@ -175,6 +153,7 @@ function TaskDashboard() {
                             </div>
                             <button
                                 onClick={()=>setIsSlideDrawerOpen(true)}
+                                disabled={!task.can_edit}
                                 className="
                                 flex items-center gap-2
                                 rounded-2xl
@@ -188,6 +167,14 @@ function TaskDashboard() {
                                 hover:border-cyan-400/30
                                 hover:bg-cyan-500/10
                                 hover:text-cyan-300
+                                disabled:cursor-not-allowed
+                                disabled:opacity-80
+                                disabled:border-white/5
+                                disabled:bg-white/[0.02]
+                                disabled:text-zinc-500
+                                disabled:hover:border-white/5
+                                disabled:hover:bg-white/[0.02]
+                                disabled:hover:text-zinc-500
                                 "
                             >
                                 <Settings size={18} />
@@ -271,19 +258,6 @@ function TaskDashboard() {
                                 </div>
                             </div>
                         </div>
-                        <div className="rounded-3xl border min-h-28 border-white/10 bg-[#081312] p-6">
-                            <div className='flex justify-center mt-1 items-center'>
-                                {task.priority == 'low' && (
-                                    <ChevronDown className="h-12 w-12 text-blue-400" />
-                                )}
-                                {task.priority == 'medium' && (
-                                    <Flame className="h-12 w-12 text-yellow-400" />
-                                )}
-                                {task.priority == 'high' && (
-                                    <AlertTriangle className="h-12 w-12 text-red-400" />
-                                )}
-                            </div>                        
-                        </div>
                     </div>
                 </div>
                 <div className="rounded-3xl overflow-auto border border-dashed border-white/10 bg-[#081312] p-6">
@@ -295,7 +269,6 @@ function TaskDashboard() {
                 <RightSlideDrawer
                 isSlideDrawerOpen={isSlideDrawerOpen}
                 setIsSlideDrawerOpen={setIsSlideDrawerOpen}
-                taskfetch={fetchTask}
                 />
             }
         </>

@@ -1,51 +1,31 @@
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import Teams from './Teams'
-import Sidebar from '../components/Sidebar'
 import { useNavigate } from 'react-router-dom';
 import UserProfilePfp from '../components/UserProfilePfp';
-import { LayoutDashboard, Users, PlusCircle, UserPlus, Sparkles, ArrowRight, Plus, Hash, CirclePlus } from "lucide-react"
+import { LayoutDashboard, Users, CirclePlus } from "lucide-react"
 import CreateTeam from '../Modal/CreateTeam';
 import JoinTeam from '../Modal/JoinTeam';
 import AddTeam from '../Modal/AddTeam';
-import { getUserProfile } from '../api/auth';
 import { listTeams } from '../api/teams';
+import { useCurrentUserQuery } from '../hooks/useCurrentUserQuery';
+import { useQuery } from '@tanstack/react-query';
+import { teamKeys } from '../api/queryKeys';
 
 function Dashboard() {
-    const BASE_URL = import.meta.env.VITE_DJANGO_BASE_URL
-    const [profile, setProfile] = useState('')
     const [isAddTeamOpen, setIsAddTeamOpen] = useState(false)
     const [isCreateOpen, setIsCreateOpen] = useState(false)
     const [isJoinOpen, setIsJoinOpen] = useState(false)
     const navigate = useNavigate()
-    const [teams, setTeams] = useState([])
-    const [loading, setLoading] = useState(false);
-
-    useEffect(() => {
-        fetchapi()
-    }, [])
-
-    async function fetchapi() {
-        try {
+    const { data: profile } = useCurrentUserQuery()
+    const { data: teams = [] } = useQuery({
+        queryKey: teamKeys.list,
+        queryFn: async () => {
             const response = await listTeams()
-            setTeams(response.data)
-        } catch (err) {
-            console.log(err)
-            setTeams([])
-        }
-    }
-
-    useEffect(() => {
-        const fetchprofile = async () => {
-            try {
-                const response = await getUserProfile()
-                setProfile(response.data)
-                console.log("hn", response.data)
-            } catch (error) {
-                console.log(error)
-            }
-        }
-        fetchprofile()
-    }, [])
+            return response.data
+        },
+        staleTime: 60 * 1000,
+        refetchOnWindowFocus: true,
+    })
 
     const sidebarBtn =
     "flex w-full items-center gap-3 rounded-2xl px-5 py-3 text-sm font-medium text-[var(--color-cool-steel)] transition-all duration-300 hover:bg-white/[0.05] hover:text-white"
@@ -156,18 +136,12 @@ function Dashboard() {
             />
 
             <CreateTeam 
-            loading={loading}
-            setLoading={setLoading}
             isCreateOpen={isCreateOpen}
             setIsCreateOpen={setIsCreateOpen}
-            fetchapi={fetchapi}
             setIsAddTeamOpen={setIsAddTeamOpen}
             />
 
             <JoinTeam 
-            loading={loading}
-            setLoading={setLoading}
-            fetchapi={fetchapi}
             isJoinOpen={isJoinOpen}
             setIsJoinOpen={setIsJoinOpen}
             setIsAddTeamOpen={setIsAddTeamOpen}

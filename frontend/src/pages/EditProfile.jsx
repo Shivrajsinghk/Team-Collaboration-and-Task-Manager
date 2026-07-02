@@ -8,7 +8,10 @@ import {
     ImagePlus, Trash2, Save, X, MapPin, GitBranch,
     Link, Briefcase, Code2, ArrowLeft
 } from "lucide-react"
-import { getUserProfile, updateUserProfile } from '../api/auth'
+import { updateUserProfile } from '../api/auth'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { authKeys } from '../api/queryKeys'
+import { useCurrentUserQuery } from '../hooks/useCurrentUserQuery'
 
 const BASE_URL = import.meta.env.VITE_DJANGO_BASE_URL
 
@@ -21,9 +24,6 @@ function getMediaUrl(baseUrl, path) {
 function EditProfile() {
     const navigate = useNavigate()
     const dispatch = useDispatch()
-    const [user, setLocalUser] = useState(null)
-    const [loading, setLoading] = useState(true)
-    const [submitting, setSubmitting] = useState(false)
     const [errorMessage, setErrorMessage] = useState('')
     const [selectedFile, setSelectedFile] = useState(null)
     const [previewUrl, setPreviewUrl] = useState('')
@@ -41,6 +41,23 @@ function EditProfile() {
         linkedin_url: "",
         skills: "",
     })
+    const queryClient = useQueryClient()
+    const { data: user, isLoading: loading } = useCurrentUserQuery({
+        onSuccess: undefined,
+    })
+
+    const updateProfileMutation = useMutation({
+        mutationFn: (payload) => updateUserProfile(payload),
+        onSuccess: (response) => {
+            queryClient.setQueryData(authKeys.me, response.data)
+            dispatch(setAuthUser(response.data))
+            navigate("/profile")
+        },
+        onError: (error) => {
+            console.log(error.response?.data)
+            setErrorMessage("Couldn't save your profile. Please try again.")
+        },
+    })
 
     useEffect(() => {
         return () => {
@@ -50,31 +67,20 @@ function EditProfile() {
 
     const handleSubmit = async (e) => {
         e.preventDefault()
-        setSubmitting(true)
         setErrorMessage('')
-        try {
-            const formDataToSend = new FormData()
-            formDataToSend.append("first_name", formData.first_name)
-            formDataToSend.append("last_name", formData.last_name)
-            formDataToSend.append("bio", formData.bio)
-            formDataToSend.append("about", formData.about)
-            formDataToSend.append("job_title", formData.job_title)
-            formDataToSend.append("location", formData.location)
-            formDataToSend.append("github_url", formData.github_url)
-            formDataToSend.append("linkedin_url", formData.linkedin_url)
-            formDataToSend.append("skills", formData.skills)
-            formDataToSend.append("remove_profile_picture", String(removeProfilePicture))
-            if (selectedFile) formDataToSend.append("profile_picture", selectedFile)
-            const response = await updateUserProfile(formDataToSend)
-            setLocalUser(response.data)
-            dispatch(setAuthUser(response.data))
-            navigate("/profile")
-        } catch (error) {
-            console.log(error.response?.data)
-            setErrorMessage("Couldn't save your profile. Please try again.")
-        } finally {
-            setSubmitting(false)
-        }
+        const formDataToSend = new FormData()
+        formDataToSend.append("first_name", formData.first_name)
+        formDataToSend.append("last_name", formData.last_name)
+        formDataToSend.append("bio", formData.bio)
+        formDataToSend.append("about", formData.about)
+        formDataToSend.append("job_title", formData.job_title)
+        formDataToSend.append("location", formData.location)
+        formDataToSend.append("github_url", formData.github_url)
+        formDataToSend.append("linkedin_url", formData.linkedin_url)
+        formDataToSend.append("skills", formData.skills)
+        formDataToSend.append("remove_profile_picture", String(removeProfilePicture))
+        if (selectedFile) formDataToSend.append("profile_picture", selectedFile)
+        updateProfileMutation.mutate(formDataToSend)
     }
 
     const handleChange = (e) => {
@@ -94,36 +100,27 @@ function EditProfile() {
         setRemoveProfilePicture(true)
         if (previewUrl) URL.revokeObjectURL(previewUrl)
         setPreviewUrl('')
-        setLocalUser((prev) => prev ? { ...prev, profile_picture: null } : prev)
+        queryClient.setQueryData(authKeys.me, (prev) =>
+            prev ? { ...prev, profile_picture: null } : prev
+        )
     }
 
     useEffect(() => {
-        const fetchProfile = async () => {
-            try {
-                const response = await getUserProfile()
-                const d = response.data
-                setFormData({
-                    username: d.username || "",
-                    email: d.email || "",
-                    first_name: d.first_name || "",
-                    last_name: d.last_name || "",
-                    bio: d.bio || "",
-                    about: d.about || "",
-                    job_title: d.job_title || "",
-                    location: d.location || "",
-                    github_url: d.github_url || "",
-                    linkedin_url: d.linkedin_url || "",
-                    skills: d.skills || "",
-                })
-                setLocalUser(d)
-            } catch (error) {
-                console.log(error)
-            } finally {
-                setLoading(false)
-            }
-        }
-        fetchProfile()
-    }, [])
+        if (!user) return
+        setFormData({
+            username: user.username || "",
+            email: user.email || "",
+            first_name: user.first_name || "",
+            last_name: user.last_name || "",
+            bio: user.bio || "",
+            about: user.about || "",
+            job_title: user.job_title || "",
+            location: user.location || "",
+            github_url: user.github_url || "",
+            linkedin_url: user.linkedin_url || "",
+            skills: user.skills || "",
+        })
+    }, [user])
 
     if (loading) return <Loading />
 
@@ -382,11 +379,11 @@ function EditProfile() {
                             </button>
                             <button
                                 type="submit"
-                                disabled={submitting}
+                                disabled={updateProfileMutation.isPending}
                                 className="flex flex-1 items-center justify-center gap-2 rounded-xl border border-teal-500/20 bg-teal-500/10 px-5 py-2.5 text-sm font-medium text-teal-400 hover:bg-teal-500/15 transition-colors disabled:cursor-not-allowed disabled:opacity-50"
                             >
                                 <Save size={14} />
-                                {submitting ? "Saving..." : "Save Changes"}
+                                {updateProfileMutation.isPending ? "Saving..." : "Save Changes"}
                             </button>
                         </div>
                     </div>

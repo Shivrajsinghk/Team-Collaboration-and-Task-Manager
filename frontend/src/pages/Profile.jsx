@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react'
+import React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { logout, setUser } from '../Features/authslice'
+import { logout } from '../Features/authslice'
 import { useNavigate } from 'react-router-dom'
 import {
     MapPin, Mail, Pencil, LogOut, ShieldCheck,
@@ -8,7 +8,7 @@ import {
     Briefcase, Calendar, CheckCircle2, Clock, Activity, User2
 } from 'lucide-react'
 import Loading from '../components/Loading'
-import { getUserProfile } from '../api/auth'
+import { useCurrentUserQuery } from '../hooks/useCurrentUserQuery'
 
 const BASE_URL = import.meta.env.VITE_DJANGO_BASE_URL
 
@@ -21,31 +21,15 @@ function getMediaUrl(baseUrl, path) {
 function Profile() {
     const navigate = useNavigate()
     const authUser = useSelector((state) => state.auth.user)
-    const [user, setLocalUser] = useState(authUser)
     const dispatch = useDispatch()
+    const { data: user } = useCurrentUserQuery({
+        initialData: authUser || undefined,
+    })
 
     const handleLogout = () => {
         dispatch(logout())
         navigate('/')
     }
-
-    useEffect(() => {
-        const fetchProfile = async () => {
-            try {
-                const response = await getUserProfile()
-                setLocalUser(response.data)
-                console.log('Fetched user profile:', response.data)
-                dispatch(setUser(response.data))
-            } catch (error) {
-                console.log(error)
-                if (error.response?.status === 401) {
-                    dispatch(logout())
-                    navigate('/')
-                }
-            }
-        }
-        fetchProfile()
-    }, [dispatch, navigate])
 
     if (!user) return <Loading />
 

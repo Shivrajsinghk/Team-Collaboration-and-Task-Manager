@@ -1,25 +1,22 @@
-/* eslint-disable react-refresh/only-export-components */
-import { createContext, useState } from 'react'
-import api from '../api/axios'
+import { createContext, useContext } from 'react'
+import { useQueryClient } from '@tanstack/react-query'
+import { teamKeys } from '../api/queryKeys'
 
 export const TeamActivityContext = createContext()
 
 const TeamActivityProviderFunction = ({children}) => {
-    const [activities, setActivities] = useState([])
+    const queryClient = useQueryClient()
+
     const fetchTeamActivities = async (teamID) => {
-        try{
-            const response = await api.get(`activity/teams/${teamID}/activities/`)
-            setActivities(response.data)
-        }
-        catch(error){
-            console.log(error)
-        }
+        if (!teamID) return
+        await queryClient.invalidateQueries({
+            queryKey: teamKeys.activities(teamID),
+        })
     }
 
     return (
         <TeamActivityContext.Provider
         value={{
-            activities, 
             fetchTeamActivities
         }} 
         >
@@ -29,3 +26,5 @@ const TeamActivityProviderFunction = ({children}) => {
 }
 
 export default TeamActivityProviderFunction
+
+export const useTeamActivityContext = () => useContext(TeamActivityContext)

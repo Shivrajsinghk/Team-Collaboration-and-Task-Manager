@@ -12,6 +12,7 @@ from .views import (
     promote_member_to_admin,
     remove_user_from_team,
     update_team,
+    team_members_presence,
 )
 
 urlpatterns = [
@@ -27,4 +28,5 @@ urlpatterns = [
     path("<int:team_id>/demote/<int:user_id>", demote_admin_to_member, name="demote_admin_to_member"),
     path("<int:team_id>/members", members_list, name="members_list"),
     path("<int:team_id>/members/<int:member_id>", member_details, name="member_details"),
+    path("<int:team_id>/members/presence/", team_members_presence, name="team_members_presence"),
 ]

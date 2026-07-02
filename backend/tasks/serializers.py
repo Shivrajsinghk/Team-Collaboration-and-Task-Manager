@@ -18,6 +18,16 @@ class TaskSerializer(serializers.ModelSerializer):
         source="team.id",
         read_only=True
     )
+    can_edit = serializers.SerializerMethodField()
+
+    def get_can_edit(self, obj):
+        request = self.context["request"]
+        membership = TeamMembership.objects.get(
+            team=obj.team,
+            user=request.user
+        )
+        return membership.role == "admin"
+    
     def get_created_by(self, obj):
         return SimpleUserSerializer(obj.created_by, context={"team": obj.team}).data
 
@@ -44,6 +54,7 @@ class TaskSerializer(serializers.ModelSerializer):
             "due_date",
             "created_at",
             "updated_at",
+            "can_edit"
         ]
         read_only_fields = ["created_at", "updated_at"]
 

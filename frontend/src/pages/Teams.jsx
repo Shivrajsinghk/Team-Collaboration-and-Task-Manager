@@ -20,7 +20,7 @@ function Teams({teams}) {
                         No teams yet
                     </h2>
                     <p className="mt-4 max-w-md text-sm leading-7 text-gray-400">
-                        Create your first workspace and start collaborating with your team members.
+                        Create your first team and start collaborating with your team members.
                     </p>
                 </section>
             )}

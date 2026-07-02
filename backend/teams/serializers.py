@@ -150,7 +150,6 @@ class TeamMemberDetailsSerializer(serializers.ModelSerializer):
 
 class TeamMemberListSerializer(serializers.ModelSerializer):
     role = serializers.SerializerMethodField()
-    status = serializers.SerializerMethodField()
     profile_picture = serializers.ImageField(
         source="profile.profile_picture",
         read_only=True,
@@ -161,9 +160,21 @@ class TeamMemberListSerializer(serializers.ModelSerializer):
         membership = TeamMembership.objects.filter(team=team, user=obj).first()
         return membership.role if membership else None
 
-    def get_status(self, obj):
-        return obj.profile.status
-
     class Meta:
         model = User
-        fields = ["id", "username", "first_name", "last_name", "role", "status", "profile_picture"]
+        fields = ["id", "username", "first_name", "last_name", "role", "profile_picture"]
+
+class TeamMemberPresenceSerializer(serializers.ModelSerializer):
+    id = serializers.IntegerField(source="user.id")
+    full_name = serializers.SerializerMethodField()
+    is_online = serializers.BooleanField(source="user.profile.is_online")
+    last_seen = serializers.DateTimeField(source="user.profile.last_seen")
+    role = serializers.CharField()
+
+    def get_full_name(self, obj):
+        name = f"{obj.user.first_name} {obj.user.last_name}".strip()
+        return name if name else obj.user.username
+
+    class Meta:
+        model = TeamMembership
+        fields = ["id", "full_name", "is_online", "last_seen", "role"]

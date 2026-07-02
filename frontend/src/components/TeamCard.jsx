@@ -1,6 +1,9 @@
 import React from 'react'
 import { useNavigate } from 'react-router-dom'
 import { ArrowUpRight, CalendarDays, Users, Sparkles } from "lucide-react"
+import { useQueryClient } from '@tanstack/react-query'
+import { getTeam } from '../api/teams'
+import { teamKeys } from '../api/queryKeys'
 
 function formatCreatedAt(value) {
     if (!value) return 'Recently created'
@@ -15,6 +18,7 @@ function formatCreatedAt(value) {
 
 function TeamCard({ team }) {
     const navigate = useNavigate()
+    const queryClient = useQueryClient()
     const teamInfo = team?.team ?? {}
     const teamName = teamInfo.name || 'Untitled Team'
     const createdBy = teamInfo.created_by || 'Unknown creator'
@@ -30,8 +34,19 @@ function TeamCard({ team }) {
         navigate(`/team/${team.team_id}`)
     }
 
+    const handlePrefetch = () => {
+        queryClient.prefetchQuery({
+            queryKey: teamKeys.detail(team.team_id),
+            queryFn: async () => {
+                const response = await getTeam(team.team_id)
+                return response.data
+            },
+            staleTime: 2 * 60 * 1000,
+        })
+    }
+
     return (
-        <div onClick={handleClick}>
+        <div onClick={handleClick} onMouseEnter={handlePrefetch}>
             <article
                 className="group relative cursor-pointer overflow-hidden rounded-[2rem] border border-white/10 bg-[linear-gradient(180deg,#112826_0%,#081312_45%,#020404_100%)] p-6 shadow-[0_20px_60px_rgba(0,0,0,0.35)] transition-all duration-500 hover:-translate-y-2 hover:border-cyan-400/30 hover:shadow-[0_25px_80px_rgba(34,211,238,0.12)]"
             >
@@ -50,13 +65,13 @@ function TeamCard({ team }) {
                     </div>
                 </div>
                 <div className="relative mt-8">
-                    <h2 className="text-2xl font-bold tracking-tight text-white transition duration-300 group-hover:text-cyan-100">
+                    <h2 className="text-2xl capitalize font-bold tracking-tight text-white transition duration-300 group-hover:text-cyan-100">
                         {teamName}
                     </h2>
                     <p className="mt-4 text-sm leading-7 text-gray-400">
                         Created by{" "}
                         <span className="font-semibold text-white">
-                            {createdBy}
+                            @{createdBy}
                         </span>
                     </p>
                 </div>

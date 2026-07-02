@@ -3,28 +3,27 @@ import Modal from './Modal'
 import { useParams } from 'react-router-dom'
 import UserProfilePfp from '../components/UserProfilePfp'
 import { demoteMember } from '../api/teams'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { teamKeys } from '../api/queryKeys'
 
 function DemoteMember({
     isDemoteAYSOpen,
     setIsDemoteAYSOpen, 
-    loading,
-    setLoading,
     selectedMember,
     setSelectedMember,
     setIsMemberOpen,
-    fetchapi,
 }) {
     const { team_id } = useParams()
-
-    const handleDemoteSubmit = async () => {
-        if (loading) return
-        setLoading(true)
-        try {
-            await demoteMember(team_id, selectedMember.user__id)
+    const queryClient = useQueryClient()
+    const demoteMutation = useMutation({
+        mutationFn: () => demoteMember(team_id, selectedMember.user__id),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: teamKeys.detail(team_id) })
+            queryClient.invalidateQueries({ queryKey: teamKeys.list })
             setIsMemberOpen(false)
             setSelectedMember(null)
-        }
-        catch (error) {
+        },
+        onError: (error) => {
             console.log(
                 "ERROR",
                 error.response?.data || error
@@ -33,13 +32,16 @@ function DemoteMember({
                 error.response?.data?.error ||
                 "Something went wrong"
             )
-        }
-        finally {
-            setLoading(false)
+        },
+        onSettled: () => {
             setIsDemoteAYSOpen(false);
             setIsMemberOpen(false)
-            fetchapi()
-        }
+        },
+    })
+
+    const handleDemoteSubmit = async () => {
+        if (demoteMutation.isPending) return
+        demoteMutation.mutate()
     }
 
     return (
@@ -57,7 +59,7 @@ function DemoteMember({
                 <div className="mt-6 flex flex-col gap-3">
                     <button
                         onClick={handleDemoteSubmit}
-                        disabled={loading}
+                        disabled={demoteMutation.isPending}
                         className="
                         w-full
                         rounded-2xl
@@ -71,7 +73,7 @@ function DemoteMember({
                         disabled:opacity-50
                         "
                     >
-                        {loading ? "Demoting..." : "Demote to Member"}
+                        {demoteMutation.isPending ? "Demoting..." : "Demote to Member"}
                     </button>
                     <button
                         type="button"

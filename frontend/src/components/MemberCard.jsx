@@ -2,24 +2,26 @@ import React from 'react'
 import UserProfilePfp from './UserProfilePfp'
 import { EllipsisVertical } from 'lucide-react'
 import { useLocation, useNavigate, useParams } from 'react-router-dom'
+import { isPresenceOnline } from '../utils/presence'
 
-function MemberCard({ onManage, member }) {
+function MemberCard({ onManage, member, isAdmin }) {
     const navigate = useNavigate()
     const { team_id } = useParams()
     const location = useLocation()
     const isMembersPage = location.pathname.includes('/members')
-
-    const isOnline = member.user__profile__is_online
-
+    const isOnline = isPresenceOnline(
+        member.user__profile__is_online,
+        member.user__profile__last_seen
+    )
     return (
         <div
             onClick={() => navigate(`/team/${team_id}/members/${member.user__id}`)}
             className="group flex items-center justify-between gap-4 rounded-2xl border border-white/5 bg-white/[0.02] p-4 transition-all duration-200 hover:border-cyan-500/15 hover:bg-white/[0.04] cursor-pointer"
         >
             <div className="flex items-center gap-4 min-w-0">
-                <UserProfilePfp memberUser={member} isOnline={member.user__profile__is_online} />
+                <UserProfilePfp memberUser={member} isOnline={isOnline} />
                 <div className="min-w-0">
-                    <p className="font-medium text-white truncate">
+                    <p className="font-medium text-white capitalize truncate">
                         {member.user__first_name} {member.user__last_name}
                     </p>
                     <p className="text-sm text-zinc-500 truncate">
@@ -37,7 +39,7 @@ function MemberCard({ onManage, member }) {
                 <span className="px-3 py-1 rounded-full text-xs font-medium capitalize bg-cyan-400/10 text-cyan-300 border border-cyan-500/20">
                     {member.role}
                 </span>
-                {isMembersPage && (
+                {isMembersPage && isAdmin && (
                     <span className="group/btn relative">
                         <span
                             onClick={(e) => {

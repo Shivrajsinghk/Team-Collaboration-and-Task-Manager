@@ -1,28 +1,16 @@
-import React, { useEffect, useState } from 'react'
+import React from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import UserProfilePfp from './UserProfilePfp'
 import { LayoutDashboard, CheckSquare, Users, MessageCircle } from "lucide-react"
-import { getUserProfile } from '../api/auth'
+import { useCurrentUserQuery } from '../hooks/useCurrentUserQuery'
 
 function Sidebar() {
     const { team_id } = useParams()
-    const [profile, setProfile] = useState('')
     const navigate = useNavigate()
+    const { data: profile } = useCurrentUserQuery()
 
     const sidebarBtn =
     "flex w-full items-center gap-3 rounded-2xl px-5 py-3 text-sm font-medium text-[var(--color-cool-steel)] transition-all duration-300 hover:bg-white/[0.05] hover:text-white"
-
-    useEffect(() => {
-        const fetchprofile = async () => {
-            try {
-                const response = await getUserProfile()
-                setProfile(response.data)
-            } catch (error) {
-                console.log(error)
-            }
-        }
-        fetchprofile()
-    }, [])
 
     return (
         <>

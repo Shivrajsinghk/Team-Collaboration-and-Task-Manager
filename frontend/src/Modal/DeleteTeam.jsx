@@ -2,27 +2,33 @@ import React from 'react'
 import Modal from './Modal'
 import { useNavigate, useParams } from 'react-router-dom'
 import { deleteTeam } from '../api/teams'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { teamKeys } from '../api/queryKeys'
 
-function DeleteTeam({isDeleteOpen, setIsDeleteOpen, loading, setLoading, team}) {
+function DeleteTeam({isDeleteOpen, setIsDeleteOpen, team}) {
     const { team_id } = useParams()
     const navigate = useNavigate()
+    const queryClient = useQueryClient()
+    const deleteTeamMutation = useMutation({
+        mutationFn: () => deleteTeam(team_id),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: teamKeys.list })
+            queryClient.removeQueries({ queryKey: teamKeys.detail(team_id) })
+            navigate('/dashboard')
+        },
+        onError: (error) => {
+            console.log("ERROR", error.response?.data?.error || error);
+            alert(error.response?.data?.error)
+        },
+        onSettled: () => {
+            setIsDeleteOpen(false);
+        },
+    })
 
     const handleDeleteSubmit = async (e) => {
         e.preventDefault()
-        if (loading) return; 
-        setLoading(true);
-        try{
-            await deleteTeam(team_id)
-            navigate('/dashboard')
-        }
-        catch(error){
-            console.log("ERROR", error.response?.data?.error || error);
-            alert(error.response?.data?.error)
-        }
-        finally {
-            setLoading(false)
-            setIsDeleteOpen(false);
-        }
+        if (deleteTeamMutation.isPending) return
+        deleteTeamMutation.mutate()
     }
 
     return (
@@ -51,10 +57,10 @@ function DeleteTeam({isDeleteOpen, setIsDeleteOpen, loading, setLoading, team}) 
                 <div className="mt-7 flex justify-center gap-4">
                     <button
                         onClick={handleDeleteSubmit}
-                        disabled={loading && !team?.team?.is_admin}
+                        disabled={deleteTeamMutation.isPending && !team?.team?.is_admin}
                         className="rounded-xl bg-red-500 px-5 py-2.5 text-sm font-medium text-white transition-all hover:bg-red-600 disabled:cursor-not-allowed disabled:opacity-60"
                     >
-                        {loading ? "Deleting..." : "Delete Team"}
+                        {deleteTeamMutation.isPending ? "Deleting..." : "Delete Team"}
                     </button>
                     <button
                         type="button"

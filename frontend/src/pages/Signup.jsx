@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { registerUser } from '../api/auth'
+import { useMutation } from '@tanstack/react-query'
 import { User, Mail, Lock, ArrowRight, Sparkles, ShieldCheck, Users, Layers3 } from "lucide-react"
 
 function Signup() {
@@ -15,24 +16,13 @@ function Signup() {
         password: '',
         confirmPassword: '',
     })
-
-    const handleSubmit = async (e) => {
-        e.preventDefault()
-        try {
-            setError("")
-            setSuccessMessage("")
-            localStorage.clear()
-            await registerUser({
-                first_name: formData.first_name,
-                last_name: formData.last_name,
-                username: formData.username,
-                email: formData.email,
-                password: formData.password,
-                confirm_password: formData.confirmPassword,
-            })
+    const signupMutation = useMutation({
+        mutationFn: (payload) => registerUser(payload),
+        onSuccess: () => {
             setSuccessMessage('Account created successfully. You can log in now.')
             navigate('/login')
-        } catch (error) {
+        },
+        onError: (error) => {
             const apiError = error.response?.data
             if (typeof apiError === 'string') {
                 setError(apiError)
@@ -44,7 +34,22 @@ function Signup() {
                 return
             }
             setError('Unable to create your account')
-        }
+        },
+    })
+
+    const handleSubmit = async (e) => {
+        e.preventDefault()
+        setError("")
+        setSuccessMessage("")
+        localStorage.clear()
+        signupMutation.mutate({
+            first_name: formData.first_name,
+            last_name: formData.last_name,
+            username: formData.username,
+            email: formData.email,
+            password: formData.password,
+            confirm_password: formData.confirmPassword,
+        })
     }
 
     const handleChange = (e) => {
@@ -183,9 +188,10 @@ function Signup() {
                         </div>
                         <button
                             type="submit"
+                            disabled={signupMutation.isPending}
                             className="flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-teal-400 to-cyan-500 px-4 py-4 text-sm font-semibold text-black transition duration-300 hover:scale-[1.01] hover:shadow-xl hover:shadow-cyan-500/20"
                         >
-                            Create Account
+                            {signupMutation.isPending ? 'Creating Account...' : 'Create Account'}
                             <ArrowRight size={18} />
                         </button>
                     </form>

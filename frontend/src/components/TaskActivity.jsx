@@ -1,9 +1,11 @@
-import React, { useContext, useEffect } from 'react'
+import React from 'react'
 import { Clock3 } from 'lucide-react'
 import { useParams } from 'react-router-dom'
 import { formatDistanceToNow } from 'date-fns'
-import { TaskActivityContext } from '../context/TaskActivityContext' 
 import { ArrowRightLeft, Flag, Pencil, CalendarDays, UserPlus, UserMinus } from 'lucide-react'
+import { useQuery } from '@tanstack/react-query'
+import { listTaskActivities } from '../api/activity'
+import { taskKeys } from '../api/queryKeys'
 
 const formatActivityMessage = (activity) => {
     const actor = activity.actor.username
@@ -140,18 +142,25 @@ const formatActivityMessage = (activity) => {
             )
     }
 }
+
 const formatTime = (date) => {
     return formatDistanceToNow(new Date(date), {
         addSuffix: true
     })
 }
+
 function TaskActivity() {
     const { team_id, task_id } = useParams()
-    const { activities, fetchTaskActivities } = useContext(TaskActivityContext)
-
-    useEffect(() => {
-        fetchTaskActivities(team_id, task_id)
-    }, [fetchTaskActivities, team_id, task_id])
+    const { data: activities = [] } = useQuery({
+        queryKey: taskKeys.activities(team_id, task_id),
+        queryFn: async () => {
+            const response = await listTaskActivities(team_id, task_id)
+            return response.data
+        },
+        enabled: !!team_id && !!task_id,
+        staleTime: 30 * 1000,
+        refetchOnWindowFocus: true,
+    })
 
     return (
         <div className="bg-[#071717] border border-green-500/20 rounded-3xl p-6 shadow-[0_0_40px_rgba(0,255,255,0.03)]">

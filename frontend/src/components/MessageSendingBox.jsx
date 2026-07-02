@@ -111,6 +111,8 @@ const MessageSendingBox = ({
                     </div>
                     <div className="flex flex-1 items-center rounded-[1.3rem] bg-black/20 px-4">
                         <input
+                            name="message" 
+                            id="team-chat-message-input"
                             type="text"
                             value={message}
                             onChange={(e) => {

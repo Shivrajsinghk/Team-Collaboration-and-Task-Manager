@@ -13,7 +13,7 @@ const MessageList = ({
     getSenderName,
     formatMessageTime,
     navigate,
-    teamId
+    teamId,
 }) => {
     const isDM = variant === "dm"
 
@@ -21,7 +21,7 @@ const MessageList = ({
         <div className="relative h-full flex-1 overflow-y-auto overflow-x-hidden bg-[#07110f] scrollbar-thin scrollbar-track-transparent scrollbar-thumb-teal-500/40 hover:scrollbar-thumb-teal-400/60">
             <div
                 className={`
-                    relative px-6 py-6 
+                    relative min-h-full px-6 py-6 
                     ${isDM
                         ? "flex min-h-full flex-col bg-[linear-gradient(to_bottom,rgba(0,0,0,0.2),rgba(0,0,0,0.3)),url(assets/download.jpg)] bg-repeat"
                         : "bg-[linear-gradient(to_bottom,rgba(0,0,0,0.2),rgba(0,0,0,0.4),rgba(0,0,0,0.3)),url(assets/download.jpg)] bg-repeat"

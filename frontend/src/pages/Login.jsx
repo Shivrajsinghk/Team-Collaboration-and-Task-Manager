@@ -3,38 +3,59 @@ import { Link, useNavigate } from 'react-router-dom'
 import { getUserProfile, login } from '../api/auth'
 import { useDispatch } from 'react-redux'
 import { loginSuccess } from '../Features/authslice'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { authKeys } from '../api/queryKeys'
 import { Lock, User, ArrowRight, Sparkles, ShieldCheck, Users, Layers3 } from "lucide-react"
 
 function Login() {
     const dispatch = useDispatch()
     const navigate = useNavigate()
+    const queryClient = useQueryClient()
     const [error, setError] = useState("")
     const [formData, setFormData] = useState({
         username: '',
         password: '',
     })
+    const loginMutation = useMutation({
+        mutationFn: async (credentials) => {
+            const tokenResponse = await login(credentials)
+            localStorage.setItem("access", tokenResponse.data.access)
+            localStorage.setItem("refresh", tokenResponse.data.refresh)
+            const profile = await queryClient.fetchQuery({
+                queryKey: authKeys.me,
+                queryFn: async () => {
+                    const response = await getUserProfile()
+                    return response.data
+                },
+                staleTime: 5 * 60 * 1000,
+            })
+            return {
+                access: tokenResponse.data.access,
+                refresh: tokenResponse.data.refresh,
+                profile,
+            }
+        },
+        onSuccess: ({ access, refresh, profile }) => {
+            dispatch(loginSuccess({
+                user: profile,
+                access,
+                refresh,
+            }))
+            navigate("/dashboard")
+        },
+        onError: (error) => {
+            console.log("Login Failed", error.response?.data || error.message)
+            setError("Invalid username or password")
+        },
+    })
 
     const handleSubmit = async (e) => {
         e.preventDefault()
-        try{
-            const tokenResponse = await login({
-                username: formData.username,
-                password: formData.password
-            })
-            localStorage.setItem("access", tokenResponse.data.access)
-            localStorage.setItem("refresh", tokenResponse.data.refresh)
-            const profileResponse = await getUserProfile()
-            dispatch(loginSuccess({
-                user: profileResponse.data,
-                access: tokenResponse.data.access,
-                refresh: tokenResponse.data.refresh,
-            }))
-            navigate("/dashboard")
-        }   
-        catch(error){
-            console.log("Login Failed", error.response?.data || error.message)
-            setError("Invalid username or password")
-        }
+        setError("")
+        loginMutation.mutate({
+            username: formData.username,
+            password: formData.password
+        })
     }
 
     const handleChange = (e) => {
@@ -167,9 +188,10 @@ function Login() {
                         </div>
                         <button
                             type="submit"
+                            disabled={loginMutation.isPending}
                             className="flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-teal-400 to-cyan-500 px-4 py-4 text-sm font-semibold text-black transition duration-300 hover:scale-[1.01] hover:shadow-xl hover:shadow-cyan-500/20"
                         >
-                            Sign In
+                            {loginMutation.isPending ? 'Signing In...' : 'Sign In'}
                             <ArrowRight size={18} />
                         </button>
                     </form>

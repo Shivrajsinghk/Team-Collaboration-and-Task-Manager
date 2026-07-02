@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { Save, ArrowLeft, Trash2, LogOut, Barcode } from 'lucide-react'
+import { Save, Trash2, LogOut, Barcode } from 'lucide-react'
 import Loading from '../components/Loading'
 import TeamInfo from '../components/TeamInfo'
 import LeaveTeam from '../Modal/LeaveTeam'
@@ -8,11 +8,11 @@ import DeleteTeam from '../Modal/DeleteTeam'
 import TeamInviteCode from '../Modal/TeamInviteCode'
 import PreviousPageButton from '../components/PreviousPageButton'
 import { getTeam, updateTeam } from '../api/teams'
+import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { teamKeys } from '../api/queryKeys'
 
 function UpdateTeam() {
     const { team_id } = useParams()
-    const [team, setTeam] = useState(null)
-    const [loading, setLoading] = useState(true)
     const navigate = useNavigate()
     const [isLeaveOpen, setIsLeaveOpen] = useState(false)
     const [isDeleteOpen, setIsDeleteOpen] = useState(false)
@@ -21,27 +21,46 @@ function UpdateTeam() {
         name: '',
         description: '',
     })
+    const queryClient = useQueryClient()
+    const { data: team = null, isLoading: loading } = useQuery({
+        queryKey: teamKeys.detail(team_id),
+        queryFn: async () => {
+            const response = await getTeam(team_id)
+            return response.data
+        },
+        enabled: !!team_id,
+        staleTime: 2 * 60 * 1000,
+        placeholderData: keepPreviousData,
+    })
+    const updateTeamMutation = useMutation({
+        mutationFn: (payload) => updateTeam(team_id, payload),
+        onSuccess: (response) => {
+            queryClient.setQueryData(teamKeys.detail(team_id), (previous) => {
+                if (!previous) {
+                    return { team: response.data }
+                }
+                return {
+                    ...previous,
+                    team: response.data,
+                }
+            })
+            queryClient.invalidateQueries({ queryKey: teamKeys.detail(team_id) })
+            queryClient.invalidateQueries({ queryKey: teamKeys.list })
+            navigate(`/team/${team_id}`)
+        },
+        onError: (error) => {
+            console.log(error.response?.data || error)
+        },
+    })
     const isAdmin = team?.team?.is_admin
-    
+
     useEffect(() => {
-        const fetchTeam = async () => {
-            try{
-                const response = await getTeam(team_id)
-                setTeam(response.data)
-                setFormData({
-                    name: response.data?.team?.name || '',
-                    description: response.data?.team?.description || '',
-                })
-            }
-            catch (err) {
-                console.log(err.response?.data || err)
-            }
-            finally {
-                setLoading(false)
-            }
-        }
-        fetchTeam()
-    }, [team_id])
+        if (!team) return
+        setFormData({
+            name: team?.team?.name || '',
+            description: team?.team?.description || '',
+        })
+    }, [team])
 
     const handleChange = (e) => {
         setFormData((prev) => ({
@@ -51,17 +70,7 @@ function UpdateTeam() {
     }
 
     const handleSave = () => {
-        async function fetchsave(){
-            try{
-                const response = await updateTeam(team_id, formData)
-                setTeam(response.data)
-                navigate(`/team/${team_id}`)
-            }
-            catch(error){
-                console.log(error.response?.data || error)
-            }
-        }
-        fetchsave()
+        updateTeamMutation.mutate(formData)
     }
 
     return (
@@ -193,14 +202,11 @@ function UpdateTeam() {
                                 <div className="mt-5 space-y-3">
                                     <button
                                         onClick={() => setIsLeaveOpen(true)}
-                                        className="
-                                        flex w-full items-center justify-center gap-2
-                                        rounded-2xl
-                                        border border-white/[0.08]
-                                        px-4 py-3
-                                        transition
-                                        hover:bg-white/[0.04]
-                                        "
+                                        className="flex w-full items-center justify-center gap-2 rounded-xl
+                                        border border-red-500/40 bg-red-500/10
+                                        px-5 py-3 font-semibold text-red-400
+                                        transition-all duration-200
+                                        hover:border-red-500 hover:bg-red-500/20 hover:text-red-300"
                                     >
                                         <LogOut size={18} />
                                         Leave Team
@@ -239,15 +245,11 @@ function UpdateTeam() {
             <LeaveTeam 
             isLeaveOpen={isLeaveOpen}
             setIsLeaveOpen={setIsLeaveOpen}
-            loading={loading} 
-            setLoading={setLoading}
             />
 
             <DeleteTeam 
             isDeleteOpen={isDeleteOpen}
             setIsDeleteOpen={setIsDeleteOpen}
-            loading={loading} 
-            setLoading={setLoading}
             team={team}
             />
         </>

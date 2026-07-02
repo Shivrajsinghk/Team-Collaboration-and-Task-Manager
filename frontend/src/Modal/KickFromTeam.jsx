@@ -3,36 +3,38 @@ import Modal from './Modal'
 import { useParams } from 'react-router-dom'
 import UserProfilePfp from '../components/UserProfilePfp'
 import { removeUserFromTeam } from '../api/teams'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { teamKeys } from '../api/queryKeys'
 
 function KickFromTeam({
     isKickAYSOpen, 
     setIsKickAYSOpen, 
-    loading, 
-    setLoading, 
     selectedMember,
     setIsMemberOpen,
-    fetchapi
 }) {
 
     const { team_id } = useParams()
+    const queryClient = useQueryClient()
+    const kickMutation = useMutation({
+        mutationFn: () => removeUserFromTeam(team_id, selectedMember.user__id),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: teamKeys.detail(team_id) })
+            queryClient.invalidateQueries({ queryKey: teamKeys.list })
+            setIsMemberOpen(false)
+        },
+        onError: (error) => {
+            console.log(error.response?.data?.error || error)
+            alert(error.response?.data?.error || error)
+        },
+        onSettled: () => {
+            setIsKickAYSOpen(false);
+        },
+    })
 
     const handleKickSubmit = async (e) => {
         e.preventDefault()
-        if (loading) return; 
-        setLoading(true);
-        try{
-            await removeUserFromTeam(team_id, selectedMember.user__id)
-        }
-        catch(error){
-            console.log(error.response?.data?.error || error)
-            alert(error.response?.data?.error || error)
-        }
-        finally {
-            setLoading(false)
-            setIsKickAYSOpen(false);
-            setIsMemberOpen(false)
-            fetchapi()
-        }
+        if (kickMutation.isPending) return
+        kickMutation.mutate()
     }
 
     return (
@@ -50,10 +52,10 @@ function KickFromTeam({
                 <div className="flex justify-center gap-4 mt-6">
                     <button
                         onClick={handleKickSubmit}
-                        disabled={loading}
+                        disabled={kickMutation.isPending}
                         className="px-4 py-2 rounded-lg bg-red-500/80 hover:bg-red-500 text-white transition"
                     >
-                        {loading ? "Kicking..." : "Kick Member"}
+                        {kickMutation.isPending ? "Kicking..." : "Kick Member"}
                     </button>
                     <button
                         type="button"

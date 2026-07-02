@@ -1,18 +1,15 @@
-import React from 'react'
-import { useState } from 'react'
-import { useEffect } from 'react'
-import { useRef } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
-import { listConversations } from '../api/chat'
+import React, { useRef, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { useSelector } from 'react-redux'
 import { useChat } from '../context/ChatContext'
 
 const ChatDropdown = ({open, setOpen}) => {
     const dropdownRef = useRef(null)
     const { conversations } = useChat()
-    const [loading, setLoading] = useState(true)
     const currentUser = useSelector((state) => state.auth.user)
     const navigate = useNavigate()
+    console.log(conversations)
+console.log(conversations.length)
 
     useEffect(() => {
         const handleClickOutside = (event) => {
@@ -44,53 +41,69 @@ const ChatDropdown = ({open, setOpen}) => {
             </div>
             <div className="flex-1 overflow-y-auto p-3 scrollbar-thin scrollbar-track-transparent scrollbar-thumb-cyan-500/30">
                 <div className="space-y-2">
-                    {conversations.map((convo) => {
-                        const otherParticipant = convo.participant.find(
-                            (participant) => participant.id !== currentUser.id
-                        )
-                        return (
-                            <button
-                                key={convo.id}
-                                onClick={() => {
-                                    navigate(`/messages/${convo.id}`)
-                                    setOpen(false)
-                                }}
-                                className={`
-                                    flex w-full items-center gap-4
-                                    rounded-2xl border p-4 text-left
-                                    transition-all duration-200
-                                    hover:scale-[1.01]
-                                    hover:border-cyan-500/20
-                                    hover:bg-white/[0.035]
-                                    ${!convo.last_message.is_read && convo.last_message.sender !== currentUser.username
-                                        ? 'border-cyan-500/20 bg-cyan-500/[0.06]'
-                                        : 'border-white/5 bg-white/[0.02]'
-                                    }
-                                `}
-                            >
-                                <img
-                                    src={otherParticipant.profile_picture}
-                                    alt={otherParticipant.full_name}
-                                    className="h-12 w-12 rounded-2xl object-cover border border-white/10"
-                                />
-                                <div className="min-w-0 flex-1">
-                                    <h4 className="truncate font-medium text-[var(--color-mint-cream)]">
-                                        {otherParticipant.full_name}
-                                    </h4>
-                                    <p className={`truncate text-sm ${
-                                        !convo.last_message.is_read && convo.last_message.sender !== currentUser.username
-                                            ? 'text-white font-medium'
-                                            : 'text-[var(--color-cool-steel)]'
-                                    }`}>
-                                        {convo.last_message.message}
-                                    </p>
-                                </div>
-                                {!convo.last_message.is_read && convo.last_message.sender !== currentUser.username && (
-                                    <span className="h-2 w-2 rounded-full bg-cyan-400 shrink-0" />
-                                )}
-                            </button>
-                        )
-                    })}
+                    {conversations.length > 0 ? (
+                        conversations.map((convo) => {
+                            const otherParticipant = convo.participant.find(
+                                (participant) => participant.id !== currentUser.id
+                            )
+                            const hasUnread =
+                                convo.last_message &&
+                                !convo.last_message.is_read &&
+                                convo.last_message.sender !== currentUser.username
+                            return (
+                                <button
+                                    key={convo.id}
+                                    onClick={() => {
+                                        navigate(`/messages/${convo.id}`)
+                                        setOpen(false)
+                                    }}
+                                    className={`
+                                        flex w-full items-center gap-4
+                                        rounded-2xl border p-4 text-left
+                                        transition-all duration-200
+                                        hover:scale-[1.01]
+                                        hover:border-cyan-500/20
+                                        hover:bg-white/[0.035]
+                                        ${
+                                            hasUnread
+                                                ? 'border-cyan-500/20 bg-cyan-500/[0.06]'
+                                                : 'border-white/5 bg-white/[0.02]'
+                                        }
+                                    `}
+                                >
+                                    <img
+                                        src={otherParticipant.profile_picture}
+                                        alt={otherParticipant.full_name}
+                                        className="h-12 w-12 rounded-2xl border border-white/10 object-cover"
+                                    />
+
+                                    <div className="min-w-0 flex-1">
+                                        <h4 className="truncate font-medium text-[var(--color-mint-cream)]">
+                                            {otherParticipant.full_name}
+                                        </h4>
+
+                                        <p
+                                            className={`truncate text-sm ${
+                                                hasUnread
+                                                    ? 'font-medium text-white'
+                                                    : 'text-[var(--color-cool-steel)]'
+                                            }`}
+                                        >
+                                            {convo.last_message?.message || 'No messages yet'}
+                                        </p>
+                                    </div>
+
+                                    {hasUnread && (
+                                        <span className="h-2 w-2 shrink-0 rounded-full bg-cyan-400" />
+                                    )}
+                                </button>
+                            )
+                        })
+                    ) : (
+                        <div className="py-6 text-center text-zinc-500">
+                            No recent chats
+                        </div>
+                    )}
                 </div>
             </div>
             <div className="border-t border-white/10 p-4">

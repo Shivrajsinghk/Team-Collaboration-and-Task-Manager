@@ -1,25 +1,22 @@
-/* eslint-disable react-refresh/only-export-components */
-import { createContext, useState } from 'react'
-import api from '../api/axios'
+import { createContext, useContext } from 'react'
+import { useQueryClient } from '@tanstack/react-query'
+import { taskKeys } from '../api/queryKeys'
 
 export const TaskActivityContext = createContext()
 
 const TaskActivityProviderFunction = ({children}) => {
-    const [activities, setActivities] = useState([])
+    const queryClient = useQueryClient()
+
     const fetchTaskActivities = async (teamID, taskID) => {
-        try{
-            const response = await api.get(`activity/teams/${teamID}/tasks/${taskID}/activities/`)
-            setActivities(response.data)
-        }
-        catch(error){
-            console.log(error)
-        }
+        if (!teamID || !taskID) return
+        await queryClient.invalidateQueries({
+            queryKey: taskKeys.activities(teamID, taskID),
+        })
     }
 
     return (
         <TaskActivityContext.Provider
         value={{
-            activities, 
             fetchTaskActivities
         }} 
         >
@@ -29,3 +26,5 @@ const TaskActivityProviderFunction = ({children}) => {
 }
 
 export default TaskActivityProviderFunction
+
+export const useTaskActivityContext = () => useContext(TaskActivityContext)

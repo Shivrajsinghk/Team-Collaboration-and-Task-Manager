@@ -2,27 +2,33 @@ import React from 'react'
 import Modal from './Modal'
 import { useNavigate, useParams } from 'react-router-dom'
 import { leaveTeam } from '../api/teams'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { teamKeys } from '../api/queryKeys'
 
-function LeaveTeam({isLeaveOpen, setIsLeaveOpen, loading, setLoading}) {
+function LeaveTeam({isLeaveOpen, setIsLeaveOpen}) {
     const { team_id } = useParams()
     const navigate = useNavigate()
+    const queryClient = useQueryClient()
+    const leaveTeamMutation = useMutation({
+        mutationFn: () => leaveTeam(team_id),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: teamKeys.list })
+            queryClient.removeQueries({ queryKey: teamKeys.detail(team_id) })
+            navigate('/dashboard')
+        },
+        onError: (error) => {
+            console.log("ERROR", error.response?.data?.error || error);
+            alert(error.response?.data?.error)
+        },
+        onSettled: () => {
+            setIsLeaveOpen(false);
+        },
+    })
 
     const handleLeaveSubmit = async (e) => {
         e.preventDefault()
-        if (loading) return; 
-        setLoading(true);
-        try{
-            await leaveTeam(team_id)
-            navigate('/dashboard')
-        }
-        catch(error){
-            console.log("ERROR", error.response?.data?.error || error);
-            alert(error.response?.data?.error)
-        }
-        finally {
-            setLoading(false)
-            setIsLeaveOpen(false);
-        }
+        if (leaveTeamMutation.isPending) return
+        leaveTeamMutation.mutate()
     }
 
     return (
@@ -54,10 +60,10 @@ function LeaveTeam({isLeaveOpen, setIsLeaveOpen, loading, setLoading}) {
                 <div className="flex justify-center gap-4 mt-6">
                     <button
                         onClick={handleLeaveSubmit}
-                        disabled={loading}
+                        disabled={leaveTeamMutation.isPending}
                         className="px-4 py-2 rounded-lg bg-white/5 hover:bg-white/10 text-white transition"
                     >
-                        {loading ? "Leaving..." : "Yes"}
+                        {leaveTeamMutation.isPending ? "Leaving..." : "Yes"}
                     </button>
                     <button
                         type="button"

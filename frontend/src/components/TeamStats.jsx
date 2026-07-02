@@ -44,7 +44,7 @@ function TeamStats({team}) {
                 <div className="flex items-center justify-between">
                     <div className="min-w-0">
                         <p className="text-sm text-[var(--color-cool-steel)]">
-                            Team Admins
+                            {admin?.length == 1 ? "Team Admin" : "Team Admins"}
                         </p>
                         <div className="mt-3 flex flex-wrap gap-2">
                             {admin?.map((member) => (

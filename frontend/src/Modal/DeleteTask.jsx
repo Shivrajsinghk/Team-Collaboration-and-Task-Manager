@@ -3,21 +3,29 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { UserMinus } from 'lucide-react'
 import Modal from './Modal'
 import { deleteTask } from '../api/tasks'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { taskKeys } from '../api/queryKeys'
 
 function DeleteTask({isDeleteTaskOpen, setIsDeleteTaskOpen, setIsSlideDrawerOpen}) {
     const { team_id, task_id } = useParams()
     const navigate = useNavigate()
-
-    const handleDeleteTask = async () => {
-        try{
-            await deleteTask(team_id, task_id)
+    const queryClient = useQueryClient()
+    const deleteTaskMutation = useMutation({
+        mutationFn: () => deleteTask(team_id, task_id),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: taskKeys.list(team_id) })
+            queryClient.removeQueries({ queryKey: taskKeys.detail(team_id, task_id) })
             navigate(`/team/${team_id}/tasks`)
             setIsSlideDrawerOpen(false)
-        }   
-        catch(err){
+        },
+        onError: (err) => {
             alert(err?.response?.data?.error || err)
             console.log(err?.response || err)
-        }
+        },
+    })
+
+    const handleDeleteTask = async () => {
+        deleteTaskMutation.mutate()
     }
 
     return (

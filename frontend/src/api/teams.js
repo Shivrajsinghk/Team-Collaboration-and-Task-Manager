@@ -59,3 +59,5 @@ export function uploadTeamChatAttachment(teamId, data) {
         },
     });
 }
+
+export const teamMembersPresence = (team_id) => api.get(`/teams/${team_id}/members/presence/`)

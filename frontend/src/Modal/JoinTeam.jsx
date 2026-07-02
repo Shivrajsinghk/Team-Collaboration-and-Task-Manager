@@ -1,32 +1,37 @@
 import React from 'react'
 import Modal from './Modal'
 import { joinTeam } from '../api/teams'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { teamKeys } from '../api/queryKeys'
 
-function JoinTeam({isJoinOpen, setIsJoinOpen, fetchapi, loading, setLoading, setIsAddTeamOpen}) {
+function JoinTeam({isJoinOpen, setIsJoinOpen, setIsAddTeamOpen}) {
+    const queryClient = useQueryClient()
+    const joinTeamMutation = useMutation({
+        mutationFn: (payload) => joinTeam(payload),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: teamKeys.list })
+        },
+    })
 
     const handleJoinSubmit = async (e) => {
         e.preventDefault()
-        if (loading) return; 
-        setLoading(true);
+        if (joinTeamMutation.isPending) return
         const formData = new FormData(e.target);
         const data = {
             invite_code: formData.get("team_invite_code"),   
         }
         if(!data.invite_code || !data.invite_code.trim()){
             alert("Team's Invite Code is required");
-            setLoading(false)
             return
         }
         try{
-            await joinTeam(data)
-            fetchapi()
+            await joinTeamMutation.mutateAsync(data)
         }
         catch(error){
             console.log("ERROR", error.response || error);
             alert(error.response.data.error)
         }
         finally {
-            setLoading(false)
             setIsJoinOpen(false);
             setIsAddTeamOpen(false)
         }
@@ -53,14 +58,14 @@ function JoinTeam({isJoinOpen, setIsJoinOpen, fetchapi, loading, setLoading, set
                 </div>
                 <button
                 type="submit"
-                disabled={loading}
+                disabled={joinTeamMutation.isPending}
                 className={`w-full rounded-2xl py-3 text-sm font-semibold transition duration-300 ${
-                loading
+                joinTeamMutation.isPending
                 ? "cursor-not-allowed bg-gray-500"
                 : "bg-gradient-to-r from-teal-400 to-cyan-500 text-black hover:scale-[1.01]"
                 }`}
                 >
-                    {loading ? "Joining..." : "Join Team"}
+                    {joinTeamMutation.isPending ? "Joining..." : "Join Team"}
                 </button>
             </form>
         </Modal>

@@ -13,6 +13,7 @@ from .serializers import (
     TeamMemberListSerializer,
     TeamMembershipSerializer,
     TeamSerializer,
+    TeamMemberPresenceSerializer,
 )
 from sockets.utils import create_notification
 
@@ -322,3 +323,15 @@ def member_details(request, team_id, member_id):
         )
     serializer = TeamMemberDetailsSerializer(member, context={"team": team})
     return Response(serializer.data, status=status.HTTP_200_OK)
+
+@api_view(["GET"])
+@permission_classes([IsAuthenticated])
+def team_members_presence(request, team_id):
+    memberships = TeamMembership.objects.filter(
+        team_id=team_id
+    ).select_related("user", "user__profile")
+    serializer = TeamMemberPresenceSerializer(
+        memberships,
+        many=True
+    )
+    return Response(serializer.data)

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import {
     MapPin,
@@ -19,31 +19,34 @@ import {
 } from 'lucide-react'
 import Loading from '../components/Loading'
 import { getPublicUserProfile } from '../api/auth'
-import api from '../api/axios'
+import { getOrCreateDirectConversation } from '../api/chat'
+import { useMutation, useQuery, useQueryClient, keepPreviousData } from '@tanstack/react-query'
+import { authKeys, chatKeys } from '../api/queryKeys'
 
 function PublicProfile() {
     const { username } = useParams()
-    const [user, setUser] = useState(null)
-    const [loading, setLoading] = useState(true)
     const navigate = useNavigate()
     const BASE_URL = import.meta.env.VITE_DJANGO_BASE_URL
+    const queryClient = useQueryClient()
 
-    useEffect(() => {
-        const fetchProfile = async () => {
-            try{
-                const response = await getPublicUserProfile(username)
-                setUser(response.data)
-                console.log("user", response.data)
-            } 
-            catch(err){
-                console.log(err)
-            } 
-            finally{
-                setLoading(false)
-            }
-        }
-        fetchProfile()
-    }, [username])
+    const { data: user, isLoading: loading } = useQuery({
+        queryKey: authKeys.publicProfile(username),
+        queryFn: async () => {
+            const response = await getPublicUserProfile(username)
+            return response.data
+        },
+        enabled: !!username,
+        staleTime: 5 * 60 * 1000,
+        placeholderData: keepPreviousData,
+    })
+
+    const startConversationMutation = useMutation({
+        mutationFn: (userId) => getOrCreateDirectConversation(userId),
+        onSuccess: (response, userId) => {
+            queryClient.setQueryData(chatKeys.directConversation(userId), response.data)
+            navigate(`/messages/${response.data.id}`)
+        },
+    })
 
     const formatLastSeen = (iso) => {
         if (!iso) return null
@@ -63,13 +66,8 @@ function PublicProfile() {
     }
 
     const handleMessageClick = async () => {
-        try{
-            const response = await api.get(`sockets/user/${user.id}/chats/`)
-            navigate(`/messages/${response.data.id}`)
-        }
-        catch (err) {
-            console.log(err)
-        }
+        if (!user?.id) return
+        startConversationMutation.mutate(user.id)
     }
 
     const skills = user['skills']

@@ -1,37 +1,31 @@
-import React, { useEffect, useState } from 'react'
-import { useParams } from 'react-router-dom'
+import React from 'react'
+import { useNavigate, useParams } from 'react-router-dom'
 import { Mail, ShieldCheck, Clock3, Activity, User2 } from 'lucide-react'
 import PreviousPageButton from '../components/PreviousPageButton'
 import { getMemberDetails } from '../api/teams'
+import { useQuery, keepPreviousData } from '@tanstack/react-query'
+import { teamKeys } from '../api/queryKeys'
+import Loading from '../components/Loading'
+import { isPresenceOnline } from '../utils/presence'
 
 function MemberProfile() {
     const { team_id, member_id } = useParams()
-    const [member, setMember] = useState(null)
-    const [loading, setLoading] = useState(true)
+    const navigate = useNavigate()
     const BASE_URL = import.meta.env.VITE_DJANGO_BASE_URL
-
-    useEffect(() => {
-        async function fetchMember() {
-            try {
-                const response = await getMemberDetails(team_id, member_id)
-                setMember(response.data)
-                console.log(response.data)
-            }
-            catch (err) {
-                console.log(err?.response || err)
-            }
-            finally {
-                setLoading(false)
-            }
-        }
-        fetchMember()
-    }, [team_id, member_id])
+    const { data: member = null, isLoading: loading } = useQuery({
+        queryKey: teamKeys.memberDetail(team_id, member_id),
+        queryFn: async () => {
+            const response = await getMemberDetails(team_id, member_id)
+            return response.data
+        },
+        enabled: !!team_id && !!member_id,
+        staleTime: 2 * 60 * 1000,
+        placeholderData: keepPreviousData,
+    })
 
     if (loading) {
         return (
-            <div className="flex h-full items-center justify-center text-zinc-400">
-                Loading Profile...
-            </div>
+            <Loading />
         )
     }
 
@@ -43,6 +37,11 @@ function MemberProfile() {
         )
     }
 
+    const isMemberOnline = isPresenceOnline(
+        member.profile.is_online,
+        member.profile.last_seen
+    )
+
     return (
         <div className="relative min-h-screen ml-5 bg-black p-6">
             <PreviousPageButton className="absolute left-12 top-12 text-white" />
@@ -50,7 +49,9 @@ function MemberProfile() {
                 <div className="rounded-[32px] border border-cyan-500/10 bg-gradient-to-br from-cyan-500/[0.08] via-black to-black p-8 shadow-[0_0_50px_rgba(0,255,255,0.05)]">
                     <div className="flex flex-col gap-8 lg:flex-row lg:items-center lg:justify-between">
                         <div className="flex items-center gap-6">
-                            <div className="relative
+                            <div 
+                                onClick={() => navigate(`/profile/${member.profile.username}`)}
+                                className="relative
                                 h-36 w-36
                                 overflow-hidden
                                 rounded-3xl
@@ -69,12 +70,12 @@ function MemberProfile() {
                                         </div>
                                     )}
                                 <div className={`absolute bottom-1 right-1 h-5 w-5 rounded-full border-2 border-black
-                                    ${member.profile.is_online ? 'bg-emerald-400' : 'bg-zinc-600'}`}
+                                    ${isMemberOnline ? 'bg-emerald-400' : 'bg-zinc-600'}`}
                                 />
                             </div>
                             <div className="space-y-3">
                                 <div>
-                                    <h1 className="text-3xl font-bold text-white">
+                                    <h1 className="text-3xl font-bold capitalize text-white">
                                         {member.profile.full_name}
                                     </h1>
                                     <p className="mt-1 text-lg text-zinc-400">
@@ -88,7 +89,7 @@ function MemberProfile() {
                                     </div>
                                     <div className="flex items-center gap-2 rounded-full border border-emerald-500/20 bg-emerald-500/10 px-4 py-2 text-sm text-emerald-300">
                                         <Activity className="h-4 w-4" />
-                                        {member.profile.is_online ? 'Active' : 'Offline'}
+                                        {isMemberOnline ? 'Active' : 'Offline'}
                                     </div>
                                 </div>
                             </div>
@@ -268,17 +269,19 @@ function MemberProfile() {
                                         <p className="text-sm text-zinc-500">
                                             Last Seen
                                         </p>
-                                        <p className="mt-2 text-white">
-                                            {new Date(member.profile.last_seen).toLocaleDateString()}
-                                        </p>
+                                        {!isMemberOnline && ( 
+                                            <p className="mt-2 text-white">
+                                                {new Date(member.profile.last_seen).toLocaleDateString()}
+                                            </p>
+                                        )}
                                     </div>
                                     <div className={`rounded-full px-3 py-1 text-xs font-medium
-                                        ${member.profile.is_online
+                                        ${isMemberOnline
                                             ? 'bg-emerald-500/10 text-emerald-300 border border-emerald-500/20'
                                             : 'bg-zinc-500/10 text-zinc-300 border border-zinc-500/20'
                                         }`}
                                     >
-                                        {member.profile.is_online ? 'Active' : 'Offline'}
+                                        {isMemberOnline ? 'Active' : 'Offline'}
                                     </div>
                                 </div>
                             </div>

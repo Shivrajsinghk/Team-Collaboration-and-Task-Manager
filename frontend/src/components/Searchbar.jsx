@@ -2,49 +2,46 @@ import React, { useState, useEffect, useRef } from 'react'
 import { Search, X } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { search } from '../api/auth'
+import { keepPreviousData, useQuery, useQueryClient } from '@tanstack/react-query'
+import { authKeys, taskKeys, teamKeys } from '../api/queryKeys'
+import { getTeam } from '../api/teams'
+import { getTask } from '../api/tasks'
 
 function Searchbar() {
     const [query, setQuery] = useState('')
-    const [users, setUsers] = useState([])
-    const [results, setResults] = useState({
-        users: [],
-        teams: [],
-        tasks: []
-    })
-    const [loading, setLoading] = useState(false)
+    const [debouncedQuery, setDebouncedQuery] = useState('')
     const [open, setOpen] = useState(false)
     const [focused, setFocused] = useState(false)
     const debounceRef = useRef(null)
     const wrapperRef = useRef(null)
     const navigate = useNavigate()
+    const queryClient = useQueryClient()
+    const { data: results = { users: [], teams: [], tasks: [] }, isFetching: loading } = useQuery({
+        queryKey: authKeys.search(debouncedQuery),
+        queryFn: async () => {
+            const response = await search(debouncedQuery)
+            return response.data
+        },
+        enabled: !!debouncedQuery.trim(),
+        placeholderData: keepPreviousData,
+        staleTime: 30 * 1000,
+        select: (data) => ({
+            users: data.users || [],
+            teams: data.teams || [],
+            tasks: data.tasks || [],
+        }),
+    })
 
     useEffect(() => {
         if (!query.trim()) {
-            setResults({
-                users: [],
-                teams: [],
-                tasks: []
-            })
+            setDebouncedQuery('')
             setOpen(false)
             return
         }
         clearTimeout(debounceRef.current)
-        debounceRef.current = setTimeout(async () => {
-            setLoading(true)
-            try {
-                const response = await search(query)
-                setResults({
-                    users: response.data.users || [],
-                    teams: response.data.teams || [],
-                    tasks: response.data.tasks || []
-                })
-                console.log('Search results:', response.data)
-                setOpen(true)
-            } catch (error) {
-                console.error('Search error:', error)
-            } finally {
-                setLoading(false)
-            }
+        debounceRef.current = setTimeout(() => {
+            setDebouncedQuery(query.trim())
+            setOpen(true)
         }, 250)
         return () => clearTimeout(debounceRef.current)
     }, [query])
@@ -64,7 +61,6 @@ function Searchbar() {
         navigate(`/profile/${username}`)
         setOpen(false)
         setQuery('')
-        setUsers([])
     }
 
     const handleTeamClick = (teamId) => {
@@ -79,12 +75,30 @@ function Searchbar() {
 
     const clearSearch = () => {
         setQuery('')
-        setResults({
-            users: [],
-            teams: [],
-            tasks: []
-        })
+        setDebouncedQuery('')
         setOpen(false)
+    }
+
+    const prefetchTeam = (teamId) => {
+        queryClient.prefetchQuery({
+            queryKey: teamKeys.detail(teamId),
+            queryFn: async () => {
+                const response = await getTeam(teamId)
+                return response.data
+            },
+            staleTime: 2 * 60 * 1000,
+        })
+    }
+
+    const prefetchTask = (teamId, taskId) => {
+        queryClient.prefetchQuery({
+            queryKey: taskKeys.detail(teamId, taskId),
+            queryFn: async () => {
+                const response = await getTask(teamId, taskId)
+                return response.data
+            },
+            staleTime: 30 * 1000,
+        })
     }
 
     return (
@@ -114,7 +128,7 @@ function Searchbar() {
                 )}
             </div>
             {open && (
-                <div className="absolute top-full left-0 z-50 mt-1.5 w-full overflow-hidden rounded-xl border border-white/[0.06] bg-[#0d1512] shadow-xl shadow-black/40">
+                <div className="absolute top-full left-0 z-50 mt-1.5 w-full max-h-[75vh] overflow-y-auto overflow-x-hidden rounded-xl border border-white/[0.06] bg-[#0d1512] shadow-xl shadow-black/40 scrollbar-thin scrollbar-track-transparent scrollbar-thumb-teal-500/40 hover:scrollbar-thumb-teal-400/60">
                     {results.users.length > 0 && (
                     <>
                         <div className="px-4 py-2 text-[11px] font-semibold uppercase tracking-wider text-zinc-500 border-b border-white/[0.04]">
@@ -176,6 +190,7 @@ function Searchbar() {
                         <button
                             key={team.id}
                             onClick={() => handleTeamClick(team.id)}
+                            onMouseEnter={() => prefetchTeam(team.id)}
                             className={`flex w-full items-center gap-3 px-4 py-3 text-left hover:bg-white/[0.04] transition-colors duration-100 ${
                             index !== results.teams.length - 1
                                 ? "border-b border-white/[0.04]"
@@ -209,6 +224,7 @@ function Searchbar() {
                         <button
                             key={task.id}
                             onClick={() => handleTaskClick(task.team_id, task.id)}
+                            onMouseEnter={() => prefetchTask(task.team_id, task.id)}
                             className={`flex w-full items-center gap-3 px-4 py-3 text-left hover:bg-white/[0.04] transition-colors duration-100 ${
                             index !== results.tasks.length - 1
                                 ? "border-b border-white/[0.04]"

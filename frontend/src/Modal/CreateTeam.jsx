@@ -2,15 +2,23 @@ import React, { useContext } from 'react'
 import Modal from './Modal'
 import { TeamActivityContext } from '../context/TeamActivityContext'
 import { createTeam } from '../api/teams'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { teamKeys } from '../api/queryKeys'
 
-function CreateTeam({isCreateOpen, setIsCreateOpen, fetchapi, loading, setLoading, setIsAddTeamOpen}) {
+function CreateTeam({isCreateOpen, setIsCreateOpen, setIsAddTeamOpen}) {
 
     const { fetchTeamActivities } = useContext(TeamActivityContext)
+    const queryClient = useQueryClient()
+    const createTeamMutation = useMutation({
+        mutationFn: (payload) => createTeam(payload),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: teamKeys.list })
+        },
+    })
     
     const handleCreateSubmit = async (e) => {
         e.preventDefault()
-        if (loading) return; 
-        setLoading(true);
+        if (createTeamMutation.isPending) return
         const formData = new FormData(e.target);
         const data = {
             name: formData.get("team_name"),   
@@ -18,19 +26,15 @@ function CreateTeam({isCreateOpen, setIsCreateOpen, fetchapi, loading, setLoadin
         }
         if(!data.name || !data.name.trim()){
             alert("Team name is required");
-            setLoading(false)
             return
         }
         try{
-            await createTeam(data)
-            fetchapi()
-            fetchTeamActivities()
+            await createTeamMutation.mutateAsync(data)
         }
         catch(error){
             console.log("ERROR", error.response || error);
         }
         finally {
-            setLoading(false)
             setIsCreateOpen(false);
             setIsAddTeamOpen(false)
         }
@@ -66,14 +70,14 @@ function CreateTeam({isCreateOpen, setIsCreateOpen, fetchapi, loading, setLoadin
                 </div>
                 <button
                 type="submit"
-                disabled={loading}
+                disabled={createTeamMutation.isPending}
                 className={`w-full rounded-2xl py-3 text-sm font-semibold transition duration-300 ${
-                loading
+                createTeamMutation.isPending
                 ? "cursor-not-allowed bg-gray-500"
                 : "bg-gradient-to-r from-teal-400 to-cyan-500 text-black hover:scale-[1.01]"
                 }`}
                 >
-                    {loading ? "Creating..." : "Create Team"}
+                    {createTeamMutation.isPending ? "Creating..." : "Create Team"}
                 </button>
             </form>
         </Modal>

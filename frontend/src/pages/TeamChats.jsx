@@ -2,29 +2,57 @@ import React, { useEffect, useRef, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { format, isToday, isYesterday } from 'date-fns'
 import { useSelector } from 'react-redux'
-import { teamChats, uploadTeamChatAttachment } from '../api/teams'
+import { teamChats, teamMembersPresence, uploadTeamChatAttachment } from '../api/teams'
 import Loading from '../components/Loading'
-import UserProfilePfp from '../components/UserProfilePfp'
-import EmojiPickerComp from '../components/EmojiPickerComp'
-import { Download, FileImage, FileText, Loader2, MessageCircle, Mic, Paperclip, Radio, SendHorizontal, Smile, X } from 'lucide-react'
+import { MessageCircle, Radio } from 'lucide-react'
 import MessageSendingBox from '../components/MessageSendingBox'
 import MessageList from '../components/MessageList'
+import { useMutation, useQuery } from '@tanstack/react-query'
+import { teamKeys } from '../api/queryKeys'
+import { isPresenceOnline } from '../utils/presence'
 
 const IMAGE_EXTENSIONS = ['.png', '.jpg', '.jpeg', '.gif', '.webp', '.bmp', '.svg']
 
 function TeamChats() {
+    const BASE_URL = import.meta.env.VITE_DJANGO_BASE_URL
     const { team_id } = useParams()
-    const [chats, setChats] = useState([])
+    const [liveChats, setLiveChats] = useState([])
     const [message, setMessage] = useState('')
     const [selectedFile, setSelectedFile] = useState(null)
     const [showEmojiPicker, setShowEmojiPicker] = useState(false)
-    const [loading, setLoading] = useState(true)
-    const [uploadingFile, setUploadingFile] = useState(false)
     const socketRef = useRef(null)
     const bottomRef = useRef(null)
     const fileInputRef = useRef(null)
     const currentUser = useSelector((state) => state.auth.user)
     const navigate = useNavigate()
+    const { data: initialChats = [], isLoading: loading } = useQuery({
+        queryKey: teamKeys.chats(team_id),
+        queryFn: async () => {
+            const response = await teamChats(team_id)
+            return response.data
+        },
+        enabled: !!team_id,
+        staleTime: 15 * 1000,
+        refetchOnWindowFocus: true,
+    })
+    const { data: members = [] } = useQuery({
+        queryKey: teamKeys.membersPresence(team_id),
+        queryFn: async () => {
+            const response = await teamMembersPresence(team_id)
+            return response.data
+        },
+        enabled: !!team_id,
+        refetchInterval: 30000,
+    })
+
+    const onlineCount = members.filter((member) =>
+        isPresenceOnline(member.is_online, member.last_seen)
+    ).length
+    const chats = liveChats.length > 0 ? liveChats : (initialChats ?? [])
+
+    const uploadAttachmentMutation = useMutation({
+        mutationFn: (formData) => uploadTeamChatAttachment(team_id, formData),
+    })
 
     useEffect(() => {
         const token = localStorage.getItem('access')
@@ -33,29 +61,12 @@ function TeamChats() {
         )
         socketRef.current.onmessage = (event) => {
             const data = JSON.parse(event.data)
-            setChats((prev) => [...prev, data])
+            setLiveChats((prev) => [...prev, data])
         }
         socketRef.current.onerror = (error) => {
             console.log(error)
         }
         return () => socketRef.current?.close()
-    }, [team_id])
-
-    useEffect(() => {
-        const fetchChats = async () => {
-            try {
-                const response = await teamChats(team_id)
-                setChats(response.data)
-                console.log(response.data)
-            }
-            catch (error) {
-                console.log(error?.response?.data || error)
-            }
-            finally {
-                setLoading(false)
-            }
-        }
-        fetchChats()
     }, [team_id])
 
     useEffect(() => {
@@ -87,7 +98,7 @@ function TeamChats() {
             return chat.attachment_url
         }
         const path = chat.attachment_url || chat.attachments
-        return `http://127.0.0.1:8000${path.startsWith('/') ? path : `/${path}`}`
+        return `${BASE_URL}${path.startsWith('/') ? path : `/${path}`}`
     }
 
     const getAttachmentName = (chat) => {
@@ -121,16 +132,12 @@ function TeamChats() {
         formData.append('file', selectedFile)
         formData.append('message', message.trim())
         try {
-            setUploadingFile(true)
-            await uploadTeamChatAttachment(team_id, formData)
+            await uploadAttachmentMutation.mutateAsync(formData)
             setMessage('')
             resetSelectedFile()
         }
         catch (error) {
             console.log(error?.response?.data || error)
-        }
-        finally {
-            setUploadingFile(false)
         }
     }
 
@@ -155,45 +162,13 @@ function TeamChats() {
     return (
         <div className="min-h-screen overflow-x-hidden overflow-y-auto bg-[linear-gradient(180deg,#071714_0%,#020404_100%)] text-white">
             <div className="mx-auto ml-4 flex max-w-7xl flex-col px-2 py-4 sm:px-6 lg:px-8">
-                {/* Team Header */}
-                <section className="sticky top-4 z-30 shrink-0 overflow-hidden rounded-[2rem] border border-white/10 bg-gradient-to-br from-teal-500/10 via-cyan-500/5 to-indigo-500/10 p-5 backdrop-blur-xl">
-                    <div className="absolute -right-12 -top-16 h-52 w-52 rounded-full bg-cyan-500/10 blur-3xl"></div>
-                    <div className="relative flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
-                        <div className="flex items-start gap-4">
-                            <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-[1.25rem] border border-cyan-400/20 bg-cyan-500/10">
-                                <MessageCircle className="h-7 w-7 text-cyan-300" />
-                            </div>
-                            <div>
-                                <p className="text-xs font-semibold uppercase tracking-[0.28em] text-cyan-300/80">
-                                    Team Chat
-                                </p>
-                                <h1 className="mt-2 text-3xl font-bold tracking-tight text-[var(--color-mint-cream)]">
-                                    {chats[0]?.team_name || 'General Chat'}
-                                </h1>
-                                <p className="mt-3 max-w-2xl text-sm leading-relaxed text-[var(--color-cool-steel)]">
-                                    {chats[0]?.team_description || 'Share updates, files, and quick conversations with your team.'}
-                                </p>
-                            </div>
-                        </div>
-                        <div className="flex flex-wrap gap-3">
-                            <div className="flex items-center gap-2 rounded-2xl border border-emerald-400/20 bg-emerald-500/10 px-4 py-2 text-sm font-medium text-emerald-300">
-                                <Radio size={15} />
-                                Live room
-                            </div>
-                            <div className="rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-2 text-sm text-[var(--color-cool-steel)]">
-                                Managed by <span className="font-semibold text-white">{chats[0]?.team_creator || 'Team admin'}</span>
-                            </div>
-                        </div>
-                    </div>
-                </section>
-
                 {/* Chat Section */}
                 <section className="mt-4 flex h-screen min-h-screen flex-col overflow-hidden rounded-[2rem] border border-white/[0.08] bg-white/[0.03] backdrop-blur-xl">
                     {/* Header */}
                     <div className="sticky top-0 z-20 flex shrink-0 flex-col gap-4 border-b border-white/10 bg-[#121a18]/95 px-6 py-5 backdrop-blur-xl sm:flex-row sm:items-center sm:justify-between">
                         <div>
-                            <h2 className="text-xl font-semibold text-white">
-                                Team Conversation
+                            <h2 className="text-2xl font-bold capitalize text-white">
+                                {chats[0]?.team_name ? `${chats[0].team_name}'s GC` : "Team's GC"}
                             </h2>
                             <p className="mt-1 text-sm text-[var(--color-cool-steel)]">
                                 {chats.length} {chats.length === 1 ? 'message' : 'messages'}
@@ -201,7 +176,7 @@ function TeamChats() {
                         </div>
                         <div className="flex items-center justify-center gap-2 text-sm text-[var(--color-cool-steel)]">
                             <span className="h-2 w-2 rounded-full bg-green-500"></span>
-                            <span>5 Online</span>
+                            <span>{onlineCount} Online</span>
                         </div>
                     </div>
 
@@ -209,7 +184,7 @@ function TeamChats() {
                     <MessageList
                         variant="team"
                         chats={chats}
-                        setChats={setChats}
+                        setChats={setLiveChats}
                         currentUser={currentUser}
                         bottomRef={bottomRef}
                         getAttachmentUrl={getAttachmentUrl}
@@ -233,7 +208,7 @@ function TeamChats() {
                         fileInputRef={fileInputRef}
                         showEmojiPicker={showEmojiPicker}
                         setShowEmojiPicker={setShowEmojiPicker}
-                        uploadingFile={uploadingFile}
+                        uploadingFile={uploadAttachmentMutation.isPending}
                     />
                 </section>
             </div>

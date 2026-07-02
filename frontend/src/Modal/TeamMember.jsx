@@ -2,6 +2,7 @@ import React from 'react'
 import { ShieldCheck, UserX } from 'lucide-react'
 import Modal from './Modal'
 import UserProfilePfp from '../components/UserProfilePfp'
+import { useSelector } from 'react-redux'
 
 function TeamMember({
     isMemberOpen,
@@ -13,6 +14,9 @@ function TeamMember({
     setIsDemoteAYSOpen,
     selectedMember,
 }) {
+    const currentUser = useSelector((state) => state.auth.user)
+    const isSelf = selectedMember?.user__id === currentUser?.id
+    
     return (
         <Modal
             isOpen={isMemberOpen}
@@ -92,7 +96,8 @@ function TeamMember({
                         }}
                         disabled={
                             loading ||
-                            !team?.team?.is_admin
+                            !team?.team?.is_admin ||
+                            isSelf
                         }
                         className="
                         flex items-center justify-center gap-2

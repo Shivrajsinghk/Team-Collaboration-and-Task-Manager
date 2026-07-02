@@ -1,35 +1,51 @@
-/* eslint-disable react-hooks/set-state-in-effect, react-hooks/exhaustive-deps */
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { ArrowLeft, Users, Crown, Shield, CalendarDays, UserCircle2, Info, Sparkles, ShieldCheck, Settings, Barcode } from 'lucide-react'
-import TeamInfo from '../components/TeamInfo'
+import { Settings, Barcode } from 'lucide-react'
 import TeamStats from '../components/TeamStats'
-import UserProfilePfp from '../components/UserProfilePfp'
 import TeamMembers from '../components/TeamMembers'
 import PreviousPageButton from '../components/PreviousPageButton'
 import TeamInviteCode from '../Modal/TeamInviteCode'
 import TeamActivity from '../components/TeamActivity'
-import { getTeam } from '../api/teams'
+import { getTeam, teamMembersPresence } from '../api/teams'
+import { keepPreviousData, useQuery } from '@tanstack/react-query'
+import { teamKeys } from '../api/queryKeys'
 
 function TeamDashboard() {
     const { team_id } = useParams()
-    const [team, setTeam] = useState(null)
     const [isInviteOpen, setIsInviteOpen] = useState(false)
     const navigate = useNavigate()
-    
-    async function fetchapi(){
-        try{
+    const { data: team = null } = useQuery({
+        queryKey: teamKeys.detail(team_id),
+        queryFn: async () => {
             const response = await getTeam(team_id)
-            setTeam(response.data)
-        }
-        catch(error){
-            console.log(error.response?.data)
-        }
-    }
+            return response.data
+        },
+        enabled: !!team_id,
+        staleTime: 2 * 60 * 1000,
+        placeholderData: keepPreviousData,
+    })
+    const { data: presenceMembers = [] } = useQuery({
+        queryKey: teamKeys.membersPresence(team_id),
+        queryFn: async () => {
+            const response = await teamMembersPresence(team_id)
+            return response.data
+        },
+        enabled: !!team_id,
+        refetchInterval: 30000,
+        refetchOnWindowFocus: true,
+    })
 
-    useEffect(() => {
-        fetchapi()
-    }, [team_id])
+    const presenceByUserId = new Map(presenceMembers.map((member) => [member.id, member]))
+
+    const membersWithPresence = (team?.team?.all_members || []).map((member) => ({
+        ...member,
+        user__profile__is_online: presenceByUserId.has(member.user__id)
+            ? presenceByUserId.get(member.user__id).is_online
+            : member.user__profile__is_online,
+        user__profile__last_seen: presenceByUserId.has(member.user__id)
+            ? presenceByUserId.get(member.user__id).last_seen
+            : member.user__profile__last_seen,
+    }))
 
     return (
         <>
@@ -41,11 +57,11 @@ function TeamDashboard() {
                             <div className="flex items-start gap-7">
                                 <PreviousPageButton className="shrink-0" />
                                 <div>
-                                    <h1 className="text-4xl font-bold tracking-tight text-[var(--color-mint-cream)]">
+                                    <h1 className="text-4xl font-bold capitalize tracking-tight text-[var(--color-mint-cream)]">
                                         {team?.team?.name}
                                     </h1>
                                     <p className="mt-3 max-w-2xl text-sm leading-relaxed text-[var(--color-cool-steel)]">
-                                        {team?.team?.description || "Manage your team members, collaboration, and workflow in one place."}
+                                        {team?.team?.description || '"No description"'}
                                     </p>
                                 </div>
                             </div>
@@ -99,7 +115,7 @@ function TeamDashboard() {
                         {/* Team Members */}
                         <TeamMembers 
                         team={team} 
-                        filteredMembers={team?.team?.all_members || []}
+                        filteredMembers={membersWithPresence}
                         />
                     </div>
                     <div className='mt-8'>

@@ -13,7 +13,7 @@ const MessageBubble = ({
     getSenderName,
     formatMessageTime,
     navigate,
-    teamId
+    teamId,
 }) => {
     const isMine = chat?.sender?.id === currentUser?.id
     const attachmentUrl = getAttachmentUrl(chat)
@@ -106,7 +106,7 @@ const MessageBubble = ({
                         <p className="whitespace-pre-wrap [overflow-wrap:anywhere]">
                             {chat.message}
                         </p>
-                    )}
+                    )} 
                     <div className="mt-2 flex items-center justify-end gap-1.5">
                         <span className="whitespace-nowrap text-[11px] text-slate-400">
                             {formatMessageTime(chat.created_at)}

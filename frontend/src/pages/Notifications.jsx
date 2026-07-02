@@ -1,6 +1,7 @@
-import React, { useEffect, useState, useMemo } from 'react'
-import { list_notifications, mark_notification_read } from '../api/chat'
+import React, { useState, useMemo } from 'react'
+import { mark_notification_read } from '../api/chat'
 import { useNotifications } from '../context/NotificationContext'
+import { useMutation } from '@tanstack/react-query'
 
 const TYPE_META = {
     task_assigned: { icon: 'ti-clipboard-plus', label: 'Task assigned' },
@@ -28,6 +29,9 @@ function Notifications() {
     const { notifications, setNotifications, loading } = useNotifications()
     const [filter, setFilter] = useState('all')
     const [removingIds, setRemovingIds] = useState(new Set())
+    const markReadMutation = useMutation({
+        mutationFn: (notificationId) => mark_notification_read(notificationId),
+    })
 
     const unreadCount = useMemo(
         () => notifications.filter((n) => !n.is_read).length,
@@ -43,7 +47,7 @@ function Notifications() {
         if (notification.is_read) return
         setRemovingIds((prev) => new Set(prev).add(notification.id))
         try {
-            await mark_notification_read(notification.id)
+            await markReadMutation.mutateAsync(notification.id)
             setTimeout(() => {
                 setNotifications((prev) =>
                     prev.map((n) =>
@@ -72,7 +76,7 @@ function Notifications() {
             await Promise.all(
                 notifications
                     .filter((n) => !n.is_read)
-                    .map((n) => mark_notification_read(n.id))
+                    .map((n) => markReadMutation.mutateAsync(n.id))
             )
             setNotifications((prev) =>
                 prev.map((n) => ({ ...n, is_read: true }))

@@ -56,7 +56,7 @@ def list_tasks(request, team_id):
             status=status.HTTP_403_FORBIDDEN,
         )
     tasks = Task.objects.filter(team=team)
-    serializer = TaskSerializer(tasks, many=True)
+    serializer = TaskSerializer(tasks, context={'request': request}, many=True)
     return Response(serializer.data, status=status.HTTP_200_OK)
 
 @api_view(["GET"])
@@ -70,7 +70,7 @@ def list_task(request, team_id, task_id):
             status=status.HTTP_403_FORBIDDEN,
         )
     task = get_object_or_404(Task, team=team, id=task_id)
-    serializer = TaskSerializer(task)
+    serializer = TaskSerializer(task, context={'request': request})
     return Response(serializer.data, status=status.HTTP_200_OK)
 
 @api_view(["PUT", "PATCH"])
@@ -162,7 +162,7 @@ def update_task_status(request, team_id, task_id):
             activity_type="TASK_STATUS_CHANGED",
             metadata={"old_status": old_status, "new_status": new_status},
         )
-        return Response(TaskSerializer(task).data, status=status.HTTP_200_OK)
+        return Response(TaskSerializer(task).data, context={'request': request}, status=status.HTTP_200_OK)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(["DELETE"])

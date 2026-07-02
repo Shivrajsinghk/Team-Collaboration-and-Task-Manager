@@ -13,10 +13,13 @@ import { TeamRoutes } from './routes/TeamRoutes'
 import { ChatRoutes } from './routes/ChatRoutes'
 import { ProfileRoutes } from './routes/ProfileRoutes'
 import { NotificationRoutes } from './routes/NotificationRoutes'
+import { useQueryClient } from '@tanstack/react-query'
+import { authKeys } from './api/queryKeys'
 
 function App() {
 	const dispatch = useDispatch()
 	const { isAuthenticated } = useSelector(state => state.auth);
+	const queryClient = useQueryClient()
 	
 	useEffect(() => {
 		const initializeAuth = async () => {
@@ -32,9 +35,16 @@ function App() {
 				})
 				const access = refreshResponse.data.access
 				localStorage.setItem("access", access)
-				const profileResponse = await getUserProfile()
+				const profileResponse = await queryClient.fetchQuery({
+					queryKey: authKeys.me,
+					queryFn: async () => {
+						const response = await getUserProfile()
+						return response.data
+					},
+					staleTime: 5 * 60 * 1000,
+				})
 				dispatch(loginSuccess({
-					user: profileResponse.data,
+					user: profileResponse,
 					access,
 					refresh: storedRefresh,
 				}))
@@ -46,7 +56,7 @@ function App() {
 			}
 		}
 		initializeAuth()
-	}, [dispatch])
+	}, [dispatch, queryClient])
 
 	return (
 		<div>

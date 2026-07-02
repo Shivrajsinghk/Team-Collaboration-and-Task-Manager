@@ -1,8 +1,11 @@
 import React from 'react'
 import { Draggable } from '@hello-pangea/dnd'
-import { MessageCircleMore, Paperclip, Circle, CircleDashed, AlertTriangle, Flame, ChevronDown } from 'lucide-react'
+import { AlertTriangle, Flame, ChevronDown } from 'lucide-react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { differenceInDays } from "date-fns";
+import { useQueryClient } from '@tanstack/react-query'
+import { getTask } from '../api/tasks'
+import { taskKeys } from '../api/queryKeys'
 
 function getPriorityIcon(priority) {
     switch(priority) {
@@ -22,6 +25,7 @@ function getPriorityIcon(priority) {
             return null
     }
 }
+
 function formatDate(date){
     const daysLeft = differenceInDays(
         new Date(date),
@@ -35,11 +39,12 @@ function formatDate(date){
     }
     return `${daysLeft} days left`;
 }
+
 function TaskCard({ task, index }) {
     const navigate = useNavigate()
     const { team_id } = useParams()
     const BASE_URL = import.meta.env.VITE_DJANGO_BASE_URL
-
+    const queryClient = useQueryClient()
     
     const priorityStyles = {
         low: 'bg-emerald-500/15 text-emerald-300 border-emerald-500/20',
@@ -51,11 +56,23 @@ function TaskCard({ task, index }) {
         navigate(`/team/${team_id}/tasks/${task.id}`)
     }
 
+    const handlePrefetch = () => {
+        queryClient.prefetchQuery({
+            queryKey: taskKeys.detail(team_id, task.id),
+            queryFn: async () => {
+                const response = await getTask(team_id, task.id)
+                return response.data
+            },
+            staleTime: 30 * 1000,
+        })
+    }
+
     return (
         <Draggable draggableId={String(task.id)} index={index}>
             {(provided, snapshot) => (
                 <div
                     onDoubleClick={handleClick}
+                    onMouseEnter={handlePrefetch}
                     ref={provided.innerRef}
                     {...provided.draggableProps}
                     {...provided.dragHandleProps}
