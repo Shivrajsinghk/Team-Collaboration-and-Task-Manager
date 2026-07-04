@@ -91,8 +91,8 @@ function PublicProfile() {
                                             className="h-24 w-24 rounded-2xl border-2 border-zinc-900 object-cover shadow-xl"
                                         />
                                     ) : (
-                                        <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-teal-400 to-indigo-500 text-7xl font-bold text-white">
-                                            {(user.full_name || user.username).slice(0,1)}
+                                        <div className="flex h-24 w-24 rounded-2xl items-center justify-center bg-gradient-to-br from-teal-400 to-indigo-500 text-7xl font-bold text-white">
+                                            {(user.full_name || user.username).charAt(0).toUpperCase()}
                                         </div>
                                     )}
                                     <span className={`absolute -bottom-1 -right-1 h-4 w-4 rounded-full border-2 border-zinc-950 ${user?.is_online ? 'bg-emerald-400' : 'bg-zinc-600'}`} />

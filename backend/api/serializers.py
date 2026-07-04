@@ -52,7 +52,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = UserProfile
-        fields = ['id', "username", "email", 'first_name', 'joined_at', 'last_name', "profile_picture", 'bio', 'about', 'last_seen', 'is_online', "full_name", "remove_profile_picture", 'total_tasks', 'github_url', 'linkedin_url', 'resume', 'skills', 'job_title', 'location', 'total_teams', 'completed_tasks', 'phone_number']
+        fields = ['id', "username", "active_connections", "email", 'first_name', 'joined_at', 'last_name', "profile_picture", 'bio', 'about', 'last_seen', 'is_online', "full_name", "remove_profile_picture", 'total_tasks', 'github_url', 'linkedin_url', 'resume', 'skills', 'job_title', 'location', 'total_teams', 'completed_tasks', 'phone_number']
 
     def update(self, instance, validated_data):
         user_data = validated_data.pop('user', {})
@@ -102,7 +102,7 @@ class PublicUserProfileSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = UserProfile
-        fields = ['id', 'joined_at', 'username', 'first_name', 'last_name', 'profile_picture', 'bio', 'about', 'last_seen', 'is_online', 'full_name', 'total_tasks', 'github_url', 'linkedin_url', 'skills', 'job_title', 'location']
+        fields = ['id', "active_connections", 'joined_at', 'username', 'first_name', 'last_name', 'profile_picture', 'bio', 'about', 'last_seen', 'is_online', 'full_name', 'total_tasks', 'github_url', 'linkedin_url', 'skills', 'job_title', 'location']
 
 class UserSerializer(serializers.ModelSerializer):
     profile = UserProfileSerializer(read_only = True) 

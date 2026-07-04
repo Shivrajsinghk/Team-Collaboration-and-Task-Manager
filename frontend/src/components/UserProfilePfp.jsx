@@ -59,7 +59,7 @@ function UserProfilePfp({ memberUser, isOnline }) {
                     />
                 ) : (
                     <div className="flex h-8 w-8 items-center justify-center rounded-full border-2 border-[#0B1117] bg-gradient-to-br from-teal-400 to-indigo-500 text-xl font-semibold text-white shadow-2xl">
-                        {(fullName || "U").slice(0,1)}
+                        {(fullName || "U").charAt(0).toUpperCase()}
                     </div>
                 )}
             </div>

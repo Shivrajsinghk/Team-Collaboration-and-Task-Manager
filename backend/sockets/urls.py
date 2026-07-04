@@ -13,7 +13,12 @@ urlpatterns = [
         upload_chat_attachments, 
         name="upload_chat_attachments"
     ),
-    
+    path(
+        'teams/<int:team_id>/members/search/', 
+        search_team_members, 
+        name="search_team_members"
+    ),
+
 
     # Personal Chat Views
     path(

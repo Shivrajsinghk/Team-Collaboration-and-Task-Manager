@@ -26,8 +26,8 @@ class Chats(models.Model):
         ordering = ['created_at']
     
     def __str__(self):
-        return self.sender.username
-
+        sender = self.sender.username if self.sender else 'Deleted User'
+        return f'{sender}: {self.message[:20]}'
 class PersonalConversation(models.Model):
     participant = models.ManyToManyField(
         User,
@@ -68,6 +68,7 @@ class Notification(models.Model):
         ('team_member_joined', 'Team Member Joined'),
         ('team_member_left', 'Team Member Left'),
         ('team_member_removed', 'Team Member Removed'),
+        ('mention', 'Mention'),
     ]
     user = models.ForeignKey(
         User,
@@ -90,3 +91,17 @@ class Notification(models.Model):
     def __str__(self):
         return self.title  
     
+    class Meta:
+        ordering = ['-created_at']
+        indexes = [
+            models.Index(fields=['user', 'is_read']),
+        ]
+    
+class Mention(models.Model):
+    message = models.ForeignKey(Chats, on_delete=models.CASCADE, related_name='mentions')
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_mentions')
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('message', 'user')
+        

@@ -3,8 +3,40 @@ import { Download, FileText } from 'lucide-react'
 import UserProfilePfp from './UserProfilePfp'
 import { format, isToday, isYesterday } from 'date-fns'
 
+function renderMessageWithMentions(text, mentionUserIds, members, currentUserId) {
+    if (!mentionUserIds?.length) return text
+
+    const mentionedUsers = members.filter(m => mentionUserIds.includes(m.id))
+    if (!mentionedUsers.length) return text
+
+    const escaped = mentionedUsers.map(u => u.username.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'))
+    const pattern = new RegExp(`@(${escaped.join('|')})\\b`, 'g')
+
+    const parts = []
+    let lastIndex = 0 
+    let match
+
+    while ((match = pattern.exec(text)) !== null) {
+        if (match.index > lastIndex) parts.push(text.slice(lastIndex, match.index))
+        const user = mentionedUsers.find(u => u.username === match[1])
+        const isSelf = user?.id === currentUserId
+        parts.push(
+            <span key={match.index} className={`rounded px-1 font-medium ${isSelf ? 'bg-amber-500/20 text-amber-300' : 'bg-cyan-500/15 text-cyan-300'}`}>
+                {match[0]}
+            </span>
+        )
+        lastIndex = match.index + match[0].length
+    }
+    
+    if (lastIndex < text.length){
+        parts.push(text.slice(lastIndex))
+        return parts
+    }
+}
+
 const MessageBubble = ({
     variant = "team",
+    members = [],
     chat,
     currentUser,
     getAttachmentUrl,
@@ -104,9 +136,9 @@ const MessageBubble = ({
                         )}
                     {chat.message && (
                         <p className="whitespace-pre-wrap [overflow-wrap:anywhere]">
-                            {chat.message}
+                            {renderMessageWithMentions(chat.message, chat.mentions, members, currentUser?.id)}
                         </p>
-                    )} 
+                    )}
                     <div className="mt-2 flex items-center justify-end gap-1.5">
                         <span className="whitespace-nowrap text-[11px] text-slate-400">
                             {formatMessageTime(chat.created_at)}

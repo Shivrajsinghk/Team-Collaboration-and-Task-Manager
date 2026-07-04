@@ -167,6 +167,7 @@ class TeamMemberListSerializer(serializers.ModelSerializer):
 class TeamMemberPresenceSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField(source="user.id")
     full_name = serializers.SerializerMethodField()
+    username = serializers.CharField(source="user.username")
     is_online = serializers.BooleanField(source="user.profile.is_online")
     last_seen = serializers.DateTimeField(source="user.profile.last_seen")
     role = serializers.CharField()
@@ -177,4 +178,4 @@ class TeamMemberPresenceSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = TeamMembership
-        fields = ["id", "full_name", "is_online", "last_seen", "role"]
+        fields = ["id", "full_name", "username", "is_online", "last_seen", "role"]

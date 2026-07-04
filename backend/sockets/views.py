@@ -80,12 +80,40 @@ def upload_chat_attachments(request, team_id):
     for member in members:
         create_notification(
             user=member.user,
-            notification_type="team_new_message_received",
+            notification_type="teamchat_new_attachment_uploaded",
             title="New Team Attachment",
             message=f"{request.user.username.title()} has uploaded a new attachment",
             extra_data={"team_id": team.id, "chat_id": chat.id},
         )
     return Response(payload, status=status.HTTP_201_CREATED)
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def search_team_members(request, team_id):
+    team = get_object_or_404(Team, id=team_id)
+    if not TeamMembership.objects.filter(
+        team=team, 
+        user=request.user
+    ).exists():
+        return Response(
+            {"message": "You are not a member of this team."}, 
+            status=status.HTTP_403_FORBIDDEN
+        )    
+    query = request.GET.get('q', '').strip()
+    members = TeamMembership.objects.filter(
+        team=team
+    ).select_related('user')
+    if query:
+        members = members.filter(
+            user__username__istartswith=query
+        )
+    members = members[:10]  
+    data = [
+        {"id": m.user.id, "username": m.user.username}
+        for m in members
+    ]
+    return Response(data, status=status.HTTP_200_OK)
+
 
 
 
@@ -222,6 +250,10 @@ def upload_personal_attachments(request, conversation_id):
         }
     )
     return Response(payload, status=status.HTTP_201_CREATED)
+
+
+
+
 
 
 # Notification Views

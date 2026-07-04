@@ -2,11 +2,13 @@ from channels.generic.websocket import AsyncWebsocketConsumer
 from channels.exceptions import StopConsumer
 from channels.db import database_sync_to_async
 import json
+from .services import process_mentions
 from .models import Chats, PersonalConversation, PersonalMessage
 from .serializer import ChatsSerializer, PersonalMessageSerializer
 from teams.models import TeamMembership
 from api.models import UserProfile
 from django.utils import timezone
+from django.db import transaction
 
 class TeamChatsConsumer(AsyncWebsocketConsumer):
     async def connect(self):
@@ -21,13 +23,32 @@ class TeamChatsConsumer(AsyncWebsocketConsumer):
         await self.accept()
 
     async def receive(self, text_data=None, bytes_data=None):
-        data = json.loads(text_data)
-        message = data['message']
-        chat = await self.save_chat(message)
+        try:
+            data = json.loads(text_data)
+            message = data['message']
+        except (json.JSONDecodeError, KeyError):
+            await self.send(text_data=json.dumps({'error': 'invalid payload'}))
+            return
+        
+        mention_ids = data.get('mention_ids', [])
+        if not isinstance(mention_ids, list) or not all(isinstance(i, int) for i in mention_ids):
+            mention_ids = []
+        mention_ids = mention_ids[:50]
+        
+        chat_instance, chat = await self.save_chat(message)
+
+        try:
+            await database_sync_to_async(process_mentions)(chat_instance, mention_ids)
+        except Exception as e:
+            print(f"Mention processing failed for chat {chat_instance.id}: {e}")
+        
+        chat = await self.serialize_chat(chat_instance)
+
         await self.channel_layer.group_send(self.group_name, {
             'type': 'chat_message',
             'chat': chat
-        })
+        }) 
+    
         print("MESSAGE RECEIVED FROM CLIENT TO SERVER", text_data)
 
     async def chat_message(self, event):
@@ -48,7 +69,7 @@ class TeamChatsConsumer(AsyncWebsocketConsumer):
             team_id=self.team_id,
             message=message
         )
-        return ChatsSerializer(chat).data   
+        return chat, ChatsSerializer(chat).data   
         # We return ChatsSerializer(chat).data because WebSockets, Redis channel layers, and APIs need plain serializable data (dict/JSON). A Django model instance (chat) cannot be safely transmitted directly. 
     
     @database_sync_to_async
@@ -58,6 +79,10 @@ class TeamChatsConsumer(AsyncWebsocketConsumer):
             user_id=user.id,
             team_id=self.team_id
         ).exists()
+
+    @database_sync_to_async
+    def serialize_chat(self, chat_instance):
+        return ChatsSerializer(chat_instance).data
 
 class PersonalChatsConsumer(AsyncWebsocketConsumer):
     async def connect(self):
@@ -172,23 +197,33 @@ class NotificationsConsumer(AsyncWebsocketConsumer):
             return
         self.group_name = f'notifications_{user.id}'
         await self.channel_layer.group_add(self.group_name, self.channel_name)  
-        await self.set_online_status(True)
+        await self.set_online_status(1)
         await self.accept()
     
+    async def receive(self, text_data=None, bytes_data=None):
+        try:
+            data = json.loads(text_data)
+        except json.JSONDecodeError:
+            return
+        if data.get('type') == 'heartbeat':
+            await self.set_online_status(0)  
+
     async def send_notification(self, event):
         await self.send(text_data=json.dumps(event['notification']))
 
     async def disconnect(self, close_code):
         print("Disconnected")
-        await self.set_online_status(False)
+        await self.set_online_status(-1)
         if hasattr(self, 'group_name'):
             await self.channel_layer.group_discard(self.group_name, self.channel_name)
         raise StopConsumer()
 
     @database_sync_to_async
-    def set_online_status(self, status):
+    def set_online_status(self, delta):
         user = self.scope['user']
-        UserProfile.objects.filter(user_id=user.id).update(
-            last_seen = timezone.now(),
-            is_online = status
-        )
+        with transaction.atomic():
+            profile = UserProfile.objects.select_for_update().get(user_id=user.id)
+            profile.active_connections = max(0, profile.active_connections + delta)
+            profile.is_online = profile.active_connections > 0
+            profile.last_seen = timezone.now()
+            profile.save(update_fields=['active_connections', 'is_online', 'last_seen'])

@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { format, isToday, isYesterday } from 'date-fns'
 import { useSelector } from 'react-redux'
@@ -35,20 +35,27 @@ function TeamChats() {
         staleTime: 15 * 1000,
         refetchOnWindowFocus: true,
     })
+
     const { data: members = [] } = useQuery({
         queryKey: teamKeys.membersPresence(team_id),
         queryFn: async () => {
             const response = await teamMembersPresence(team_id)
+            console.log(response.data)
             return response.data
         },
         enabled: !!team_id,
         refetchInterval: 30000,
     })
-
+    
     const onlineCount = members.filter((member) =>
         isPresenceOnline(member.is_online, member.last_seen)
     ).length
-    const chats = liveChats.length > 0 ? liveChats : (initialChats ?? [])
+    
+    const chats = useMemo(() => {
+        const merged = [...initialChats, ...liveChats]
+        const seen = new Set()
+        return merged.filter(c => (seen.has(c.id) ? false : (seen.add(c.id), true)))
+    }, [initialChats, liveChats])
 
     const uploadAttachmentMutation = useMutation({
         mutationFn: (formData) => uploadTeamChatAttachment(team_id, formData),
@@ -57,7 +64,7 @@ function TeamChats() {
     useEffect(() => {
         const token = localStorage.getItem('access')
         socketRef.current = new WebSocket(
-            `ws://127.0.0.1:8000/ws/team-chats/${team_id}/?token=${token}`
+            `ws://127.0.0.1:8000/ws/team-chats/${team_id}/?token=${encodeURIComponent(token)}`
         )
         socketRef.current.onmessage = (event) => {
             const data = JSON.parse(event.data)
@@ -120,9 +127,9 @@ function TeamChats() {
         }
     }
 
-    const sendMessage = () => {
+    const sendMessage = (mentionIds = []) => {
         if (!message.trim() || socketRef.current?.readyState !== WebSocket.OPEN) return
-        socketRef.current.send(JSON.stringify({ message }))
+        socketRef.current.send(JSON.stringify({ message, mention_ids: mentionIds }))
         setMessage('')
     }
 
@@ -141,12 +148,12 @@ function TeamChats() {
         }
     }
 
-    const handleSend = () => {
+    const handleSend = (mentionIds = []) => {
         if (selectedFile) {
             sendAttachment()
             return
         }
-        sendMessage()
+        sendMessage(mentionIds)
     }
 
     const handleFileChange = (event) => {
@@ -184,6 +191,7 @@ function TeamChats() {
                     <MessageList
                         variant="team"
                         chats={chats}
+                        members={members}
                         setChats={setLiveChats}
                         currentUser={currentUser}
                         bottomRef={bottomRef}
@@ -200,6 +208,8 @@ function TeamChats() {
                     <MessageSendingBox
                         variant="team"
                         message={message}
+                        members={members}
+                        currentUserId={currentUser?.id}
                         setMessage={setMessage}
                         handleSend={handleSend}
                         selectedFile={selectedFile}

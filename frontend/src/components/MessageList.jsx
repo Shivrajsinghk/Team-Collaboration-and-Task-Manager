@@ -4,6 +4,7 @@ import MessageBubble from './MessageBubble'
 
 const MessageList = ({
     variant = "team",
+    members = [],
     chats,
     currentUser,
     bottomRef,
@@ -48,6 +49,7 @@ const MessageList = ({
                             {chats.map((chat) => (
                                 <MessageBubble
                                     key={chat.id}
+                                    members={members}
                                     variant={variant}
                                     chat={chat}
                                     currentUser={currentUser}

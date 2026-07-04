@@ -24,6 +24,7 @@ class UserProfile(models.Model):
     location = models.CharField(max_length=100, blank=True)
     phone_number = models.IntegerField(blank=True, null=True)
     joined_at = models.DateTimeField(auto_now_add=True)
+    active_connections = models.PositiveIntegerField(default=0)
 
     def __str__(self):
         return f"{self.user.first_name} {self.user.last_name}".strip() or self.user.username

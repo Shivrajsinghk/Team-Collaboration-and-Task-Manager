@@ -48,7 +48,13 @@ export function NotificationProvider({ children }) {
         socketRef.current.onerror = (error) => {
             console.error('WebSocket error:', error)
         }
+        const heartbeatInterval = setInterval(() => {
+            if (socketRef.current?.readyState === WebSocket.OPEN) {
+                socketRef.current.send(JSON.stringify({ type: 'heartbeat' }))
+            }
+        }, 30 * 1000)
         return () => {
+            clearInterval(heartbeatInterval)
             if (socketRef.current) {
                 socketRef.current.close()
             }

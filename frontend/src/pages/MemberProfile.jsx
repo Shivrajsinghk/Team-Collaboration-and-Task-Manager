@@ -66,7 +66,7 @@ function MemberProfile() {
                                         />
                                     ) : (
                                         <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-teal-400 to-indigo-500 text-7xl font-bold text-white">
-                                            {(member.profile.first_name || "U").slice(0,1)}
+                                            {(member.profile.first_name || "U").charAt(0).toUpperCase()}
                                         </div>
                                     )}
                                 <div className={`absolute bottom-1 right-1 h-5 w-5 rounded-full border-2 border-black

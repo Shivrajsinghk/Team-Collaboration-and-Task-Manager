@@ -8,17 +8,14 @@ class ChatsSerializer(serializers.ModelSerializer):
         source = 'team.name',
         read_only = True
     )
-
     team_creator = serializers.CharField(
         source = 'team.created_by.username',
         read_only = True
     )
-
     team_description = serializers.CharField(
         source = 'team.description',
         read_only = True
     )
-
     sender = UserProfileSerializer(
         source = 'sender.profile',
         read_only=True
@@ -27,6 +24,7 @@ class ChatsSerializer(serializers.ModelSerializer):
     attachment_name = serializers.SerializerMethodField()
     attachment_url = serializers.SerializerMethodField()
     attachment_is_image = serializers.SerializerMethodField()
+    mentions = serializers.SerializerMethodField()
 
     def get_attachment_name(self, obj):
         if not obj.attachment:
@@ -46,9 +44,12 @@ class ChatsSerializer(serializers.ModelSerializer):
         _ , extension = os.path.splitext(obj.attachment.name.lower())
         return extension in {'.png', '.jpg', '.jpeg', '.gif', '.webp', '.bmp', '.svg'}
 
+    def get_mentions(self, obj):
+        return list(obj.mentions.values_list('user_id', flat=True))
+
     class Meta:
         model = Chats
-        fields = ['id', 'team', 'sender', 'attachment', 'attachment_url', 'attachment_name', 'attachment_is_image', 'message', 'created_at', 'team_name', 'team_creator', 'team_description']
+        fields = ['id', 'team', 'sender', 'attachment', 'attachment_url', 'attachment_name', 'attachment_is_image', 'mentions', 'message', 'created_at', 'team_name', 'team_creator', 'team_description']
 
 class PersonalConversationSerializer(serializers.ModelSerializer):
     participant = serializers.SerializerMethodField()
