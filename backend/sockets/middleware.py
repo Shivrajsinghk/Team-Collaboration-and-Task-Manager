@@ -28,5 +28,4 @@ class JWTAuthMiddleware:
             except Exception as e:
                 print(f"Unexpected middleware error: {e}")
 
-            return await self.inner(scope, receive, send)
-    
+        return await self.inner(scope, receive, send)

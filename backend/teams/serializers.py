@@ -16,9 +16,11 @@ class TeamSerializer(serializers.ModelSerializer):
         return obj.memberships.count()
 
     def get_is_admin(self, obj):
-        user = self.context["request"].user
-        return obj.memberships.filter(user=user, role="admin").exists()
-
+        request = self.context.get("request")
+        if not request:
+            return False
+        return obj.memberships.filter(user=request.user, role="admin").exists()
+    
     def get_all_members(self, obj):
         return obj.memberships.all().values(
             "id",
@@ -65,7 +67,10 @@ class TeamMembershipSerializer(serializers.ModelSerializer):
             team = Team.objects.get(invite_code=invite_code)
         except Team.DoesNotExist:
             raise serializers.ValidationError({"error": "Invalid invite code"})
-        user = self.context["request"].user
+        request = self.context.get("request")
+        if not request:
+            raise serializers.ValidationError({"error": "Request context is required"})
+        user = request.user
         if TeamMembership.objects.filter(user=user, team=team).exists():
             raise serializers.ValidationError({"error": "Already a member"})
         return TeamMembership.objects.create(user=user, team=team)

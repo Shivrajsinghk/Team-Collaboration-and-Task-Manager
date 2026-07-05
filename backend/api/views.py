@@ -72,18 +72,20 @@ def get_search_results(request):
     ).exclude(
         user=request.user
     ).select_related('user')[:10]
-    teams = Team.objects.filter(
+    teams = Team.objects.filter(    
         Q(name__icontains=query) |
-        Q(description__icontains=query)
-    )[:10]
+        Q(description__icontains=query),
+        memberships__user=request.user
+    ).distinct()[:10]
     tasks = Task.objects.filter(
-        Q(title__icontains=query) |
-        Q(description__icontains=query) |
-        Q(team__name__icontains=query)
-    )[:10]
+        Q(title__icontains=query) | 
+        Q(description__icontains=query) | 
+        Q(team__name__icontains=query),
+        team__memberships__user=request.user
+    ).distinct()[:10]
     user_serializer = PublicUserProfileSerializer(users, many=True)
     team_serializer = TeamSerializer(teams, many=True, context={"request": request})
-    task_serializer = TaskSerializer(tasks, many=True)
+    task_serializer = TaskSerializer(tasks, many=True, context={"request": request})
     return Response({
         "users": user_serializer.data,
         "teams": team_serializer.data,

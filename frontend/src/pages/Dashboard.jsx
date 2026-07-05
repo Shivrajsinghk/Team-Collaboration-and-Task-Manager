@@ -117,7 +117,7 @@ function Dashboard() {
                                             Tasks
                                         </p>
                                         <h2 className="mt-2 text-2xl font-bold text-white">
-                                            {profile.total_tasks}
+                                            {profile?.total_tasks ?? 0}
                                         </h2>
                                     </div>
                                 </div>

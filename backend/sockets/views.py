@@ -13,6 +13,7 @@ from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
 from django.contrib.auth.models import User
 from .utils import create_notification
+from django.db import transaction
 
 # Team Chat Views
 @api_view(['GET'])
@@ -129,6 +130,9 @@ def get_or_create_personal_conversations_with_new_user(request, other_user_id):
             {"error": "You cannot create a conversation with yourself"},
             status=status.HTTP_400_BAD_REQUEST
         )
+    lock_ids = sorted([current_user.id, other_user.id])
+    with transaction.atomic():
+        User.objects.select_for_update().filter(id__in=lock_ids)
     existing_conversation = (
         PersonalConversation.objects
         .filter(participant=current_user)
@@ -217,11 +221,6 @@ def upload_personal_attachments(request, conversation_id):
     )
     attachment = request.FILES.get('file')
     message = (request.data.get('message') or '').strip()
-    if not attachment:
-        return Response(
-            {"message": "Please choose a file to upload."},
-            status=status.HTTP_400_BAD_REQUEST
-        )
     if not attachment and not message:
         return Response(
             {"message": "Message or attachment is required."},

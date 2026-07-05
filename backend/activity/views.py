@@ -7,16 +7,18 @@ from rest_framework.permissions import IsAuthenticated
 from django.shortcuts import get_object_or_404
 from tasks.models import Task
 from teams.models import Team
+from teams.models import TeamMembership 
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def list_team_activities(request, team_id):
     team = get_object_or_404(Team, id=team_id)
-    activities = Activity.objects.filter(
-        team=team,
-    ).order_by(
-        '-created_at'
-    )
+    if not TeamMembership.objects.filter(team=team, user=request.user).exists():
+        return Response(
+            {"message": "You are not a member of this team."},
+            status=status.HTTP_403_FORBIDDEN
+        )
+    activities = Activity.objects.filter(team=team).order_by('-created_at')
     serializer = ActivitySerializer(activities, many=True)
     return Response(serializer.data, status=status.HTTP_200_OK)
 
@@ -24,13 +26,13 @@ def list_team_activities(request, team_id):
 @permission_classes([IsAuthenticated])
 def list_task_activities(request, team_id, task_id):
     team = get_object_or_404(Team, id=team_id)
+    if not TeamMembership.objects.filter(team=team, user=request.user).exists():
+        return Response(
+            {"message": "You are not a member of this team."},
+            status=status.HTTP_403_FORBIDDEN
+        )
     task = get_object_or_404(Task, team=team, id=task_id)
-    activities = Activity.objects.filter(
-        team=team,
-        task=task,
-    ).order_by(
-        '-created_at'
-    )
+    activities = Activity.objects.filter(team=team, task=task).order_by('-created_at')
     serializer = ActivitySerializer(activities, many=True)
     return Response(serializer.data, status=status.HTTP_200_OK)
 

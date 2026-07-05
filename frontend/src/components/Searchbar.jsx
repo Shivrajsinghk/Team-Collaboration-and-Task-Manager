@@ -69,7 +69,7 @@ function Searchbar() {
     }
 
     const handleTaskClick = (teamId, taskId) => {
-        navigate(`team/${teamId}/tasks/${taskId}`)
+        navigate(`/team/${teamId}/tasks/${taskId}`)
         clearSearch()
     }
 

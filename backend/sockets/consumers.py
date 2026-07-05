@@ -25,8 +25,10 @@ class TeamChatsConsumer(AsyncWebsocketConsumer):
     async def receive(self, text_data=None, bytes_data=None):
         try:
             data = json.loads(text_data)
+            if not isinstance(data, dict):
+                return
             message = data['message']
-        except (json.JSONDecodeError, KeyError):
+        except (json.JSONDecodeError, KeyError, TypeError):
             await self.send(text_data=json.dumps({'error': 'invalid payload'}))
             return
         
@@ -101,7 +103,12 @@ class PersonalChatsConsumer(AsyncWebsocketConsumer):
         await self.accept()
 
     async def receive(self, text_data=None, bytes_data=None):
-        data = json.loads(text_data)
+        try:
+            data = json.loads(text_data)
+            if not isinstance(data, dict):
+                return
+        except (json.JSONDecodeError, TypeError):
+            return
         if data.get('type') == 'seen':
             seen_ids = await self.mark_seen()
             await self.channel_layer.group_send(
@@ -123,7 +130,10 @@ class PersonalChatsConsumer(AsyncWebsocketConsumer):
                 }
             )
             return
-        message = data['message']
+        try:
+            message = data['message']
+        except KeyError:
+            return 
         chat = await self.save_chat(message)
         await self.channel_layer.group_send(
             self.group_name,
@@ -203,7 +213,9 @@ class NotificationsConsumer(AsyncWebsocketConsumer):
     async def receive(self, text_data=None, bytes_data=None):
         try:
             data = json.loads(text_data)
-        except json.JSONDecodeError:
+            if not isinstance(data, dict):
+                return
+        except (json.JSONDecodeError, TypeError):
             return
         if data.get('type') == 'heartbeat':
             await self.set_online_status(0)  
@@ -213,8 +225,8 @@ class NotificationsConsumer(AsyncWebsocketConsumer):
 
     async def disconnect(self, close_code):
         print("Disconnected")
-        await self.set_online_status(-1)
         if hasattr(self, 'group_name'):
+            await self.set_online_status(-1)                
             await self.channel_layer.group_discard(self.group_name, self.channel_name)
         raise StopConsumer()
 

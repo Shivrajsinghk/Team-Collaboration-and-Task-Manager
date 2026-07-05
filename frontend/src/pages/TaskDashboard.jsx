@@ -249,11 +249,11 @@ function TaskDashboard() {
                                     from-cyan-400 to-indigo-500
                                     font-bold text-white
                                 ">
-                                    <UserProfilePfp memberUser={task.created_by}/>
+                                    <UserProfilePfp memberUser={task.created_by ?? undefined}/>
                                 </div>
                                 <div>
                                     <p className="font-medium first-letter:capitalize">
-                                        {task.created_by.username}
+                                        {task.created_by?.username || 'Deleted User'}
                                     </p>
                                 </div>
                             </div>

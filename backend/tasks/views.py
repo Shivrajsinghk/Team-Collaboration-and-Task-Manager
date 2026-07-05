@@ -11,6 +11,11 @@ from teams.models import Team, TeamMembership
 from .models import Task
 from .serializers import TaskSerializer, TaskStatusSerializer
 
+def is_task_admin_or_creator(user, task, membership):
+    is_admin = membership.role == "admin"
+    is_creator = task.created_by_id == user.id  
+    return is_admin or is_creator
+
 @api_view(["POST"])
 @permission_classes([IsAuthenticated])
 @transaction.atomic
@@ -85,13 +90,8 @@ def update_task(request, team_id, task_id):
             status=status.HTTP_403_FORBIDDEN,
         )
     task = get_object_or_404(Task, id=task_id, team=team)
-    is_admin = membership.role == "admin"
-    is_creator = task.created_by.id == request.user.id
-    if not (is_admin or is_creator):
-        return Response(
-            {"error": "You are not allowed to update the task"},
-            status=status.HTTP_403_FORBIDDEN,
-        )
+    if not is_task_admin_or_creator(request.user, task, membership):
+        return Response({"error": "You are not allowed to update the task"}, status=status.HTTP_403_FORBIDDEN)
     old_title = task.title
     old_priority = task.priority
     old_due_date = task.due_date
@@ -162,7 +162,7 @@ def update_task_status(request, team_id, task_id):
             activity_type="TASK_STATUS_CHANGED",
             metadata={"old_status": old_status, "new_status": new_status},
         )
-        return Response(TaskSerializer(task).data, context={'request': request}, status=status.HTTP_200_OK)
+        return Response(TaskSerializer(task, context={'request': request}).data, status=status.HTTP_200_OK)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(["DELETE"])
@@ -173,13 +173,8 @@ def delete_task(request, team_id, task_id):
     if not membership:
         return Response({"error": "Not a team member"}, status=status.HTTP_403_FORBIDDEN)
     task = get_object_or_404(Task, id=task_id, team=team)
-    is_admin = membership.role == "admin"
-    is_creator = task.created_by.id == request.user.id
-    if not (is_admin or is_creator):
-        return Response(
-            {"error": "You are not allowed to delete this task."},
-            status=status.HTTP_403_FORBIDDEN,
-        )
+    if not is_task_admin_or_creator(request.user, task, membership):
+        return Response({"error": "You are not allowed to delete this task."}, status=status.HTTP_403_FORBIDDEN)
     create_activity(actor=request.user, team=team, task=task, activity_type="TASK_DELETED")
     task.delete()
     return Response({"message": "Task deleted successfully"}, status=status.HTTP_200_OK)
@@ -188,40 +183,25 @@ def delete_task(request, team_id, task_id):
 @permission_classes([IsAuthenticated])
 def remove_member_from_task(request, team_id, member_id, task_id):
     team = get_object_or_404(Team, id=team_id)
-    is_admin = TeamMembership.objects.filter(user=request.user, team=team, role="admin").exists()
+    membership = TeamMembership.objects.filter(user=request.user, team=team).first()
+    if not membership:
+        return Response({"error": "Not a team member"}, status=status.HTTP_403_FORBIDDEN)
     task = get_object_or_404(Task, id=task_id, team=team)
-    is_creator = task.created_by.id == request.user.id
-    if not (is_admin or is_creator):
+    if not is_task_admin_or_creator(request.user, task, membership):
         return Response(
             {"error": "You are not allowed to remove a member from this task"},
             status=status.HTTP_403_FORBIDDEN,
         )
     member = get_object_or_404(User, id=member_id)
-    membership = TeamMembership.objects.filter(user=member, team=team).first()
-    if not membership:
-        return Response(
-            {"error": "User is not the part of this team"},
-            status=status.HTTP_400_BAD_REQUEST,
-        )
+    target_membership = TeamMembership.objects.filter(user=member, team=team).first()
+    if not target_membership:
+        return Response({"error": "User is not the part of this team"}, status=status.HTTP_400_BAD_REQUEST)
     if not task.assigned_to.filter(id=member.id).exists():
-        return Response(
-            {"error": "User is not assigned to this task"},
-            status=status.HTTP_400_BAD_REQUEST,
-        )
+        return Response({"error": "User is not assigned to this task"}, status=status.HTTP_400_BAD_REQUEST)
     task.assigned_to.remove(member)
     create_activity(
-        actor=request.user,
-        team=team,
-        task=task,
-        activity_type="TASK_UNASSIGNED",
-        metadata={
-            "unassigned_member": {
-                "id": member.id,
-                "username": member.username,
-                "first_name": member.first_name,
-                "last_name": member.last_name,
-            }
-        },
+        actor=request.user, team=team, task=task, activity_type="TASK_UNASSIGNED",
+        metadata={"unassigned_member": {"id": member.id, "username": member.username, "first_name": member.first_name, "last_name": member.last_name}},
     )
     return Response({"message": "Member removed from task successfully"}, status=status.HTTP_200_OK)
 
@@ -229,39 +209,24 @@ def remove_member_from_task(request, team_id, member_id, task_id):
 @permission_classes([IsAuthenticated])
 def add_member_to_task(request, team_id, member_id, task_id):
     team = get_object_or_404(Team, id=team_id)
-    is_admin = TeamMembership.objects.filter(user=request.user, team=team, role="admin").exists()
+    membership = TeamMembership.objects.filter(user=request.user, team=team).first()
+    if not membership:
+        return Response({"error": "Not a team member"}, status=status.HTTP_403_FORBIDDEN)
     task = get_object_or_404(Task, id=task_id, team=team)
-    is_creator = task.created_by.id == request.user.id
-    if not (is_admin or is_creator):
+    if not is_task_admin_or_creator(request.user, task, membership):
         return Response(
             {"error": "You are not allowed to add a member to this task"},
             status=status.HTTP_403_FORBIDDEN,
         )
     member = get_object_or_404(User, id=member_id)
-    membership = TeamMembership.objects.filter(user=member, team=team).first()
-    if not membership:
-        return Response(
-            {"error": "User is not the part of this team"},
-            status=status.HTTP_400_BAD_REQUEST,
-        )
+    target_membership = TeamMembership.objects.filter(user=member, team=team).first()
+    if not target_membership:
+        return Response({"error": "User is not the part of this team"}, status=status.HTTP_400_BAD_REQUEST)
     if task.assigned_to.filter(id=member.id).exists():
-        return Response(
-            {"error": "User is already assigned to this task"},
-            status=status.HTTP_400_BAD_REQUEST,
-        )
+        return Response({"error": "User is already assigned to this task"}, status=status.HTTP_400_BAD_REQUEST)
     task.assigned_to.add(member)
     create_activity(
-        actor=request.user,
-        team=team,
-        task=task,
-        activity_type="TASK_ASSIGNED",
-        metadata={
-            "assigned_member": {
-                "id": member.id,
-                "username": member.username,
-                "first_name": member.first_name,
-                "last_name": member.last_name,
-            }
-        },
+        actor=request.user, team=team, task=task, activity_type="TASK_ASSIGNED",
+        metadata={"assigned_member": {"id": member.id, "username": member.username, "first_name": member.first_name, "last_name": member.last_name}},
     )
     return Response({"message": "Member added to task successfully"}, status=status.HTTP_200_OK)

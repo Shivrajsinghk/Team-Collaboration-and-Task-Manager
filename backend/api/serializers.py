@@ -19,7 +19,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
         return obj.user.team_memberships.count()
 
     def get_completed_tasks(self, obj):
-        return obj.user.tasks_assigned.filter(status='completed').count()
+        return obj.user.tasks_assigned.filter(status='done').count()
 
     def get_total_tasks(self, obj):
         return obj.user.tasks_assigned.count()
