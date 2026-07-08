@@ -36,4 +36,3 @@ class Task(models.Model):
     class Meta:
         app_label = "api"
         ordering = ["-created_at"]
-

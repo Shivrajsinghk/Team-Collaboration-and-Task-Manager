@@ -105,21 +105,26 @@ function MessageDashboard() {
                                                     hover:bg-white/[0.035]
                                                 '
                                             >
-                                                <img
-                                                    src={otherParticipant?.profile_picture}
-                                                    alt={otherParticipant?.full_name}
-                                                    onClick={() =>
-                                                        navigate(
-                                                            `/profile/${otherParticipant.username}`
-                                                        )
-                                                    }
-                                                    className="
-                                                        h-12 w-12
-                                                        rounded-2xl
-                                                        object-cover
-                                                        border border-white/10
-                                                    "
-                                                />
+                                                {otherParticipant?.profile_picture ? (
+                                                    <img
+                                                        src={otherParticipant.profile_picture}
+                                                        alt={otherParticipant.full_name}
+                                                        onClick={() => navigate(`/profile/${otherParticipant.username}`)}
+                                                        className="
+                                                            h-12 w-12
+                                                            rounded-2xl
+                                                            object-cover
+                                                            border border-white/10
+                                                            cursor-pointer
+                                                        "
+                                                    />
+                                                ) : (
+                                                    <div 
+                                                    onClick={() => navigate(`/profile/${otherParticipant.username}`)}
+                                                    className="flex h-12 w-12 items-center justify-center rounded-2xl border border-white/10 bg-gradient-to-br from-teal-400 to-indigo-500 text-xl font-bold text-white">
+                                                        {(otherParticipant.full_name || "U").charAt(0).toUpperCase()}
+                                                    </div>
+                                                )}
                                                 <div className="min-w-0 flex-1">
                                                     <h4 className="truncate capitalize font-medium text-[var(--color-mint-cream)]">
                                                         {otherParticipant?.full_name}

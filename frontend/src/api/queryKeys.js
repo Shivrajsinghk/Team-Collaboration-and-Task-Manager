@@ -2,7 +2,7 @@ export const authKeys = {
     all: ['auth'],
     me: ['auth', 'me'],
     publicProfile: (username) => ['auth', 'public-profile', username],
-    search: (query) => ['auth', 'search', query],
+    search: (query, filters = {}) => ['auth', 'search', query, filters],
 }
 
 export const teamKeys = {
