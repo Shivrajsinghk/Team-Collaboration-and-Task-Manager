@@ -28,6 +28,7 @@ class Chats(models.Model):
     def __str__(self):
         sender = self.sender.username if self.sender else 'Deleted User'
         return f'{sender}: {self.message[:20]}'
+
 class PersonalConversation(models.Model):
     participant = models.ManyToManyField(
         User,

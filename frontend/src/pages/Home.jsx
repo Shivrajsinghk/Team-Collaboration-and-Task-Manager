@@ -1,136 +1,176 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowRight, Sparkles, Users, ShieldCheck, Layers3 } from "lucide-react";
+import { useSelector } from "react-redux";
+import { ArrowRight, Users, ShieldCheck, Layers3 } from "lucide-react";
+
+const display = { fontFamily: "'Space Grotesk', sans-serif" };
+const mono = { fontFamily: "'JetBrains Mono', monospace" };
 
 function Home() {
     const navigate = useNavigate();
+    const isAuthenticated = useSelector(state => state.auth.isAuthenticated);
+
+    const members = [
+        { x: 60, y: 40, online: true },
+        { x: 200, y: 20, online: true },
+        { x: 320, y: 70, online: false },
+        { x: 90, y: 160, online: true },
+        { x: 260, y: 190, online: true },
+        { x: 370, y: 180, online: false },
+    ];
+
     return (
-        <div className="min-h-screen overflow-hidden bg-[linear-gradient(180deg,#071714_0%,#020404_100%)] text-white">
-            <section className="relative isolate px-6 pt-28 pb-24">
-                <div className="absolute inset-0 overflow-hidden">
-                    <div className="absolute left-1/2 top-0 h-[500px] w-[500px] -translate-x-1/2 rounded-full bg-cyan-500/10 blur-3xl"></div>
-                    <div className="absolute right-0 top-40 h-[400px] w-[400px] rounded-full bg-indigo-500/10 blur-3xl"></div>
-                    <div className="absolute left-0 bottom-0 h-[300px] w-[300px] rounded-full bg-teal-500/10 blur-3xl"></div>
+        <div className="min-h-screen bg-[#060807] text-[#EDF5EF]" style={{ fontFamily: "'Inter', sans-serif" }}>
+            <section className="mx-auto max-w-7xl px-6 pt-8 pb-24 lg:px-10">
+                <div className="grid gap-16 lg:grid-cols-[1.05fr_1fr] lg:items-center">
+                    <div>
+                        <h1 className="text-5xl leading-[1.05] tracking-tight sm:text-6xl" style={display}>
+                            Build teams.
+                            <br />
+                            <span className="text-[#2CFF05]">Collaborate smarter.</span>
+                        </h1>
+                        <p className="mt-6 max-w-lg text-base leading-7 text-[#8FA396]">
+                            Create workspaces, manage projects, invite members, and see who's
+                            online right now — all in one clean, connected platform.
+                        </p>
+                        <div className="mt-10 flex flex-col gap-4 sm:flex-row">
+                            {isAuthenticated ? (
+                                <button
+                                    onClick={() => navigate("/dashboard")}
+                                    className="flex items-center justify-center gap-2 rounded-full bg-[#2CFF05] px-7 py-3.5 text-sm font-medium text-[#0A1A08] transition hover:bg-[#25D604]"
+                                >
+                                    Go to dashboard
+                                    <ArrowRight size={16} />
+                                </button>
+                            ) : (
+                                <>
+                                    <button
+                                        onClick={() => navigate("/signup")}
+                                        className="flex items-center justify-center gap-2 rounded-full bg-[#2CFF05] px-7 py-3.5 text-sm font-medium text-[#0A1A08] transition hover:bg-[#25D604]"
+                                    >
+                                        Get started
+                                        <ArrowRight size={16} />
+                                    </button>
+                                    <button
+                                        onClick={() => navigate("/login")}
+                                        className="rounded-full border border-[#1E2621] px-7 py-3.5 text-sm font-medium text-[#EDF5EF] transition hover:border-[#2E5A2A]"
+                                    >
+                                        Log in
+                                    </button>
+                                </>
+                            )}
+                        </div>
+                    </div>
+
+                    <div className="relative rounded-2xl border border-[#1E2621] bg-[#0D110E] p-6">
+                        <p className="text-xs tracking-[0.15em] text-[#8FA396]" style={mono}>
+                            WORKSPACE.ONLINE_NOW
+                        </p>
+                        <svg viewBox="0 0 420 260" className="mt-4 w-full">
+                            <g stroke="#182D15" strokeWidth="1">
+                                <line x1="60" y1="40" x2="200" y2="20" />
+                                <line x1="200" y1="20" x2="90" y2="160" />
+                                <line x1="90" y1="160" x2="260" y2="190" />
+                                <line x1="260" y1="190" x2="320" y2="70" />
+                                <line x1="320" y1="70" x2="370" y2="180" />
+                            </g>
+                            {members.map((m, i) => (
+                                <g key={i}>
+                                    {m.online && (
+                                        /* Pulsing outer aura updated to your neon green #2CFF05 */
+                                        <circle cx={m.x} cy={m.y} r="14" fill="none" stroke="#2CFF05" strokeOpacity="0.35">
+                                            <animate attributeName="r" values="10;18;10" dur="2.4s" repeatCount="indefinite" begin={`${i * 0.3}s`} />
+                                            <animate attributeName="stroke-opacity" values="0.5;0;0.5" dur="2.4s" repeatCount="indefinite" begin={`${i * 0.3}s`} />
+                                        </circle>
+                                    )}
+                                    {/* Core node: Uses #2CFF05 for online, and dark slate green for offline */}
+                                    <circle
+                                        cx={m.x}
+                                        cy={m.y}
+                                        r="9"
+                                        fill={m.online ? "#2CFF05" : "#0E170C"}
+                                        stroke={m.online ? "#2CFF05" : "#1A3317"}
+                                        strokeWidth="1.5"
+                                    />
+                                </g>
+                            ))}
+                        </svg>
+                        <div className="mt-2 flex items-center justify-between border-t border-[#1E2621] pt-4">
+                            <span className="text-sm text-[#8FA396]">4 members online</span>
+                            <span className="flex items-center gap-1.5 text-xs text-[#2CFF05]" style={mono}>
+                                <span className="h-1.5 w-1.5 rounded-full bg-[#2CFF05]" />
+                                SYNCED
+                            </span>
+                        </div>
+                    </div>
                 </div>
-                <div className="relative mx-auto max-w-7xl text-center">
-                    <div className="inline-flex items-center gap-2 rounded-full border border-teal-400/20 bg-teal-400/10 px-5 py-2 text-sm text-teal-300 backdrop-blur-xl">
-                        <Sparkles size={16} />
-                        Modern Team Collaboration Platform
-                    </div>
-                    <h1 className="mx-auto mt-8 max-w-5xl text-5xl font-bold leading-tight tracking-tight sm:text-7xl">
-                        Build teams.
-                        <br />
-                        <span className="bg-gradient-to-r from-teal-300 via-cyan-400 to-indigo-400 bg-clip-text text-transparent">
-                            Collaborate smarter.
-                        </span>
-                    </h1>
-                    <p className="mx-auto mt-8 max-w-2xl text-base leading-8 text-gray-400 sm:text-lg">
-                        Create workspaces, manage projects, invite members,
-                        and organize collaboration in one clean modern platform.
-                    </p>
-                    <div className="mt-12 flex flex-col items-center justify-center gap-4 sm:flex-row">
-                        <button
-                            onClick={() => navigate("/signup")}
-                            className="flex items-center gap-2 rounded-2xl bg-gradient-to-r from-teal-400 to-cyan-500 px-7 py-4 text-sm font-semibold text-black transition duration-300 hover:scale-[1.03] hover:shadow-2xl hover:shadow-cyan-500/20"
-                        >
-                            Get Started
-                            <ArrowRight size={18} />
-                        </button>
-                        <button
-                            onClick={() => navigate("/login")}
-                            className="rounded-2xl border border-white/10 bg-white/[0.03] px-7 py-4 text-sm font-semibold text-white backdrop-blur-xl transition hover:bg-white/[0.06]"
-                        >
-                            Login
-                        </button>
-                    </div>
-                    <div className="mt-20 grid gap-6 sm:grid-cols-3">
-                        <div className="rounded-[2rem] border border-white/10 bg-white/[0.03] p-6 backdrop-blur-xl">
-                            <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-teal-500/10 text-teal-300">
-                                <Users size={28} />
+                <div className="mt-24 grid gap-6 sm:grid-cols-3">
+                    {[
+                        { icon: Users, title: "Team management", copy: "Create and organize teams with clarity and ownership." },
+                        { icon: ShieldCheck, title: "Secure collaboration", copy: "Invite members safely using scoped invite codes." },
+                        { icon: Layers3, title: "Clean workspace", copy: "Focus on the work with a distraction-free interface." },
+                    ].map((f) => (
+                        <div key={f.title} className="rounded-2xl border border-[#1E2621] bg-[#0D110E] p-7">
+                            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#7BFA6E]/10 text-[#2CFF05]">
+                                <f.icon size={20} />
                             </div>
-                            <h3 className="mt-5 text-xl font-semibold">
-                                Team Management
-                            </h3>
-                            <p className="mt-3 text-sm leading-7 text-gray-400">
-                                Create and organize teams with clarity and ownership.
-                            </p>
+                            <h3 className="mt-5 text-lg" style={display}>{f.title}</h3>
+                            <p className="mt-2 text-sm leading-6 text-[#8FA396]">{f.copy}</p>
                         </div>
-                        <div className="rounded-[2rem] border border-white/10 bg-white/[0.03] p-6 backdrop-blur-xl">
-                            <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-cyan-500/10 text-cyan-300">
-                                <ShieldCheck size={28} />
-                            </div>
-                            <h3 className="mt-5 text-xl font-semibold">
-                                Secure Collaboration
-                            </h3>
-                            <p className="mt-3 text-sm leading-7 text-gray-400">
-                                Invite members safely using secure invite codes.
-                            </p>
-                        </div>
-                        <div className="rounded-[2rem] border border-white/10 bg-white/[0.03] p-6 backdrop-blur-xl">
-                            <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-indigo-500/10 text-indigo-300">
-                                <Layers3 size={28} />
-                            </div>
-                            <h3 className="mt-5 text-xl font-semibold">
-                                Clean Workspace
-                            </h3>
-                            <p className="mt-3 text-sm leading-7 text-gray-400">
-                                Focus on productivity with a distraction-free UI.
-                            </p>
-                        </div>
-                    </div>
+                    ))}
                 </div>
             </section>
-            <section className="px-6 pb-28">
-                <div className="relative mx-auto max-w-7xl overflow-hidden rounded-[2.5rem] border border-white/10 bg-[linear-gradient(135deg,#112826_0%,#071714_45%,#020404_100%)] p-10 shadow-[0_30px_90px_rgba(0,0,0,0.45)] backdrop-blur-xl sm:p-16">
-                    <div className="absolute right-0 top-0 h-80 w-80 rounded-full bg-cyan-500/10 blur-3xl"></div>
-                    <div className="relative grid gap-10 lg:grid-cols-2 lg:items-center">
-                        <div>
-                            <p className="text-sm uppercase tracking-[0.3em] text-teal-300">
-                                TEAM WORKSPACES
-                            </p>
-                            <h2 className="mt-6 text-4xl font-bold leading-tight sm:text-5xl">
-                                Built for clarity,
-                                ownership & modern collaboration.
-                            </h2>
-                            <p className="mt-6 max-w-xl text-base leading-8 text-gray-400">
-                                Everything you need to create teams,
-                                collaborate with members, and manage workspaces —
-                                all in one elegant dashboard.
-                            </p>
-                            <button
-                                onClick={() => navigate("/signup")}
-                                className="mt-10 flex items-center gap-2 rounded-2xl bg-gradient-to-r from-teal-400 to-cyan-500 px-6 py-4 text-sm font-semibold text-black transition hover:scale-[1.02]"
-                            >
-                                Start Building
-                                <ArrowRight size={18} />
-                            </button>
-                        </div>
-                        <div className="rounded-[2rem] border border-white/10 bg-black/20 p-6 backdrop-blur-xl">
-                            <div className="space-y-4">
-                                {[1,2,3].map((item) => (
-                                    <div
-                                        key={item}
-                                        className="flex items-center justify-between rounded-2xl border border-white/5 bg-white/[0.03] p-4"
-                                    >
-                                        <div className="flex items-center gap-4">
-                                            <div className="h-12 w-12 rounded-2xl bg-gradient-to-br from-teal-400 to-cyan-500"></div>
-                                            <div>
-                                                <div className="h-3 w-28 rounded-full bg-white/20"></div>
-                                                <div className="mt-3 h-2 w-20 rounded-full bg-white/10"></div>
-                                            </div>
-                                        </div>
-                                        <div className="rounded-full bg-white/10 px-4 py-2 text-xs text-gray-300">
-                                            Active
-                                        </div>
+
+            <section className="mx-auto max-w-7xl px-6 pb-28 lg:px-10">
+                <div className="grid gap-10 rounded-2xl border border-[#1E2621] bg-[#0D110E] p-10 lg:grid-cols-2 lg:items-center lg:p-16">
+                    <div>
+                        <p className="text-xs tracking-[0.2em] text-[#2CFF05]" style={mono}>
+                            TEAM WORKSPACES
+                        </p>
+                        <h2 className="mt-6 text-4xl leading-tight" style={display}>
+                            Built for clarity, ownership and modern collaboration.
+                        </h2>
+                        <p className="mt-6 max-w-xl text-base leading-7 text-[#8FA396]">
+                            Everything you need to create teams, collaborate with members, and
+                            manage workspaces — in one connected dashboard.
+                        </p>
+                        <button
+                            onClick={() => navigate(isAuthenticated ? "/dashboard" : "/signup")}
+                            className="mt-10 flex items-center gap-2 rounded-full bg-[#2CFF05] px-6 py-3.5 text-sm font-medium text-[#0A1A08] transition hover:bg-[#25D604]"
+                        >
+                            {isAuthenticated ? "Go to dashboard" : "Start building"}
+                            <ArrowRight size={16} />
+                        </button>
+                    </div>
+
+                    <div className="rounded-xl border border-[#1E2621] bg-[#060807] p-5">
+                        <div className="space-y-3">
+                            {[
+                                { name: "Product design", status: "Active" },
+                                { name: "Backend sprint", status: "Active" },
+                                { name: "Q3 review", status: "Idle" },
+                            ].map((row) => (
+                                <div
+                                    key={row.name}
+                                    className="flex items-center justify-between rounded-lg border border-[#1E2621] px-4 py-3"
+                                >
+                                    <div className="flex items-center gap-3">
+                                        <span
+                                            className={`h-2 w-2 rounded-full ${row.status === "Active" ? "bg-[#2CFF05]" : "bg-[#2E332E]"}`}
+                                        />
+                                        <span className="text-sm text-[#EDF5EF]">{row.name}</span>
                                     </div>
-                                ))}
-                            </div>
+                                    <span className="text-[10px] tracking-[0.1em] text-[#8FA396]" style={mono}>
+                                        {row.status.toUpperCase()}
+                                    </span>
+                                </div>
+                            ))}
                         </div>
                     </div>
                 </div>
             </section>
         </div>
-    )
+    );
 }
 
 export default Home;

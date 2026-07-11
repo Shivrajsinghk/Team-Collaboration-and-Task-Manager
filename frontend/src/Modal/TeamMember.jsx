@@ -49,12 +49,11 @@ function TeamMember({
                             flex items-center justify-center gap-2
                             rounded-2xl
                             border border-cyan-500/20
-                            bg-cyan-500/10
+                            bg-[#2CFF05]/70
+                            hover:bg-[#25D604]
                             px-4 py-3
                             font-medium
-                            text-cyan-300
                             transition
-                            hover:bg-cyan-500/20
                             disabled:cursor-not-allowed
                             disabled:opacity-50
                             "
@@ -106,7 +105,6 @@ function TeamMember({
                         bg-red-500/10
                         px-4 py-3
                         font-medium
-                        text-red-300
                         transition
                         hover:bg-red-500/20
                         disabled:cursor-not-allowed

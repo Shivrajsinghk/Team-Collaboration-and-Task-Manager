@@ -1,6 +1,6 @@
 import React from 'react'
 import { useNavigate } from 'react-router-dom'
-import { ArrowUpRight, CalendarDays, Users, Sparkles } from "lucide-react"
+import { ArrowUpRight, CalendarDays, Users } from "lucide-react"
 import { useQueryClient } from '@tanstack/react-query'
 import { getTeam } from '../api/teams'
 import { teamKeys } from '../api/queryKeys'
@@ -48,47 +48,47 @@ function TeamCard({ team }) {
     return (
         <div onClick={handleClick} onMouseEnter={handlePrefetch}>
             <article
-                className="group relative cursor-pointer overflow-hidden rounded-[2rem] border border-white/10 bg-[linear-gradient(180deg,#112826_0%,#081312_45%,#020404_100%)] p-6 shadow-[0_20px_60px_rgba(0,0,0,0.35)] transition-all duration-500 hover:-translate-y-2 hover:border-cyan-400/30 hover:shadow-[0_25px_80px_rgba(34,211,238,0.12)]"
+                className="group relative cursor-pointer overflow-hidden rounded-[2rem] border border-border bg-surface p-6 shadow-[0_20px_60px_rgba(0,0,0,0.35)] transition-all duration-500 hover:-translate-y-2 hover:border-accent/30 hover:shadow-[0_25px_80px_rgba(44,255,5,0.10)]"
             >
-                <div className="absolute right-0 top-0 h-40 w-40 rounded-full bg-cyan-500/[0.03] blur-3xl transition duration-500 group-hover:bg-cyan-500/[0.05]"></div>
+                <div className="absolute right-0 top-0 h-40 w-40 rounded-full bg-accent/[0.03] blur-3xl transition duration-500 group-hover:bg-accent/[0.05]"></div>
                 <div className="relative flex items-start justify-between gap-4">
-                <div className="relative flex h-12 w-12 items-center justify-center overflow-hidden rounded-2xl bg-[linear-gradient(135deg,#2dd4bf,#06b6d4,#6366f1)] shadow-lg shadow-cyan-500/10 transition duration-300 group-hover:scale-105">
+                    <div className="relative flex h-12 w-12 items-center justify-center overflow-hidden rounded-2xl bg-gradient-to-br from-accent to-accent-hover text-accent-ink font-bold shadow-lg shadow-accent/10 transition duration-300 group-hover:scale-105">
                         {initials}
                     </div>
                     <div className="relative flex flex-col items-center justify-center">
-                        <span className="text-sm font-black tracking-wider leading-none text-white">
+                        <span className="text-sm font-extrabold tracking-wider text-[#2CFF05] leading-none origin-center transition-transform duration-150 group-hover:scale-y-[0.1]">
                             OO
                         </span>
-                        <span className="text-[10px] leading-none text-white/90">
+                        <span className="text-[10px] mt-[0.1rem] text-[#2CFF05] font-extrabold leading-none">
                             ⌣
                         </span>
                     </div>
                 </div>
                 <div className="relative mt-8">
-                    <h2 className="text-2xl capitalize font-bold tracking-tight text-white transition duration-300 group-hover:text-cyan-100">
+                    <h2 className="text-2xl capitalize font-bold tracking-tight text-ink transition duration-300 group-hover:text-accent">
                         {teamName}
                     </h2>
-                    <p className="mt-4 text-sm leading-7 text-gray-400">
+                    <p className="mt-4 text-sm leading-7 text-muted">
                         Created by{" "}
-                        <span className="font-semibold text-white">
+                        <span className="font-semibold text-ink">
                             @{createdBy}
                         </span>
                     </p>
                 </div>
-                <div className="relative mt-8 flex items-center justify-between rounded-[1.5rem] border border-white/5 bg-white/[0.03] px-5 py-4 backdrop-blur-xl">
+                <div className="relative mt-8 flex items-center justify-between rounded-[1.5rem] border border-border bg-surface-alt px-5 py-4 backdrop-blur-xl">
                     <div>
-                        <div className="flex items-center gap-2 text-gray-500">
+                        <div className="flex items-center gap-2 text-muted">
                             <CalendarDays size={15} />
                             <p className="text-[11px] uppercase tracking-[0.25em]">
                                 Created
                             </p>
                         </div>
-                        <p className="mt-2 text-sm font-medium text-white">
+                        <p className="mt-2 text-sm font-medium text-ink">
                             {createdAt}
                         </p>
                     </div>
                     <button
-                        className="group/button flex items-center gap-2 rounded-2xl border border-cyan-400/20 bg-cyan-400/10 px-5 py-3 text-sm font-semibold text-cyan-200 transition duration-300 hover:border-cyan-300/40 hover:bg-cyan-400/20"
+                        className="group/button flex items-center gap-2 rounded-2xl border border-accent/20 bg-accent/10 px-5 py-3 text-sm font-semibold text-accent transition duration-300 hover:border-accent/40 hover:bg-accent/20"
                     >
                         Open
                         <ArrowUpRight

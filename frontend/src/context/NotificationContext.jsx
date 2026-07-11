@@ -7,6 +7,7 @@ import { useSelector } from 'react-redux'
 const NotificationContext = createContext()
 
 export function NotificationProvider({ children }) {
+    const WS_URL = import.meta.env.VITE_DJANGO_WS_URL
     const socketRef = useRef(null)
     const queryClient = useQueryClient()
     const isAuthenticated = useSelector((state) => state.auth.isAuthenticated)
@@ -37,7 +38,7 @@ export function NotificationProvider({ children }) {
         }
         const token = localStorage.getItem('access')
         socketRef.current = new WebSocket(
-            `ws://127.0.0.1:8000/ws/notifications/?token=${encodeURIComponent(token)}`
+            `${WS_URL}notifications/?token=${encodeURIComponent(token)}`
         )
         socketRef.current.onmessage = (event) => {
             const data = JSON.parse(event.data)

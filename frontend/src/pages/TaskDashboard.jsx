@@ -10,42 +10,16 @@ import { Crown, SquareCheckBig, Users, CircleDot, LoaderCircle, BadgeCheck, Flam
 import { keepPreviousData, useQuery } from '@tanstack/react-query'
 import { taskKeys } from '../api/queryKeys'
 
-function getStatusIcon(status) {
-    switch(status) {
-        case 'todo':
-            return (
-                <CircleDot className="h-4 w-4 text-cyan-400" />
-            )
-        case 'in_progress':
-            return (
-                <LoaderCircle className="h-4 w-4 animate-spin text-yellow-400" />
-            )
-        case 'done':
-            return (
-                <BadgeCheck className="h-4 w-4 text-emerald-400" />
-            )
-        default:
-            return null
-    }
+const STATUS_STYLES = {
+    todo: { badge: 'border-border bg-surface-alt text-muted', icon: <CircleDot className="h-4 w-4" /> },
+    in_progress: { badge: 'border-yellow-500/20 bg-yellow-500/10 text-yellow-300', icon: <LoaderCircle className="h-4 w-4 animate-spin" /> },
+    done: { badge: 'border-accent/20 bg-accent/10 text-accent', icon: <BadgeCheck className="h-4 w-4" /> },
 }
 
-function getPriorityIcon(priority) {
-    switch(priority) {
-        case 'low':
-            return (
-                <ChevronDown className="h-4 w-4 text-blue-400" />
-            )
-        case 'medium':
-            return (
-                <Flame className="h-4 w-4 text-yellow-400" />
-            )
-        case 'high':
-            return (
-                <AlertTriangle className="h-4 w-4 text-red-400" />
-            )
-        default:
-            return null
-    }
+const PRIORITY_STYLES = {
+    low: { badge: 'border-border bg-surface-alt text-muted', icon: <ChevronDown className="h-4 w-4" /> },
+    medium: { badge: 'border-yellow-500/20 bg-yellow-500/10 text-yellow-300', icon: <Flame className="h-4 w-4" /> },
+    high: { badge: 'border-danger/20 bg-danger/10 text-danger', icon: <AlertTriangle className="h-4 w-4" /> },
 }
 
 function TaskDashboard() {
@@ -83,42 +57,45 @@ function TaskDashboard() {
 
     if (!task) {
         return (
-            <div className="flex h-full items-center justify-center text-red-400">
+            <div className="flex h-full items-center justify-center text-danger">
                 Task not found
             </div>
         )
     }
 
+    const statusStyle = STATUS_STYLES[task.status] || STATUS_STYLES.todo
+    const priorityStyle = PRIORITY_STYLES[task.priority] || PRIORITY_STYLES.low
+
     return (
         <>
-            <div className="relative min-h-screen ml-3 bg-[#020404] p-6 text-white">
-                <div className="mb-6 rounded-3xl border border-white/10 bg-[#081312] p-6 shadow-2xl">
+            <div className="relative min-h-screen ml-3 bg-base p-6 text-ink">
+                <div className="mb-6 rounded-2xl border border-border bg-surface p-6">
                     <div className="flex items-start justify-between">
                         <div className='flex flex-col gap-6'>
                             <div>
                                 <div className='flex flex-row gap-4'>
                                     <div className="mb-4">
-                                        <PreviousPageButton className="text-white" />
+                                        <PreviousPageButton className="text-ink" />
                                     </div>
                                     <h1 className="flex items-center gap-3 mb-4 text-4xl font-bold tracking-tight">
-                                        <SquareCheckBig size={32} className="text-cyan-400" />
-                                        {task.title.slice(0,1).toUpperCase()}{task.title.slice(1,)}
+                                        <SquareCheckBig size={32} className="text-accent" />
+                                        {task.title?.slice(0,1).toUpperCase()}{task.title?.slice(1,)}
                                     </h1> 
                                 </div>
-                                <p className="mt-2 text-zinc-400 first-letter:capitalize">
+                                <p className="mt-2 text-muted first-letter:capitalize">
                                     {task.description || "No description provided"}
                                 </p>
                             </div>
-                            <div className="flex flex-wrap gap-6 text-sm text-zinc-400">
+                            <div className="flex flex-wrap gap-6 text-sm text-muted">
                                 <div>
                                     Team:
-                                    <span className="ml-2 text-white">
+                                    <span className="ml-2 text-ink">
                                         {task.team}
                                     </span>
                                 </div>
                                 <div>
                                     Due:
-                                    <span className="ml-2 text-white">
+                                    <span className="ml-2 text-ink">
                                         {task.due_date
                                             ? new Date(task.due_date).toLocaleDateString()
                                             : "No due date"}
@@ -126,55 +103,40 @@ function TaskDashboard() {
                                 </div>
                                 <div>
                                     Created:
-                                    <span className="ml-2 text-white">
+                                    <span className="ml-2 text-ink">
                                         {new Date(task.created_at).toLocaleDateString()}
                                     </span>
                                 </div>
                             </div>
                         </div>
                         <div className="flex gap-3 flex-col">
-                            <div className="
-                                flex items-center gap-2
-                                rounded-xl border border-cyan-500/20
-                                bg-cyan-500/10 px-4 py-2
-                                text-sm font-medium text-cyan-300
-                            ">
-                                {getStatusIcon(task.status)}
-                                {task.status.toUpperCase()}
+                            <div className={`flex items-center gap-2 rounded-xl border px-4 py-2 text-sm font-medium ${statusStyle.badge}`}>
+                                {statusStyle.icon}
+                                {task.status?.toUpperCase()}
                             </div>
-                            <div className="
-                                flex items-center gap-2
-                                rounded-xl border border-indigo-500/20
-                                bg-indigo-500/10 px-4 py-2
-                                text-sm font-medium text-indigo-300
-                            ">
-                                {getPriorityIcon(task.priority)}
-                                {task.priority.toUpperCase()}
+                            <div className={`flex items-center gap-2 rounded-xl border px-4 py-2 text-sm font-medium ${priorityStyle.badge}`}>
+                                {priorityStyle.icon}
+                                {task.priority?.toUpperCase()}
                             </div>
                             <button
                                 onClick={()=>setIsSlideDrawerOpen(true)}
                                 disabled={!task.can_edit}
                                 className="
                                 flex items-center gap-2
-                                rounded-2xl
-                                border border-white/10
-                                bg-white/5
+                                rounded-xl
+                                border border-border
+                                bg-surface-alt
                                 px-4 py-2
                                 text-sm font-medium
                                 cursor-pointer
-                                text-[var(--color-mint-cream)]
-                                transition-all duration-200
-                                hover:border-cyan-400/30
-                                hover:bg-cyan-500/10
-                                hover:text-cyan-300
+                                text-ink
+                                transition-colors duration-150
+                                hover:border-accent
+                                hover:text-accent
                                 disabled:cursor-not-allowed
-                                disabled:opacity-80
-                                disabled:border-white/5
-                                disabled:bg-white/[0.02]
-                                disabled:text-zinc-500
-                                disabled:hover:border-white/5
-                                disabled:hover:bg-white/[0.02]
-                                disabled:hover:text-zinc-500
+                                disabled:opacity-50
+                                disabled:hover:border-border
+                                disabled:hover:text-muted
                                 "
                             >
                                 <Settings size={18} />
@@ -185,32 +147,32 @@ function TaskDashboard() {
                 </div>
                 <div className="flex mb-6 gap-6">
                     <div className="flex-1">
-                        <div className="rounded-3xl border border-white/10 bg-[#081312] p-6">
+                        <div className="rounded-2xl border border-border bg-surface p-6">
                             <div className="mb-6 flex items-center gap-3">
-                                <Users className="text-teal-300" size={24} />
-                                <h2 className="text-2xl font-bold text-white">
+                                <Users className="text-accent" size={24} />
+                                <h2 className="text-2xl font-bold text-ink">
                                     Assigned Members
                                 </h2>
                             </div>
                             <div className="space-y-4">
-                                {task.assigned_to.map((member) => (
+                                {task.assigned_to?.map((member) => (
                                     <div
                                         onClick={()=>{navigate(`/team/${team_id}/members/${member.id}`)}}
                                         key={member.id}
-                                        className="cursor-pointer hover:scale-[1.01]
+                                        className="cursor-pointer rounded-2xl
                                             flex items-center justify-between
-                                            rounded-2xl border border-white/5
-                                            bg-white/[0.02] hover:bg-white/[0.035] p-4 
-                                            hover:border-cyan-500/10 transition-all"
+                                            border border-border
+                                            bg-black hover:border-accent p-4 
+                                            transition-colors"
                                     >
                                         <div className="flex items-center gap-4">
                                             <UserProfilePfp memberUser={member}/>
                                             <div>
-                                                <p className="font-medium text-[var(--color-mint-cream)]">
+                                                <p className="font-medium text-ink">
                                                     {member.first_name}{' '}
                                                     {member.last_name}
                                                 </p>
-                                                <p className="text-sm text-[var(--color-cool-steel)]">
+                                                <p className="text-sm text-muted">
                                                     @{member.username}
                                                 </p>
                                             </div>
@@ -222,9 +184,9 @@ function TaskDashboard() {
                                             text-xs
                                             font-medium
                                             capitalize
-                                            bg-cyan-400/8
-                                            text-cyan-300
-                                            border border-cyan-500/20
+                                            bg-accent/10
+                                            text-accent
+                                            border border-accent/20
                                             "
                                         >
                                             {member.role}
@@ -235,24 +197,24 @@ function TaskDashboard() {
                         </div>
                     </div>
                     <div className="w-48 space-y-6 shrink-0">
-                        <div className="rounded-3xl border min-h-28 border-white/10 bg-[#081312] p-6">
+                        <div className="rounded-2xl border min-h-28 border-border bg-surface p-6">
                             <div className="mb-4 flex items-center gap-3">
-                                <Crown className="h-6 w-6 text-cyan-400" />
-                                <h2 className="text-lg font-semibold">
+                                <Crown className="h-6 w-6 text-accent" />
+                                <h2 className="text-lg font-semibold text-ink">
                                     Created By
                                 </h2>
                             </div>                        
                             <div className="flex items-center gap-4">
                                 <div className="
                                     flex h-12 w-12 items-center justify-center
-                                    rounded-2xl bg-gradient-to-br
-                                    from-cyan-400 to-indigo-500
-                                    font-bold text-white
+                                    rounded-xl bg-gradient-to-br
+                                    from-accent to-accent-hover
+                                    font-bold text-accent-ink
                                 ">
                                     <UserProfilePfp memberUser={task.created_by ?? undefined}/>
                                 </div>
                                 <div>
-                                    <p className="font-medium first-letter:capitalize">
+                                    <p className="font-medium text-ink first-letter:capitalize">
                                         {task.created_by?.username || 'Deleted User'}
                                     </p>
                                 </div>
@@ -260,7 +222,7 @@ function TaskDashboard() {
                         </div>
                     </div>
                 </div>
-                <div className="rounded-3xl overflow-auto border border-dashed border-white/10 bg-[#081312] p-6">
+                <div className="rounded-2xl overflow-auto border border-dashed border-border bg-surface p-6">
                     <TaskActivity />
                 </div>
             </div>

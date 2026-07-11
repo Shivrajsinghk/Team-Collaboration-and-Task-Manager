@@ -12,6 +12,7 @@ import { updateUserProfile } from '../api/auth'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { authKeys } from '../api/queryKeys'
 import { useCurrentUserQuery } from '../hooks/useCurrentUserQuery'
+import NoProfilePhoto from '../components/NoProfilePhoto' 
 
 const BASE_URL = import.meta.env.VITE_DJANGO_BASE_URL
 
@@ -42,9 +43,7 @@ function EditProfile() {
         skills: "",
     })
     const queryClient = useQueryClient()
-    const { data: user, isLoading: loading } = useCurrentUserQuery({
-        onSuccess: undefined,
-    })
+    const { data: user, isLoading: loading } = useCurrentUserQuery()
 
     const updateProfileMutation = useMutation({
         mutationFn: (payload) => updateUserProfile(payload),
@@ -100,9 +99,6 @@ function EditProfile() {
         setRemoveProfilePicture(true)
         if (previewUrl) URL.revokeObjectURL(previewUrl)
         setPreviewUrl('')
-        queryClient.setQueryData(authKeys.me, (prev) =>
-            prev ? { ...prev, profile_picture: null } : prev
-        )
     }
 
     useEffect(() => {
@@ -128,17 +124,17 @@ function EditProfile() {
     const displayName = `${formData.first_name} ${formData.last_name}`.trim() || formData.username || "User"
 
     return (
-        <div className="min-h-screen bg-black p-4 md:p-8">
+        <div className="min-h-screen bg-base p-4 md:p-8">
             <div className="mx-auto max-w-5xl space-y-5">
                 <div className="flex items-center justify-between">
                     <div>
-                        <p className="text-[11px] uppercase tracking-widest text-zinc-600">Profile Settings</p>
-                        <h1 className="mt-1 text-2xl font-semibold text-white">Edit Profile</h1>
+                        <p className="text-[11px] uppercase tracking-widest text-muted">Profile Settings</p>
+                        <h1 className="mt-1 text-2xl font-semibold text-ink">Edit Profile</h1>
                     </div>
                     <button
                         type="button"
                         onClick={() => navigate('/profile')}
-                        className="flex items-center gap-2 rounded-xl border border-white/[0.06] bg-zinc-950 px-4 py-2 text-xs text-zinc-400 hover:text-zinc-200 transition-colors"
+                        className="flex items-center gap-2 rounded-xl border border-border bg-surface px-4 py-2 text-xs text-muted hover:text-ink transition-colors"
                     >
                         <ArrowLeft size={13} />
                         Back
@@ -146,32 +142,30 @@ function EditProfile() {
                 </div>
                 <form onSubmit={handleSubmit} className="grid gap-5 lg:grid-cols-[280px_1fr]">
                     <div className="space-y-4">
-                        <div className="rounded-2xl border border-white/[0.06] bg-zinc-950 p-6 flex flex-col items-center text-center">
+                        <div className="rounded-2xl border border-border bg-surface p-6 flex flex-col items-center text-center">
                             {currentPreview ? (
                                 <img
                                     src={currentPreview}
                                     alt={displayName}
-                                    className="h-24 w-24 rounded-2xl border-2 border-zinc-900 object-cover shadow-xl"
+                                    className="h-24 w-24 rounded-2xl border-2 border-surface object-cover shadow-xl"
                                 />
                             ) : (
-                                <div className="h-24 w-24 rounded-2xl border-2 border-zinc-900 bg-gradient-to-br from-teal-600 to-emerald-800 flex items-center justify-center text-3xl font-semibold text-white shadow-xl">
-                                    {displayName.slice(0, 1).toUpperCase()}
-                                </div>
+                                <NoProfilePhoto size={104} />
                             )}
-                            <h2 className="mt-4 text-base font-semibold capitalize text-white">{displayName}</h2>
-                            <p className="text-xs text-zinc-500 mt-0.5">@{formData.username}</p>
+                            <h2 className="mt-4 text-base font-semibold capitalize text-ink">{displayName}</h2>
+                            <p className="text-xs text-muted mt-0.5">@{formData.username}</p>
                         </div>
-                        <div className="rounded-2xl border border-white/[0.06] bg-zinc-950 p-5">
+                        <div className="rounded-2xl border border-border bg-surface p-5">
                             <div className="mb-3 flex items-center gap-2">
-                                <Camera size={14} className="text-zinc-600" />
-                                <p className="text-[12px] uppercase tracking-wider text-zinc-600">Profile Picture</p>
+                                <Camera size={14} className="text-muted" />
+                                <p className="text-[12px] uppercase tracking-wider text-muted">Profile Picture</p>
                             </div>
-                            <label className="flex cursor-pointer flex-col items-center justify-center rounded-xl border border-dashed border-white/[0.06] bg-white/[0.02] px-4 py-6 text-center hover:border-teal-500/30 hover:bg-white/[0.03] transition-all">
-                                <ImagePlus size={22} className="text-zinc-600 mb-2" />
-                                <span className="text-xs font-medium text-zinc-400">
+                            <label className="flex cursor-pointer flex-col items-center justify-center rounded-xl border border-dashed border-border bg-surface-alt px-4 py-6 text-center hover:border-accent/40 hover:bg-surface-alt transition-all">
+                                <ImagePlus size={22} className="text-muted mb-2" />
+                                <span className="text-xs font-medium text-muted">
                                     {selectedFile ? selectedFile.name : "Click to upload"}
                                 </span>
-                                <span className="mt-1 text-[11px] text-zinc-700">PNG, JPG, WEBP</span>
+                                <span className="mt-1 text-[11px] text-muted">PNG, JPG, WEBP</span>
                                 <input
                                     type="file"
                                     accept="image/png,image/jpeg,image/jpg,image/webp"
@@ -183,37 +177,37 @@ function EditProfile() {
                                 <button
                                     type="button"
                                     onClick={handleRemoveProfilePicture}
-                                    className="mt-2 flex w-full items-center justify-center gap-2 rounded-xl border border-red-500/20 bg-red-500/[0.07] px-4 py-2.5 text-xs text-red-400 hover:bg-red-500/10 transition-colors"
+                                    className="mt-2 flex w-full items-center justify-center gap-2 rounded-xl border border-danger/20 bg-danger/[0.07] px-4 py-2.5 text-xs text-danger hover:bg-danger/10 transition-colors"
                                 >
                                     <Trash2 size={13} />
                                     Remove Picture
                                 </button>
                             )}
                         </div>
-                        <div className="rounded-2xl border border-white/[0.06] bg-zinc-950 p-5 space-y-3">
+                        <div className="rounded-2xl border border-border bg-surface p-5 space-y-3">
                             <div className="flex items-center justify-between text-[12px]">
-                                <div className="flex items-center gap-1.5 text-zinc-600">
+                                <div className="flex items-center gap-1.5 text-muted">
                                     <User size={12} />
                                     Username
                                 </div>
-                                <span className="text-zinc-400">@{formData.username}</span>
+                                <span className="text-muted">@{formData.username}</span>
                             </div>
-                            <div className="border-t border-white/[0.04]" />
+                            <div className="border-t border-border" />
                             <div className="flex items-center justify-between text-[12px]">
-                                <div className="flex items-center gap-1.5 text-zinc-600">
+                                <div className="flex items-center gap-1.5 text-muted">
                                     <Mail size={12} />
                                     Email
                                 </div>
-                                <span className="text-zinc-400 truncate max-w-[160px]">{formData.email}</span>
+                                <span className="text-muted truncate max-w-[160px]">{formData.email}</span>
                             </div>
                         </div>
                     </div>
                     <div className="space-y-4">
-                        <div className="rounded-2xl border border-white/[0.06] bg-zinc-950 p-6">
-                            <h3 className="text-[12px] uppercase tracking-wider text-zinc-600 mb-5">Basic Info</h3>
+                        <div className="rounded-2xl border border-border bg-surface p-6">
+                            <h3 className="text-[12px] uppercase tracking-wider text-muted mb-5">Basic Info</h3>
                             <div className="grid gap-4 sm:grid-cols-2">
                                 <div>
-                                    <label className="mb-2 flex items-center gap-1.5 text-[12px] text-zinc-500">
+                                    <label className="mb-2 flex items-center gap-1.5 text-[12px] text-muted">
                                         <User size={12} /> First Name
                                     </label>
                                     <input
@@ -221,11 +215,11 @@ function EditProfile() {
                                         name="first_name"
                                         value={formData.first_name}
                                         onChange={handleChange}
-                                        className="w-full rounded-xl border border-white/[0.06] bg-white/[0.03] px-4 py-2.5 text-sm text-white placeholder:text-zinc-700 focus:border-teal-500/40 focus:outline-none transition-colors"
+                                        className="w-full rounded-xl border border-border bg-surface-alt px-4 py-2.5 text-sm text-ink placeholder:text-muted focus:border-accent/60 focus:outline-none transition-colors"
                                     />
                                 </div>
                                 <div>
-                                    <label className="mb-2 flex items-center gap-1.5 text-[12px] text-zinc-500">
+                                    <label className="mb-2 flex items-center gap-1.5 text-[12px] text-muted">
                                         <User size={12} /> Last Name
                                     </label>
                                     <input
@@ -233,24 +227,24 @@ function EditProfile() {
                                         name="last_name"
                                         value={formData.last_name}
                                         onChange={handleChange}
-                                        className="w-full rounded-xl border border-white/[0.06] bg-white/[0.03] px-4 py-2.5 text-sm text-white placeholder:text-zinc-700 focus:border-teal-500/40 focus:outline-none transition-colors"
+                                        className="w-full rounded-xl border border-border bg-surface-alt px-4 py-2.5 text-sm text-ink placeholder:text-muted focus:border-accent/60 focus:outline-none transition-colors"
                                     />
                                 </div>
                                 <div className="sm:col-span-2">
-                                    <label className="mb-2 flex items-center gap-1.5 text-[12px] text-zinc-500">
+                                    <label className="mb-2 flex items-center gap-1.5 text-[12px] text-muted">
                                         <PencilLine size={12} /> Full Name
                                     </label>
                                     <input
                                         type="text"
                                         disabled
                                         value={`${formData.first_name} ${formData.last_name}`.trim()}
-                                        className="w-full cursor-not-allowed rounded-xl border border-white/[0.04] bg-white/[0.01] px-4 py-2.5 text-sm text-zinc-600 focus:outline-none"
+                                        className="w-full cursor-not-allowed rounded-xl border border-border bg-surface px-4 py-2.5 text-sm text-muted focus:outline-none"
                                     />
                                 </div>
                                 <div className="sm:col-span-2">
-                                    <label className="mb-2 flex items-center gap-1.5 text-[12px] text-zinc-500">
+                                    <label className="mb-2 flex items-center gap-1.5 text-[12px] text-muted">
                                         <BadgeInfo size={12} /> Short Bio
-                                        <span className="text-zinc-700">(max 100 characters)</span>
+                                        <span className="text-muted">(max 100 characters)</span>
                                     </label>
                                     <input
                                         type="text"
@@ -259,12 +253,12 @@ function EditProfile() {
                                         value={formData.bio}
                                         onChange={handleChange}
                                         placeholder="A short tagline about yourself..."
-                                        className="w-full rounded-xl border border-white/[0.06] bg-white/[0.03] px-4 py-2.5 text-sm text-white placeholder:text-zinc-700 focus:border-teal-500/40 focus:outline-none transition-colors"
+                                        className="w-full rounded-xl border border-border bg-surface-alt px-4 py-2.5 text-sm text-ink placeholder:text-muted focus:border-accent/60 focus:outline-none transition-colors"
                                     />
-                                    <p className="mt-1 text-right text-[11px] text-zinc-700">{(formData.bio || '').length}/100</p>
+                                    <p className="mt-1 text-right text-[11px] text-muted">{(formData.bio || '').length}/100</p>
                                 </div>
                                 <div className="sm:col-span-2">
-                                    <label className="mb-2 flex items-center gap-1.5 text-[12px] text-zinc-500">
+                                    <label className="mb-2 flex items-center gap-1.5 text-[12px] text-muted">
                                         <PencilLine size={12} /> About
                                     </label>
                                     <textarea
@@ -273,16 +267,16 @@ function EditProfile() {
                                         value={formData.about}
                                         onChange={handleChange}
                                         placeholder="Tell your team a bit about yourself..."
-                                        className="w-full rounded-xl border border-white/[0.06] bg-white/[0.03] px-4 py-2.5 text-sm text-white placeholder:text-zinc-700 focus:border-teal-500/40 focus:outline-none transition-colors resize-none"
+                                        className="w-full rounded-xl border border-border bg-surface-alt px-4 py-2.5 text-sm text-ink placeholder:text-muted focus:border-accent/60 focus:outline-none transition-colors resize-none"
                                     />
                                 </div>
                                 </div>
                             </div>
-                        <div className="rounded-2xl border border-white/[0.06] bg-zinc-950 p-6">
-                            <h3 className="text-[12px] uppercase tracking-wider text-zinc-600 mb-5">Professional</h3>
+                        <div className="rounded-2xl border border-border bg-surface p-6">
+                            <h3 className="text-[12px] uppercase tracking-wider text-muted mb-5">Professional</h3>
                             <div className="grid gap-4 sm:grid-cols-2">
                                 <div>
-                                    <label className="mb-2 flex items-center gap-1.5 text-[12px] text-zinc-500">
+                                    <label className="mb-2 flex items-center gap-1.5 text-[12px] text-muted">
                                         <Briefcase size={12} /> Job Title
                                     </label>
                                     <input
@@ -291,11 +285,11 @@ function EditProfile() {
                                         value={formData.job_title}
                                         onChange={handleChange}
                                         placeholder="e.g. Backend Developer"
-                                        className="w-full rounded-xl border border-white/[0.06] bg-white/[0.03] px-4 py-2.5 text-sm text-white placeholder:text-zinc-700 focus:border-teal-500/40 focus:outline-none transition-colors"
+                                        className="w-full rounded-xl border border-border bg-surface-alt px-4 py-2.5 text-sm text-ink placeholder:text-muted focus:border-accent/60 focus:outline-none transition-colors"
                                     />
                                 </div>
                                 <div>
-                                    <label className="mb-2 flex items-center gap-1.5 text-[12px] text-zinc-500">
+                                    <label className="mb-2 flex items-center gap-1.5 text-[12px] text-muted">
                                         <MapPin size={12} /> Location
                                     </label>
                                     <input
@@ -304,13 +298,13 @@ function EditProfile() {
                                         value={formData.location}
                                         onChange={handleChange}
                                         placeholder="e.g. Indore, India"
-                                        className="w-full rounded-xl border border-white/[0.06] bg-white/[0.03] px-4 py-2.5 text-sm text-white placeholder:text-zinc-700 focus:border-teal-500/40 focus:outline-none transition-colors"
+                                        className="w-full rounded-xl border border-border bg-surface-alt px-4 py-2.5 text-sm text-ink placeholder:text-muted focus:border-accent/60 focus:outline-none transition-colors"
                                     />
                                 </div>
                                 <div className="sm:col-span-2">
-                                    <label className="mb-2 flex items-center gap-1.5 text-[12px] text-zinc-500">
+                                    <label className="mb-2 flex items-center gap-1.5 text-[12px] text-muted">
                                         <Code2 size={12} /> Skills
-                                        <span className="text-zinc-700">(comma separated)</span>
+                                        <span className="text-muted">(comma separated)</span>
                                     </label>
                                     <input
                                         type="text"
@@ -318,12 +312,12 @@ function EditProfile() {
                                         value={formData.skills}
                                         onChange={handleChange}
                                         placeholder="Python, Django, React, JavaScript..."
-                                        className="w-full rounded-xl border border-white/[0.06] bg-white/[0.03] px-4 py-2.5 text-sm text-white placeholder:text-zinc-700 focus:border-teal-500/40 focus:outline-none transition-colors"
+                                        className="w-full rounded-xl border border-border bg-surface-alt px-4 py-2.5 text-sm text-ink placeholder:text-muted focus:border-accent/60 focus:outline-none transition-colors"
                                     />
                                     {formData.skills && (
                                         <div className="mt-2 flex flex-wrap gap-1.5">
                                             {formData.skills.split(',').map(s => s.trim()).filter(Boolean).map((skill) => (
-                                                <span key={skill} className="rounded-lg border border-white/[0.06] bg-white/[0.03] px-2.5 py-0.5 text-[11px] text-zinc-400">
+                                                <span key={skill} className="rounded-lg border border-border bg-surface-alt px-2.5 py-0.5 text-[11px] text-muted">
                                                     {skill}
                                                 </span>
                                             ))}
@@ -332,11 +326,11 @@ function EditProfile() {
                                 </div>
                             </div>
                         </div>
-                        <div className="rounded-2xl border border-white/[0.06] bg-zinc-950 p-6">
-                            <h3 className="text-[12px] uppercase tracking-wider text-zinc-600 mb-5">Links</h3>
+                        <div className="rounded-2xl border border-border bg-surface p-6">
+                            <h3 className="text-[12px] uppercase tracking-wider text-muted mb-5">Links</h3>
                             <div className="grid gap-4 sm:grid-cols-2">
                                 <div>
-                                    <label className="mb-2 flex items-center gap-1.5 text-[12px] text-zinc-500">
+                                    <label className="mb-2 flex items-center gap-1.5 text-[12px] text-muted">
                                         <GitBranch size={12} /> GitHub URL
                                     </label>
                                     <input
@@ -345,11 +339,11 @@ function EditProfile() {
                                         value={formData.github_url}
                                         onChange={handleChange}
                                         placeholder="https://github.com/username"
-                                        className="w-full rounded-xl border border-white/[0.06] bg-white/[0.03] px-4 py-2.5 text-sm text-white placeholder:text-zinc-700 focus:border-teal-500/40 focus:outline-none transition-colors"
+                                        className="w-full rounded-xl border border-border bg-surface-alt px-4 py-2.5 text-sm text-ink placeholder:text-muted focus:border-accent/60 focus:outline-none transition-colors"
                                     />
                                 </div>
                                 <div>
-                                    <label className="mb-2 flex items-center gap-1.5 text-[12px] text-zinc-500">
+                                    <label className="mb-2 flex items-center gap-1.5 text-[12px] text-muted">
                                         <Link size={12} /> LinkedIn URL
                                     </label>
                                     <input
@@ -358,13 +352,13 @@ function EditProfile() {
                                         value={formData.linkedin_url}
                                         onChange={handleChange}
                                         placeholder="https://linkedin.com/in/username"
-                                        className="w-full rounded-xl border border-white/[0.06] bg-white/[0.03] px-4 py-2.5 text-sm text-white placeholder:text-zinc-700 focus:border-teal-500/40 focus:outline-none transition-colors"
+                                        className="w-full rounded-xl border border-border bg-surface-alt px-4 py-2.5 text-sm text-ink placeholder:text-muted focus:border-accent/60 focus:outline-none transition-colors"
                                     />
                                 </div>
                             </div>
                         </div>
                         {errorMessage && (
-                            <div className="rounded-xl border border-red-500/20 bg-red-500/[0.07] px-4 py-3 text-sm text-red-400">
+                            <div className="rounded-xl border border-danger/20 bg-danger/[0.07] px-4 py-3 text-sm text-danger">
                                 {errorMessage}
                             </div>
                         )}
@@ -372,7 +366,7 @@ function EditProfile() {
                             <button
                                 type="button"
                                 onClick={() => navigate('/profile')}
-                                className="flex items-center justify-center gap-2 rounded-xl border border-white/[0.06] bg-zinc-950 px-5 py-2.5 text-sm text-zinc-400 hover:text-zinc-200 transition-colors"
+                                className="flex items-center justify-center gap-2 rounded-xl border border-border bg-surface px-5 py-2.5 text-sm text-muted hover:text-ink transition-colors"
                             >
                                 <X size={14} />
                                 Cancel
@@ -380,7 +374,7 @@ function EditProfile() {
                             <button
                                 type="submit"
                                 disabled={updateProfileMutation.isPending}
-                                className="flex flex-1 items-center justify-center gap-2 rounded-xl border border-teal-500/20 bg-teal-500/10 px-5 py-2.5 text-sm font-medium text-teal-400 hover:bg-teal-500/15 transition-colors disabled:cursor-not-allowed disabled:opacity-50"
+                                className="flex flex-1 items-center justify-center gap-2 rounded-xl border border-accent/20 bg-accent/10 px-5 py-2.5 text-sm font-medium text-accent hover:bg-accent/15 transition-colors disabled:cursor-not-allowed disabled:opacity-50"
                             >
                                 <Save size={14} />
                                 {updateProfileMutation.isPending ? "Saving..." : "Save Changes"}

@@ -97,13 +97,13 @@ function AddMemberToTask({
                                         </div>
                                     </div>
                                     <div className="flex items-center gap-2">
-                                        <span className="px-4 py-2 rounded-full text-xs font-medium capitalize bg-cyan-400/8 text-cyan-300 border border-cyan-500/20">
+                                        <span className="px-4 py-2 rounded-full text-xs font-medium capitalize bg-black text-[#2CFF05] border-[#25D604] border">
                                             {member.role}
                                         </span>
                                         <button
                                             disabled={alreadyAssigned}
                                             onClick={() => setConfirmAddId(member.id)}
-                                            className="flex items-center gap-1 rounded-full border border-cyan-500/20 bg-cyan-400/8 px-4 py-2 text-xs font-medium text-cyan-300 transition-all hover:bg-cyan-400/12
+                                            className="flex items-center gap-1 rounded-full border bg-black text-[#2CFF05] border-[#25D604] px-4 py-2 text-xs font-medium transition-all hover:bg-cyan-400/12
                                             disabled:cursor-not-allowed
                                             disabled:opacity-50
                                             disabled:hover:border-white/5
@@ -115,7 +115,7 @@ function AddMemberToTask({
                                     </div>
                                 </div>
                                 {confirmAddId === member.id && (
-                                    <div className="mt-4 rounded-2xl border border-cyan-500/10 bg-cyan-500/[0.05] p-4">
+                                    <div className="mt-4 rounded-2xl border border-[#25D604] bg-[#25D604]/1 p-4">
                                         <p className="text-sm text-center text-cyan-100">
                                             Add this member to the task?
                                         </p>
@@ -128,7 +128,7 @@ function AddMemberToTask({
                                             </button>
                                             <button
                                             onClick={()=>{handleSubmit()}}
-                                                className="rounded-xl border border-cyan-500/20 bg-cyan-500/10 px-4 py-2 text-sm font-medium text-cyan-300 transition-all hover:bg-cyan-500/20"
+                                                className="rounded-xl border border-[#25D604] text-[#2CFF05] px-4 py-2 text-sm font-medium transition-all hover:bg-[#25D604]/20"
                                             >
                                                 Confirm
                                             </button>

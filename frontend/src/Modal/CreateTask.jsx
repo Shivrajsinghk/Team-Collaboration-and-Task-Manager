@@ -65,7 +65,7 @@ function CreateTask({
                         name="task_title"
                         required
                         placeholder="Enter task title"
-                        className="w-full rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-2.5 text-sm text-white focus:border-teal-400 focus:outline-none focus:ring-2 focus:ring-teal-400/20"
+                        className="w-full rounded-2xl border bg-white/[0.04] px-4 py-2.5 text-sm text-white border-[#26ff007a] focus:border-[#2CFF05] focus:outline-none"
                     />
                 </div>
                 <div>
@@ -74,7 +74,7 @@ function CreateTask({
                         type="text"
                         name="task_description"
                         placeholder="Enter task description"
-                        className="w-full rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-3 text-sm text-white focus:border-teal-400 focus:outline-none focus:ring-2 focus:ring-teal-400/20"
+                        className="w-full rounded-2xl border bg-white/[0.04] px-4 py-3 text-sm text-white border-[#26ff007a] focus:border-[#2CFF05] focus:outline-none"
                     />
                 </div>
                 <div>
@@ -86,7 +86,7 @@ function CreateTask({
                             type="date"
                             required
                             name="due_date"
-                            className="w-full rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-3 text-sm text-white focus:border-teal-400 focus:outline-none focus:ring-2 focus:ring-teal-400/20"
+                            className="w-full rounded-2xl border bg-white/[0.04] px-4 py-3 text-sm text-white border-[#26ff007a] focus:border-[#2CFF05] focus:outline-none"
                         />
                     </div>
                 </div>
@@ -99,9 +99,9 @@ function CreateTask({
                         onClick={() =>
                             setIsDropdownOpen(!isDropdownOpen)
                         }
-                        className="mt-2 flex w-full items-start justify-between rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-3"
+                        className="mt-2 flex w-full items-start justify-between rounded-2xl border border-[#26ff007a] focus:border-[#2CFF05] bg-white/[0.04] px-4 py-3"
                     >
-                        <div className="flex flex-wrap gap-3 overflow-x-auto custom-scrollbar">
+                        <div className="flex flex-wrap gap-3 max-h-28 overflow-y-auto custom-scrollbar">
                             {selectedMembers.length > 0 ? ( 
                                 selectedMembers.map((selectedMember) => (
                                     <div className="flex items-center gap-3" key={selectedMember.user__id}>
@@ -113,8 +113,8 @@ function CreateTask({
                                                     className="h-full w-full object-cover"
                                                 />
                                             ) : (
-                                                <div className="flex h-full w-full items-center justify-center rounded-full bg-gradient-to-br from-teal-400 to-indigo-500 text-sm font-bold text-white">
-                                                    {(selectedMember.user__first_name || "U").slice(0, 1)}
+                                                <div className="flex h-full w-full items-center justify-center capitalize rounded-full bg-gradient-to-br from-teal-400 to-indigo-500 text-sm font-bold text-white">
+                                                    {(selectedMember.user__first_name?.charAt(0).toUpperCase() || "U")}
                                                 </div>
                                             )}
                                         </div>
@@ -142,7 +142,7 @@ function CreateTask({
                     {isDropdownOpen && (
                         <div
                             onWheel={(e) => e.stopPropagation()}
-                            className="absolute left-full bottom-0 ml-3 z-[9999] w-80 max-h-80 overflow-y-auto rounded-2xl border border-white/10 bg-[#0B1120] p-2 shadow-2xl scrollbar-thin scrollbar-track-transparent scrollbar-thumb-teal-500/40 hover:scrollbar-thumb-teal-400/60"
+                            className="absolute left-full bottom-0 ml-3 z-[9999] w-80 max-h-80 overflow-y-auto rounded-2xl border border-white/10 bg-[#000000]/80 p-2 shadow-2xl custom-scrollbar"
                         >
                     {team?.team?.all_members?.map((member) => (
                                 <button
@@ -161,9 +161,9 @@ function CreateTask({
                                             return [...prev, member]
                                         })
                                     }}
-                                    className={`flex w-full items-center gap-3 rounded-xl px-3 py-3 transition-all ${
+                                    className={`flex w-full items-center gap-3 my-1 rounded-xl px-3 py-3 transition-all ${
                                         selectedMembers.some((m) => m.user__id === member.user__id)
-                                            ? 'bg-teal-500/10 border border-teal-400/30'
+                                            ? 'bg-teal-500/10 border border-[#2CFF05]'
                                             : 'hover:bg-white/10'
                                     }`}
                                     >
@@ -175,8 +175,8 @@ function CreateTask({
                                                 className="h-full w-full object-cover"
                                             />
                                         ):(
-                                            <div className="flex h-full w-full items-center justify-center rounded-full bg-gradient-to-br from-teal-400 to-indigo-500 text-sm font-bold text-white">
-                                                {(member.user__first_name || "U").slice(0,1)}
+                                            <div className="flex h-full w-full items-center justify-center rounded-full bg-gradient-to-br capitalize from-teal-400 to-indigo-500 text-sm font-bold text-white">
+                                                {member.user__first_name?.charAt(0).toUpperCase() || "U"}
                                             </div>
                                         )}
                                     </div>
@@ -200,7 +200,7 @@ function CreateTask({
                     className={`w-full rounded-2xl py-3 text-sm font-semibold transition duration-300 ${
                     createTaskMutation.isPending
                     ? "cursor-not-allowed bg-gray-500"
-                    : "bg-gradient-to-r from-teal-400 to-cyan-500 text-black hover:scale-[1.01]"
+                    : "bg-[#2CFF05] text-black hover:scale-[1.01]"
                     }`}
                 >
                     {createTaskMutation.isPending ? "Creating..." : "Create Task"}

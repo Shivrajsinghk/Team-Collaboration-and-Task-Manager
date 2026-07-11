@@ -93,7 +93,7 @@ const MessageBubble = ({
                     )}
                 </div>
                 <div
-                    className={`inline-block bg-neutral-900 border border-emerald-400/20 max-w-full min-w-[120px] overflow-hidden rounded-[1.4rem] px-4 py-3 text-sm leading-6 text-white shadow-lg backdrop-blur-md transition-all duration-200 group-hover:scale-[1.02]`}
+                    className={`inline-block bg-neutral-900 border border-[#2CFF05] max-w-full min-w-[120px] overflow-hidden rounded-[1.4rem] px-4 py-3 text-sm leading-6 text-white shadow-lg backdrop-blur-md transition-all duration-200 group-hover:scale-[1.02]`}
                 >
                     {showImageAttachment && (
                         <a
@@ -144,7 +144,7 @@ const MessageBubble = ({
                             {formatMessageTime(chat.created_at)}
                         </span>
                         {isMine && (
-                            <span className={`text-[11px] ${chat.is_read ? 'text-cyan-400' : 'text-zinc-600'}`}>
+                            <span className={`text-[11px] ${chat.is_read ? 'text-[#2CFF05]' : 'text-zinc-600'}`}>
                                 {chat.is_read ? '✓✓' : '✓'}
                             </span>
                         )}

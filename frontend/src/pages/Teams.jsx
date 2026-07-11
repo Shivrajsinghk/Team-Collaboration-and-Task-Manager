@@ -10,16 +10,16 @@ function Teams({teams}) {
                     ))}
                 </section>
             ) : (
-                <section className="mt-10 flex min-h-[320px] flex-col items-center justify-center rounded-[2.5rem] border border-dashed border-white/10 bg-white/[0.03] px-8 text-center backdrop-blur-xl">
-                    <div className="flex h-20 w-20 items-center justify-center rounded-[1.5rem] bg-gradient-to-br from-teal-400/20 to-cyan-500/20">
-                        <span className="text-3xl">
+                <section className="mt-10 flex min-h-[320px] flex-col items-center justify-center rounded-[2.5rem] border border-dashed border-border bg-surface px-8 text-center backdrop-blur-xl">
+                    <div className="flex h-20 w-20 items-center justify-center rounded-[1.5rem] bg-accent/15">
+                        <span className="text-3xl text-accent">
                             ✦
                         </span>
                     </div>
-                    <h2 className="mt-8 text-3xl font-bold text-white">
+                    <h2 className="mt-8 text-3xl font-bold text-ink">
                         No teams yet
                     </h2>
-                    <p className="mt-4 max-w-md text-sm leading-7 text-gray-400">
+                    <p className="mt-4 max-w-md text-sm leading-7 text-muted">
                         Create your first team and start collaborating with your team members.
                     </p>
                 </section>

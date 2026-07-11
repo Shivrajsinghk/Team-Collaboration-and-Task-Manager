@@ -19,7 +19,7 @@ function Navbar() {
             <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(34,211,238,0.03),transparent,rgba(99,102,241,0.03))]" />
             <div className="relative mx-auto flex h-20 max-w-[1600px] items-center justify-between px-6">
                 <div className="flex items-center gap-10">
-                    <Link to="/dashboard" className="transition duration-300 hover:opacity-90">
+                    <Link to="/dashboard" className="transition duration-300">
                         <Logo />
                     </Link>
                 </div>
@@ -29,7 +29,7 @@ function Navbar() {
                 <div className="flex items-center gap-3">
                     <button
                         onClick={() => setOpen(!open)}
-                        className="relative flex h-11 w-11 items-center justify-center rounded-2xl border border-white/10 bg-white/[0.03] text-gray-300 transition duration-300 hover:bg-white/[0.06] hover:text-white"
+                        className="relative flex h-11 w-11 items-center justify-center rounded-2xl border border-white/10 bg-white/[0.03] text-gray-300 transition duration-300 hover:bg-[#25D604] hover:scale-110 hover:text-black"
                     >
                         <MessageCircle size={18} />
                         {unreadMessages > 0 && (
@@ -40,7 +40,7 @@ function Navbar() {
                     </button>
                     {open && <ChatDropdown open={open} setOpen={setOpen} />}
                     <button
-                        className="relative flex h-11 w-11 items-center justify-center rounded-2xl border border-white/10 bg-white/[0.03] text-gray-300 transition duration-300 hover:bg-white/[0.06] hover:text-white"
+                        className="relative flex h-11 w-11 items-center justify-center rounded-2xl border border-white/10 bg-white/[0.03] text-gray-300 transition duration-300 hover:bg-[#25D604] hover:scale-110 hover:text-black"
                         onClick={() => navigate('notifications/')}
                     >
                         <Bell size={18} />
@@ -52,7 +52,7 @@ function Navbar() {
                     </button>
                     <Link
                         to="/profile"
-                        className="group flex items-center gap-3 rounded-2xl border border-white/10 bg-white/[0.03] px-3 py-2 transition duration-300 hover:bg-white/[0.06]"
+                        className="group flex items-center gap-3 rounded-2xl px-3 py-2 transition duration-300"
                     >
                         <UserProfilePfp />
                         <div className="hidden text-left xl:block">

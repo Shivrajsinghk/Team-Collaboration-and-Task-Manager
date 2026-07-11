@@ -10,7 +10,7 @@ import { getTask, updateTask as saveTask } from '../api/tasks'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { taskKeys } from '../api/queryKeys'
 
-function RightSlideDrawer({isSlideDrawerOpen, setIsSlideDrawerOpen}) {
+function RightSlideDrawer({ isSlideDrawerOpen, setIsSlideDrawerOpen }) {
     const { team_id, task_id } = useParams()
     const { fetchTaskActivities } = useContext(TaskActivityContext)
     const [isRemoveMemberOpen, setIsRemoveMemberOpen] = useState(false)
@@ -22,7 +22,7 @@ function RightSlideDrawer({isSlideDrawerOpen, setIsSlideDrawerOpen}) {
     const [formData, setFormData] = useState({
         title: "",
         description: "",
-        priority: "Low",
+        priority: "low",
         due_date: '',
         assigned_to: []
     })
@@ -68,15 +68,13 @@ function RightSlideDrawer({isSlideDrawerOpen, setIsSlideDrawerOpen}) {
             title: task.title,
             description: task.description,
             priority: task.priority,
-            due_date: task.due_date
-                ? task.due_date.split('T')[0]
-                : '',
+            due_date: task.due_date ? task.due_date.split('T')[0] : '',
             assigned_to: task.assigned_to,
         })
         setIsInitialLoad(false)
     }, [task])
 
-    async function updateTask(){
+    async function updateTask() {
         setIsSaving(true)
         updateTaskMutation.mutate({
             title: formData.title,
@@ -85,61 +83,43 @@ function RightSlideDrawer({isSlideDrawerOpen, setIsSlideDrawerOpen}) {
             due_date: formData.due_date
         })
     }
-    
+
     useEffect(() => {
-        if(isInitialLoad) return
+        if (isInitialLoad) return
         const timeout = setTimeout(() => {
             updateTask()
         }, 500)
         return () => clearTimeout(timeout)
-    }, [
-        formData.title,
-        formData.description,
-        formData.priority,
-        formData.due_date
-    ])
+    }, [formData.title, formData.description, formData.priority, formData.due_date])
 
     const handleChange = async (e) => {
-        setFormData((prev)=>({
-            ...prev,
-            [e.target.name]: e.target.value
-        }))
+        setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }))
     }
 
     return (
         <>
-            <div className={`fixed inset-0 z-50 transition-transform duration-300 ease-out ${isSlideDrawerOpen ? 'visible opacity-100 pointer-events-auto' : 'invisible opacity-0 pointer-events-none'}`}
-            >
-                <div
-                    onClick={() => {
-                        setIsSlideDrawerOpen(false)
-                    }}
-                    className="absolute inset-0 bg-black/60 backdrop-blur-sm"
-                />
-                <div
-                    className={`absolute right-0 top-0 flex h-full w-1/2 flex-col border-l border-white/10 bg-[#0B1517] shadow-2xl transition-transform duration-300 ease-out ${isSlideDrawerOpen ? 'translate-x-0' : 'translate-x-full'}`}
-                >
-                    <div className="flex relative items-start justify-between border-b border-white/10 px-8 py-6">
-                        <h2 className="text-3xl font-bold tracking-tight text-[var(--color-mint-cream)]">
-                            Edit <span className='text-cyan-400/70'>Task</span>
+            <div className={`fixed inset-0 z-50 transition-transform duration-300 ease-out ${isSlideDrawerOpen ? 'visible opacity-100 pointer-events-auto' : 'invisible opacity-0 pointer-events-none'}`}>
+                <div onClick={() => { setIsSlideDrawerOpen(false) }} className="absolute inset-0 bg-black/60" />
+                <div className={`absolute right-0 top-0 flex h-full w-1/2 flex-col border-l border-border bg-black shadow-2xl transition-transform duration-300 ease-out ${isSlideDrawerOpen ? 'translate-x-0' : 'translate-x-full'}`}>
+                    <div className="flex relative items-start justify-between border-b border-border px-8 py-6">
+                        <h2 className="text-3xl font-bold tracking-tight text-ink">
+                            Edit <span className="text-accent/70">Task</span>
                         </h2>
                         <div className="flex absolute bottom-2 right-1/2 items-center gap-2">
-                            <span className="text-xs text-gray-300">
+                            <span className="text-xs text-muted">
                                 {isSaving ? 'Saving...' : 'Saved'}
                             </span>
                         </div>
-                        <div className='flex gap-5'>
+                        <div className="flex gap-5">
                             <button
-                            onClick={()=>{setIsDeleteTaskOpen(true)}}
-                                className="rounded-2xl border border-red-500/20 bg-red-500/10 px-2 text-xs font-medium text-red-300 transition-all duration-200 hover:bg-red-500/20"
+                                onClick={() => { setIsDeleteTaskOpen(true) }}
+                                className="rounded-xl border border-danger/20 bg-danger/10 px-2 text-xs font-medium text-danger transition-colors duration-150 hover:bg-danger/20"
                             >
                                 Delete Task
                             </button>
                             <button
-                                onClick={() => {
-                                    setIsSlideDrawerOpen(false)
-                                }}
-                                className="flex h-10 w-10 items-center justify-center rounded-xl border border-white/10 bg-white/[0.03] text-gray-400 transition-all duration-200 hover:border-white/20 hover:bg-white/[0.06] hover:text-white"
+                                onClick={() => { setIsSlideDrawerOpen(false) }}
+                                className="flex h-10 w-10 items-center justify-center rounded-xl border border-border bg-surface-alt text-muted transition-colors duration-150 hover:border-border-strong hover:text-ink"
                             >
                                 <X size={18} />
                             </button>
@@ -148,102 +128,76 @@ function RightSlideDrawer({isSlideDrawerOpen, setIsSlideDrawerOpen}) {
                     <div className="flex-1 overflow-y-auto px-8 py-7">
                         <div className="space-y-7">
                             <div>
-                                <label className="mb-3 block text-sm font-medium text-[var(--color-mint-cream)]">
-                                    Task Title
-                                </label>
+                                <label className="mb-3 block text-sm font-medium text-ink">Task Title</label>
                                 <input
                                     type="text"
                                     name="title"
                                     value={formData.title}
                                     onChange={handleChange}
                                     placeholder="Enter task title"
-                                    className="w-full rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-3 text-sm text-white outline-none transition-all duration-200 placeholder:text-gray-500 focus:border-cyan-400/40 focus:bg-white/[0.05]"
+                                    className="w-full rounded-xl border border-border bg-surface-alt px-4 py-3 text-sm text-ink outline-none transition-colors duration-150 placeholder:text-muted focus:border-accent"
                                 />
                             </div>
                             <div>
-                                <label className="mb-3 block text-sm font-medium text-[var(--color-mint-cream)]">
-                                    Description
-                                </label>
+                                <label className="mb-3 block text-sm font-medium text-ink">Description</label>
                                 <textarea
                                     rows={5}
                                     name="description"
                                     onChange={handleChange}
                                     value={formData.description}
                                     placeholder="Write task description..."
-                                    className="w-full resize-none rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-3 text-sm text-white outline-none transition-all duration-200 placeholder:text-gray-500 focus:border-cyan-400/40 focus:bg-white/[0.05]"
+                                    className="w-full resize-none rounded-xl border border-border bg-surface-alt px-4 py-3 text-sm text-ink outline-none transition-colors duration-150 placeholder:text-muted focus:border-accent"
                                 />
                             </div>
-                            <div className='flex gap-3'>
-                                <div className='w-full'>
-                                    <label className="mb-3 block text-sm font-medium text-[var(--color-mint-cream)]">
-                                        Due Date
-                                    </label>
+                            <div className="flex gap-3">
+                                <div className="w-full">
+                                    <label className="mb-3 block text-sm font-medium text-ink">Due Date</label>
                                     <input
                                         type="date"
                                         name="due_date"
                                         value={formData.due_date}
                                         onChange={handleChange}
-                                        className="w-full rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-3 text-sm text-white outline-none transition-all duration-200 focus:border-cyan-400/40 focus:bg-white/[0.05]"
+                                        className="w-full rounded-xl border border-border bg-surface-alt px-4 py-3 text-sm text-ink outline-none transition-colors duration-150 focus:border-accent"
                                     />
                                 </div>
-                                <div className='w-full'>
-                                    <label className="mb-3 block text-sm font-medium text-[var(--color-mint-cream)]">
-                                        Priority
-                                    </label>
+                                <div className="w-full">
+                                    <label className="mb-3 block text-sm font-medium text-ink">Priority</label>
                                     <select
                                         name="priority"
                                         value={formData.priority}
                                         onChange={handleChange}
-                                        className="w-full rounded-2xl border border-white/10 bg-[#0F1B1D] px-4 py-3 text-sm text-white outline-none transition-all duration-200 focus:border-cyan-400/40"
+                                        className="w-full rounded-xl border border-border bg-surface-alt px-4 py-3 text-sm text-ink outline-none transition-colors duration-150 focus:border-accent"
                                     >
-                                        <option className="bg-[#0F1B1D] text-white" value="low">
-                                            Low
-                                        </option>
-                                        <option className="bg-[#0F1B1D] text-white" value="medium">
-                                            Medium
-                                        </option>
-                                        <option className="bg-[#0F1B1D] text-white" value="high">
-                                            High
-                                        </option>
+                                        <option className="bg-surface-alt text-ink" value="low">Low</option>
+                                        <option className="bg-surface-alt text-ink" value="medium">Medium</option>
+                                        <option className="bg-surface-alt text-ink" value="high">High</option>
                                     </select>
                                 </div>
                             </div>
                             <div>
-                                <label className="mb-3 block text-sm font-medium text-[var(--color-mint-cream)]">
-                                    Assigned Members
-                                </label>
-                                <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
+                                <label className="mb-3 block text-sm font-medium text-ink">Assigned Members</label>
+                                <div className="rounded-xl border border-border bg-surface-alt p-4">
                                     {formData.assigned_to.map((member) => (
                                         <div
                                             key={member.id}
-                                            className="cursor-pointer hover:scale-[1.01]
-                                                flex items-center justify-between
-                                                rounded-2xl border border-white/5
-                                                bg-white/[0.02] hover:bg-white/[0.035] p-3 
-                                                hover:border-cyan-500/10 transition-all"
+                                            className="flex items-center justify-between rounded-xl border border-border bg-surface hover:border-accent/30 p-3 transition-colors mb-2 last:mb-0"
                                         >
                                             <div className="flex items-center gap-3">
-                                                <UserProfilePfp memberUser={member}/>
+                                                <UserProfilePfp memberUser={member} />
                                                 <div>
-                                                    <p className="font-medium text-[var(--color-mint-cream)]">
-                                                        {member.first_name}{' '}
-                                                        {member.last_name}
+                                                    <p className="font-medium text-ink">
+                                                        {member.first_name} {member.last_name}
                                                     </p>
-                                                    <p className="text-sm text-[var(--color-cool-steel)]">
-                                                        @{member.username}
-                                                    </p>
+                                                    <p className="text-sm text-muted">@{member.username}</p>
                                                 </div>
                                             </div>
-                                            <span className='flex gap-2'>
-                                                <span className="px-4 py-2 rounded-full text-xs font-medium capitalize bg-cyan-400/8 text-cyan-300 border border-cyan-500/20">
+                                            <span className="flex gap-2">
+                                                <span className="px-4 py-2 rounded-full text-xs font-medium capitalize bg-accent/10 text-accent border border-accent/20">
                                                     {member.role}
                                                 </span>
-                                                <button 
-                                                onClick={()=>{
-                                                    setSelectedMember(member)
-                                                    setIsRemoveMemberOpen(true)
-                                                }}
-                                                className="flex gap-1 px-4 py-2 rounded-full text-xs font-medium capitalize bg-cyan-400/8 border border-cyan-500/20"
+                                                <button
+                                                    onClick={() => { setSelectedMember(member); setIsRemoveMemberOpen(true) }}
+                                                    className="flex items-center gap-1 px-4 py-2 rounded-full text-xs font-medium capitalize bg-danger/10 border border-danger/20 text-danger hover:bg-danger/20 transition-colors"
                                                 >
                                                     <X size={17} />
                                                     Remove
@@ -252,18 +206,8 @@ function RightSlideDrawer({isSlideDrawerOpen, setIsSlideDrawerOpen}) {
                                         </div>
                                     ))}
                                     <button
-                                        onClick={()=>{setIsAddMemberOpen(true)}}
-                                        className="
-                                        mt-4
-                                        flex w-full items-center justify-center gap-2
-                                        rounded-2xl border border-dashed border-white/10
-                                        bg-white/[0.02]
-                                        px-4 py-3
-                                        text-sm font-medium text-cyan-300
-                                        transition-all duration-200
-                                        hover:border-cyan-400/30
-                                        hover:bg-cyan-500/5
-                                        "
+                                        onClick={() => { setIsAddMemberOpen(true) }}
+                                        className="mt-4 flex w-full items-center justify-center gap-2 rounded-xl border border-dashed border-border bg-surface px-4 py-3 text-sm font-medium text-accent transition-colors duration-150 hover:border-accent/50 hover:bg-accent/5"
                                     >
                                         <Plus size={18} />
                                         Add Member
@@ -276,21 +220,21 @@ function RightSlideDrawer({isSlideDrawerOpen, setIsSlideDrawerOpen}) {
             </div>
 
             <RemoveMemberFromTask
-            isRemoveMemberOpen={isRemoveMemberOpen}
-            setIsRemoveMemberOpen={setIsRemoveMemberOpen}
-            selectedMember={selectedMember}
+                isRemoveMemberOpen={isRemoveMemberOpen}
+                setIsRemoveMemberOpen={setIsRemoveMemberOpen}
+                selectedMember={selectedMember}
             />
 
-            <AddMemberToTask 
-            isAddMemberOpen={isAddMemberOpen}
-            setIsAddMemberOpen={setIsAddMemberOpen}
-            isAssigned={task.assigned_to} 
+            <AddMemberToTask
+                isAddMemberOpen={isAddMemberOpen}
+                setIsAddMemberOpen={setIsAddMemberOpen}
+                isAssigned={task?.assigned_to}
             />
 
-            <DeleteTask 
-            isDeleteTaskOpen={isDeleteTaskOpen}
-            setIsDeleteTaskOpen={setIsDeleteTaskOpen}
-            setIsSlideDrawerOpen={setIsSlideDrawerOpen}
+            <DeleteTask
+                isDeleteTaskOpen={isDeleteTaskOpen}
+                setIsDeleteTaskOpen={setIsDeleteTaskOpen}
+                setIsSlideDrawerOpen={setIsSlideDrawerOpen}
             />
         </>
     )

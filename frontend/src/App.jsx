@@ -15,10 +15,12 @@ import { ProfileRoutes } from './routes/ProfileRoutes'
 import { NotificationRoutes } from './routes/NotificationRoutes'
 import { useQueryClient } from '@tanstack/react-query'
 import { authKeys } from './api/queryKeys'
+import Loading from './components/Loading'
 
 function App() {
 	const dispatch = useDispatch()
-	const { isAuthenticated } = useSelector(state => state.auth);
+	const isAuthenticated = useSelector(state => state.auth.isAuthenticated)
+	const isAuthResolved = useSelector(state => state.auth.isAuthResolved)	
 	const queryClient = useQueryClient()
 	
 	useEffect(() => {
@@ -62,8 +64,6 @@ function App() {
 		<div>
 			{isAuthenticated && <Navbar />}
 			<Routes>
-				{ChatRoutes()}
-				{NotificationRoutes()}
 				{PublicRoutes()}
 				<Route element={<ProtectedRoute />}>
 					<Route path='/dashboard' element={<Dashboard />} />
@@ -71,6 +71,8 @@ function App() {
 					<Route path='/edit-profile' element={<EditProfile />} />
 					{ProfileRoutes()}
 					{TeamRoutes()}
+					{ChatRoutes()}
+					{NotificationRoutes()}
 				</Route>
 			</Routes>
 		</div>

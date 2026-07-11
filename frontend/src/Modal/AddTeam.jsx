@@ -17,7 +17,7 @@ function AddTeam({isAddTeamOpen, setIsAddTeamOpen, setIsCreateOpen, setIsJoinOpe
                 <div className="space-y-3">
                     <button
                         onClick={() => setIsCreateOpen(true)}
-                        className="group w-full rounded-2xl border border-white/10 bg-white/[0.03] p-5 text-left transition-all duration-300 hover:border-cyan-400/30 hover:bg-white/[0.05]"
+                        className="group w-full rounded-2xl border border-white/10 bg-white/[0.03] p-5 text-left transition-all duration-300 hover:border-[#25D604] hover:bg-white/[0.05]"
                     >
                         <div className="flex items-center justify-between">
                             <div>
@@ -28,14 +28,14 @@ function AddTeam({isAddTeamOpen, setIsAddTeamOpen, setIsCreateOpen, setIsJoinOpe
                                     Start a new workspace and invite members.
                                 </p>
                             </div>
-                            <div className="text-cyan-400 transition-transform duration-300 group-hover:translate-x-1">
+                            <div className="text-[#2CFF05] transition-transform duration-300 group-hover:translate-x-1">
                                 →
                             </div>
                         </div>
                     </button>
                     <button
                         onClick={() => setIsJoinOpen(true)}
-                        className="group w-full rounded-2xl border border-white/10 bg-white/[0.03] p-5 text-left transition-all duration-300 hover:border-cyan-400/30 hover:bg-white/[0.05]"
+                        className="group w-full rounded-2xl border border-white/10 bg-white/[0.03] p-5 text-left transition-all duration-300 hover:border-[#25D604] hover:bg-white/[0.05]"
                     >
                         <div className="flex items-center justify-between">
                             <div>
@@ -46,7 +46,7 @@ function AddTeam({isAddTeamOpen, setIsAddTeamOpen, setIsCreateOpen, setIsJoinOpe
                                     Enter an invite code to join an existing team.
                                 </p>
                             </div>
-                            <div className="text-cyan-400 transition-transform duration-300 group-hover:translate-x-1">
+                            <div className="text-[#2CFF05] transition-transform duration-300 group-hover:translate-x-1">
                                 →
                             </div>
                         </div>

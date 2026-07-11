@@ -26,17 +26,17 @@ function TeamActivity() {
     })
 
     return (
-        <div className="bg-[#071717] border border-green-500/20 rounded-3xl p-6 shadow-[0_0_40px_rgba(0,255,255,0.03)]">
+        <div className="bg-surface border border-border rounded-2xl p-6">
             <div className="flex items-center gap-3 mb-6">
-                <Clock3 className="text-green-400" size={28} />
-                <h2 className="text-2xl font-bold text-white">
+                <Clock3 className="text-accent" size={28} />
+                <h2 className="text-2xl font-bold text-ink">
                     Team Activity
                 </h2>
             </div>
-            <div className="relative max-h-[400px] overflow-y-auto pr-2 scrollbar-thin scrollbar-track-transparent scrollbar-thumb-teal-500/40 hover:scrollbar-thumb-teal-400/60">
+            <div className="relative max-h-[400px] overflow-y-auto pr-2 scrollbar-thin scrollbar-track-transparent scrollbar-thumb-accent/40 hover:scrollbar-thumb-accent-hover/60">
                 <div className="relative">
                     {activities.length > 0 &&
-                        <div className="absolute left-[7px] top-0 bottom-0 w-[2px] bg-cyan-500/20"></div>
+                        <div className="absolute left-[7px] top-0 bottom-0 w-[2px] bg-border"></div>
                     }
                     {/* Activities */}
                     <div className="space-y-8">
@@ -47,15 +47,15 @@ function TeamActivity() {
                                     className="relative flex gap-4 group"
                                 >
                                     <div className="relative z-10 mt-8">
-                                        <div className="w-4 h-4 rounded-full bg-green-400 border-4 border-[#071717]"></div>
+                                        <div className="w-4 h-4 rounded-full bg-accent border-4 border-surface"></div>
                                     </div>
-                                    <div className="flex-1 bg-white/[0.03] border border-white/5 rounded-2xl p-4 transition-all duration-300 hover:bg-white/[0.05] hover:border-cyan-500/20">
-                                        <div className="text-[15px] text-gray-200 leading-relaxed">
+                                    <div className="flex-1 bg-surface-alt border border-border rounded-xl p-4 transition-colors duration-150 hover:border-accent/30">
+                                        <div className="text-[15px] text-muted leading-relaxed">
                                             <ActivityMessage activity={activity} />
                                         </div>
                                         <div className="flex items-center gap-2 mt-3">
-                                            <Clock3 size={14} className="text-gray-500" />
-                                            <p className="text-xs text-gray-500">
+                                            <Clock3 size={14} className="text-muted" />
+                                            <p className="text-xs text-muted">
                                                 {formatTime(activity.created_at)}
                                             </p>
                                         </div>
@@ -63,7 +63,7 @@ function TeamActivity() {
                                 </div>
                             ))
                             ) : (
-                                <div className='text-red-400 font-medium'>No Activity till now</div>
+                                <div className='text-danger font-medium'>No Activity till now</div>
                             )
                         }
                     </div>

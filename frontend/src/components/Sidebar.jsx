@@ -1,73 +1,57 @@
 import React from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
+import { useNavigate, useParams, useLocation } from 'react-router-dom'
 import UserProfilePfp from './UserProfilePfp'
-import { LayoutDashboard, CheckSquare, Users, MessageCircle } from "lucide-react"
+import { LayoutDashboard, CheckSquare, Users, MessageCircle, Construction } from "lucide-react"
 import { useCurrentUserQuery } from '../hooks/useCurrentUserQuery'
 
 function Sidebar() {
     const { team_id } = useParams()
     const navigate = useNavigate()
+    const location = useLocation()
     const { data: profile } = useCurrentUserQuery()
 
-    const sidebarBtn =
-    "flex w-full items-center gap-3 rounded-2xl px-5 py-3 text-sm font-medium text-[var(--color-cool-steel)] transition-all duration-300 hover:bg-white/[0.05] hover:text-white"
+    const navItems = [
+        { label: 'Dashboard', icon: LayoutDashboard, path: `/team/${team_id}` },
+        { label: 'Tasks', icon: CheckSquare, path: `/team/${team_id}/tasks` },
+        { label: 'Members', icon: Users, path: `/team/${team_id}/members` },
+        { label: 'Chats', icon: MessageCircle, path: `/team/${team_id}/chats` },
+    ]
 
     return (
         <>
-            <aside className="bg-white mt-3 dark:bg-neutral-900 border-slate-300 dark:border-neutral-700 w-full h-full flex flex-col fixed top-0 left-0 max-w-[240px] py-6 px-3 overflow-auto bg-[linear-gradient(180deg,var(--color-onyx),var(--color-jet-black))] border-r border-[var(--color-cool-steel)]/15">
-                <hr className="my-5 border-slate-300 dark:border-neutral-700" />
+            <aside className="mt-3 w-full h-full flex flex-col fixed top-0 left-0 max-w-[240px] py-6 px-3 overflow-auto bg-surface border-r border-border">
+                <hr className="my-5 border-border" />
                 <nav className="mt-4 flex-1 px-4">
                     <ul className="space-y-2">
-                        <li>
-                            <button
-                                onClick={() => navigate(`/team/${team_id}`)}
-                                className={sidebarBtn}
-                            >
-                                <LayoutDashboard size={18} />
-                                Dashboard
-                            </button>
-                        </li>
-                        <li>
-                            <button
-                                onClick={() => navigate(`/team/${team_id}/tasks`)}
-                                className={sidebarBtn}
-                            >
-                                <CheckSquare size={18} />
-                                Tasks
-                            </button>
-                        </li>
-                        <li>
-                            <button
-                                onClick={() => navigate(`/team/${team_id}/members`)}
-                                className={sidebarBtn}
-                            >
-                                <Users size={18} />
-                                Members
-                            </button>
-                        </li>
-                        <li>
-                            <button
-                                onClick={() => navigate(`/team/${team_id}/chats`)}
-                                className={sidebarBtn}
-                            >
-                                <MessageCircle size={18} />
-                                Chats
-                            </button>
-                        </li>
+                        {navItems.map(({ label, icon: Icon, path }) => {
+                            const isActive = location.pathname === path
+                            return (
+                                <li key={label}>
+                                    <button
+                                        onClick={() => navigate(path)}
+                                        className={`flex w-full items-center gap-3 rounded-xl px-5 py-3 text-sm font-medium transition-colors duration-150 ${
+                                            isActive
+                                                ? 'bg-accent/10 text-accent border border-accent/20'
+                                                : 'text-muted border border-transparent hover:bg-surface-alt hover:text-ink'
+                                        }`}
+                                    >
+                                        <Icon size={18} />
+                                        {label}
+                                    </button>
+                                </li>
+                            )
+                        })}
                     </ul>
                 </nav>
                 {/* Profile */}
                 <div
                     onClick={() => navigate("/profile")}
-                    className="mx-4 mt-2 flex cursor-pointer items-center gap-2 rounded-2xl border border-white/10 bg-white/[0.03] p-4 transition duration-300 hover:bg-white/[0.05]"
+                    className="mx-4 mt-2 flex cursor-pointer items-center gap-3 rounded-xl border border-border bg-surface-alt p-4 transition-colors duration-150 hover:border-border-strong"
                 >
                     <UserProfilePfp />
                     <div className="overflow-hidden">
-                        <p className="truncate text-sm font-semibold text-white">
+                        <p className="truncate text-sm capitalize font-semibold text-ink">
                             {profile?.full_name}
-                        </p>
-                        <p className="truncate text-xs text-[var(--color-cool-steel)]">
-                            {profile?.status}
                         </p>
                     </div>
                 </div>

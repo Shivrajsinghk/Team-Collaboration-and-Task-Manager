@@ -159,7 +159,7 @@ def list_conversations(request):
         PersonalConversation.objects
         .filter(participant=request.user)
         .prefetch_related('participant')
-        .order_by('-created_at')
+        .order_by('-updated_at')
     )
     serializer = PersonalConversationSerializer(
         conversations,
@@ -227,7 +227,7 @@ def upload_personal_attachments(request, conversation_id):
             status=status.HTTP_400_BAD_REQUEST
         )
     MAX_SIZE = 10 * 1024 * 1024  
-    if attachment.size > MAX_SIZE:
+    if attachment and attachment.size > MAX_SIZE:
         return Response(
             {"message": "File size cannot exceed 10 MB."},
             status=status.HTTP_400_BAD_REQUEST
@@ -250,6 +250,16 @@ def upload_personal_attachments(request, conversation_id):
     )
     return Response(payload, status=status.HTTP_201_CREATED)
 
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def mark_messages_read(request, conversation_id):
+    PersonalMessage.objects.filter(
+        personal_conversation_id=conversation_id,
+        is_read=False
+    ).exclude(
+        sender=request.user
+    ).update(is_read=True)
+    return Response({'status': 'ok'})
 
 
 
@@ -280,14 +290,3 @@ def mark_notification_read(request, notification_id):
     notification.is_read = True
     notification.save()
     return Response({"message": "Read"})
-
-@api_view(['POST'])
-@permission_classes([IsAuthenticated])
-def mark_messages_read(request, conversation_id):
-    PersonalMessage.objects.filter(
-        personal_conversation_id=conversation_id,
-        is_read=False
-    ).exclude(
-        sender=request.user
-    ).update(is_read=True)
-    return Response({'status': 'ok'})

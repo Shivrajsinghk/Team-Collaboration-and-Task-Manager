@@ -56,14 +56,6 @@ const authSlice = createSlice({
             state.isAuthResolved = true
             persistAuth({ user, access, refresh })
         },
-        restoreSession: (state, action) => {
-            const stored = action.payload || getStoredAuth()
-            state.user = stored.user || null
-            state.access = stored.access || null
-            state.refresh = stored.refresh || null
-            state.isAuthenticated = !!stored.access
-            state.isAuthResolved = !!stored.access
-        },
         setUser: (state, action) => {
             state.user = action.payload
             persistAuth({
@@ -102,7 +94,6 @@ const authSlice = createSlice({
 
 export const {
     loginSuccess,
-    restoreSession,
     setUser,
     setAuthResolved,
     updateAccessToken,

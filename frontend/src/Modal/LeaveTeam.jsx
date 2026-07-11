@@ -61,14 +61,14 @@ function LeaveTeam({isLeaveOpen, setIsLeaveOpen}) {
                     <button
                         onClick={handleLeaveSubmit}
                         disabled={leaveTeamMutation.isPending}
-                        className="px-4 py-2 rounded-lg bg-white/5 hover:bg-white/10 text-white transition"
+                        className="px-4 py-2 rounded-lg bg-red-500/80 hover:bg-red-500 text-white transition"
                     >
                         {leaveTeamMutation.isPending ? "Leaving..." : "Yes"}
                     </button>
                     <button
                         type="button"
                         onClick={() => setIsLeaveOpen(false)}
-                        className="px-4 py-2 rounded-lg bg-red-500/80 hover:bg-red-500 text-gray-300 transition"
+                        className="px-4 py-2 rounded-lg bg-white/5 hover:bg-white/10 text-gray-300 transition"
                     >
                         No
                     </button>

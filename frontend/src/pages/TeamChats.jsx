@@ -14,6 +14,8 @@ import { isPresenceOnline } from '../utils/presence'
 const IMAGE_EXTENSIONS = ['.png', '.jpg', '.jpeg', '.gif', '.webp', '.bmp', '.svg']
 
 function TeamChats() {
+    const WS_URL = import.meta.env.VITE_DJANGO_WS_URL
+    console.log(WS_URL)
     const BASE_URL = import.meta.env.VITE_DJANGO_BASE_URL
     const { team_id } = useParams()
     const [liveChats, setLiveChats] = useState([])
@@ -40,7 +42,6 @@ function TeamChats() {
         queryKey: teamKeys.membersPresence(team_id),
         queryFn: async () => {
             const response = await teamMembersPresence(team_id)
-            console.log(response.data)
             return response.data
         },
         enabled: !!team_id,
@@ -64,7 +65,7 @@ function TeamChats() {
     useEffect(() => {
         const token = localStorage.getItem('access')
         socketRef.current = new WebSocket(
-            `ws://127.0.0.1:8000/ws/team-chats/${team_id}/?token=${encodeURIComponent(token)}`
+            `${WS_URL}team-chats/${team_id}/?token=${encodeURIComponent(token)}`
         )
         socketRef.current.onmessage = (event) => {
             const data = JSON.parse(event.data)
@@ -167,22 +168,22 @@ function TeamChats() {
     }
 
     return (
-        <div className="min-h-screen overflow-x-hidden overflow-y-auto bg-[linear-gradient(180deg,#071714_0%,#020404_100%)] text-white">
+        <div className="min-h-screen overflow-x-hidden overflow-y-auto bg-base text-ink">
             <div className="mx-auto ml-4 flex max-w-7xl flex-col px-2 py-4 sm:px-6 lg:px-8">
                 {/* Chat Section */}
-                <section className="mt-4 flex h-screen min-h-screen flex-col overflow-hidden rounded-[2rem] border border-white/[0.08] bg-white/[0.03] backdrop-blur-xl">
+                <section className="mt-4 flex h-screen min-h-screen flex-col overflow-hidden rounded-2xl border border-border bg-surface">
                     {/* Header */}
-                    <div className="sticky top-0 z-20 flex shrink-0 flex-col gap-4 border-b border-white/10 bg-[#121a18]/95 px-6 py-5 backdrop-blur-xl sm:flex-row sm:items-center sm:justify-between">
+                    <div className="sticky top-0 z-20 flex shrink-0 flex-col gap-4 border-b border-border bg-surface px-6 py-5 sm:flex-row sm:items-center sm:justify-between">
                         <div>
-                            <h2 className="text-2xl font-bold capitalize text-white">
+                            <h2 className="text-2xl font-bold capitalize text-ink">
                                 {chats[0]?.team_name ? `${chats[0].team_name}'s GC` : "Team's GC"}
                             </h2>
-                            <p className="mt-1 text-sm text-[var(--color-cool-steel)]">
+                            <p className="mt-1 text-sm text-muted">
                                 {chats.length} {chats.length === 1 ? 'message' : 'messages'}
                             </p>
                         </div>
-                        <div className="flex items-center justify-center gap-2 text-sm text-[var(--color-cool-steel)]">
-                            <span className="h-2 w-2 rounded-full bg-green-500"></span>
+                        <div className="flex items-center justify-center gap-2 text-sm text-muted">
+                            <span className="h-2 w-2 rounded-full bg-accent"></span>
                             <span>{onlineCount} Online</span>
                         </div>
                     </div>

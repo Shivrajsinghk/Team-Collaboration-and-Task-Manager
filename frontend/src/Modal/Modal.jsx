@@ -31,7 +31,7 @@ function Modal({ isOpen, onClose, children }) {
                 w-full max-w-md
                 rounded-[2rem]
                 border border-white/10
-                bg-[#0b0b0c]
+                bg-[#060606]
                 p-6
                 shadow-2xl
                 "

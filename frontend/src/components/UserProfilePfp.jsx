@@ -1,7 +1,8 @@
 import React, { useState } from "react"
 import { useSelector } from 'react-redux'
+import NoProfilePhoto from "./NoProfilePhoto"
 
-const BASE_URL = import.meta.env.VITE_DJANGO_BASE_URL 
+const BASE_URL = import.meta.env.VITE_DJANGO_BASE_URL
 
 function getMediaUrl(baseUrl, path) {
     if (!path) return ''
@@ -12,45 +13,29 @@ function getMediaUrl(baseUrl, path) {
 function UserProfilePfp({ memberUser, isOnline }) {
     const reduxUser = useSelector((state) => state.auth.user)
     const user = memberUser || reduxUser
-    const [imgError, setImgError] = useState(false);
+    const [imgError, setImgError] = useState(false)
 
     if (!user) return null
 
     const profilePicture = memberUser
         ? (
             user.profile_picture ||
-            (
-                user.user__profile__profile_picture
-                    ? `media/${user.user__profile__profile_picture}`
-                    : ''
-            )
+            (user.user__profile__profile_picture
+                ? `media/${user.user__profile__profile_picture}`
+                : '')
         )
         : user.profile_picture
 
     const fullName = memberUser
-        ? (
-            `${user.first_name || user.user__first_name || ''} ${
-                user.last_name || user.user__last_name || ''
-            }`
-        )
+        ? `${user.first_name || user.user__first_name || ''} ${user.last_name || user.user__last_name || ''}`.trim()
         : user.full_name
-            
+
     return (
         <div className="relative">
-            <div
-                className="
-                group relative flex h-12 w-12
-                items-center justify-center
-                overflow-hidden rounded-2xl
-                border border-white/10
-                bg-[linear-gradient(135deg,#0f1f1d,#081312)]
-                shadow-lg transition duration-300
-                hover:scale-125
-                hover:shadow-cyan-500/20
-                "
-            >
-                <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/5 to-indigo-500/5 opacity-0 transition duration-300 group-hover:opacity-100"></div>
-                {profilePicture && !imgError? (
+            <div className="group relative flex h-12 w-12 items-center justify-center overflow-hidden rounded-2xl border border-border bg-surface-alt shadow-lg transition duration-300 hover:scale-110">
+                <div className="absolute inset-0 bg-accent/5 opacity-0 transition duration-300 group-hover:opacity-100" />
+
+                {profilePicture && !imgError ? (
                     <img
                         src={getMediaUrl(BASE_URL, profilePicture)}
                         alt={fullName}
@@ -58,14 +43,15 @@ function UserProfilePfp({ memberUser, isOnline }) {
                         className="relative h-full w-full object-cover"
                     />
                 ) : (
-                    <div className="flex h-8 w-8 items-center justify-center rounded-full border-2 border-[#0B1117] bg-gradient-to-br from-teal-400 to-indigo-500 text-xl font-semibold text-white shadow-2xl">
-                        {(fullName || "U").charAt(0).toUpperCase()}
-                    </div>
+                    <NoProfilePhoto size={36} />
                 )}
             </div>
+
             {memberUser && isOnline !== undefined && (
-                <div className={`absolute bottom-0 right-0 h-4 w-4 rounded-full border-2 border-black
-                    ${isOnline ? 'bg-emerald-400' : 'bg-zinc-600'}`}
+                <div
+                    className={`absolute bottom-0 right-0 h-4 w-4 rounded-full border-2 border-surface ${
+                        isOnline ? 'bg-accent' : 'bg-muted'
+                    }`}
                 />
             )}
         </div>

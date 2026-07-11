@@ -9,7 +9,7 @@ export function list_personal_messages(conversationId) {
 }
 
 export function uploadPersonalChatAttachment(conversationId, data) {
-    return api.post(`sockets/${conversationId}/chats/upload/`, data, {
+    return api.post(`sockets/chats/${conversationId}/upload/`, data, {
         headers: {
             'Content-Type': 'multipart/form-data',
         },

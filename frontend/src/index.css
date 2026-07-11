@@ -3,11 +3,11 @@
 @tailwind utilities;
 
 :root {
-    --color-onyx: #000f08;
-    --color-jet-black: #1c3738;
-    --color-charcoal: #4d4847;
-    --color-mint-cream: #f4fff8;
-    --color-cool-steel: #8baaad;
+    --color-onyx: #000000;
+    --color-jet-black: #0A0A0A;
+    --color-charcoal: #1E2621;
+    --color-mint-cream: #EDF5EF;
+    --color-cool-steel: #8FA396;
 }
 
 body {
@@ -38,11 +38,11 @@ html {
 
 .overflow-auto::-webkit-scrollbar-thumb,
 .overflow-y-auto::-webkit-scrollbar-thumb {
-    background: rgba(20, 184, 166, 0.4);
+    background: rgba(44, 255, 5, 0.4);
     border-radius: 9999px;
 }
 
 .overflow-auto::-webkit-scrollbar-thumb:hover,
 .overflow-y-auto::-webkit-scrollbar-thumb:hover {
-    background: rgba(45, 212, 191, 0.6);
+    background: rgba(37, 214, 4, 0.6);
 }

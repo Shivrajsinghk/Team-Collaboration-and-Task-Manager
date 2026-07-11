@@ -106,7 +106,7 @@ function TeamTasks() {
 
     if (isTasksError) {
         return (
-            <div className="flex min-h-[50vh] items-center justify-center text-red-400">
+            <div className="flex min-h-[50vh] items-center justify-center text-danger">
                 Unable to load tasks right now.
             </div>
         )
@@ -117,11 +117,11 @@ function TeamTasks() {
             <div className="min-w-0 ml-5 my-5 px-4">
                 <div className="mb-8 flex items-center justify-between">
                     <div className="flex items-center gap-5">
-                        <div className="flex mt-1 h-12 w-12 items-center justify-center rounded-2xl border border-teal-400/20 bg-teal-500/10">
-                            <ClipboardList size={28} className="text-teal-300" />
+                        <div className="flex mt-1 h-12 w-12 items-center justify-center rounded-xl border border-accent/20 bg-accent/10">
+                            <ClipboardList size={28} className="text-accent" />
                         </div>
                         <div>
-                            <h1 className="text-3xl font-bold tracking-tight text-white">
+                            <h1 className="text-3xl font-bold tracking-tight text-ink">
                                 Team Tasks
                             </h1>
                         </div>
@@ -131,7 +131,7 @@ function TeamTasks() {
                         onClick={() => {
                             setIsCreateOpen(true)
                         }}
-                        className="flex items-center gap-2 rounded-2xl border border-teal-400/20 bg-teal-500/10 px-5 py-3 text-sm font-semibold text-teal-300 transition-all duration-200 hover:bg-teal-500/20 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:border-white/5 disabled:hover:bg-white/[0.02]"
+                        className="flex items-center gap-2 rounded-xl border border-accent bg-accent px-5 py-3 text-sm font-semibold text-accent-ink transition-colors duration-150 hover:bg-accent-hover disabled:cursor-not-allowed disabled:opacity-50 disabled:border-border disabled:bg-surface-alt disabled:text-muted"
                     >
                         <Plus size={19} />
                         Create Task

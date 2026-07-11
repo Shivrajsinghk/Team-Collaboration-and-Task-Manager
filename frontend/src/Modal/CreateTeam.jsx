@@ -56,7 +56,7 @@ function CreateTeam({isCreateOpen, setIsCreateOpen, setIsAddTeamOpen}) {
                         name="team_name"
                         required
                         placeholder="Enter team name"
-                        className="mt-2 w-full rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-3 text-sm text-white placeholder:text-gray-500 focus:border-teal-400 focus:outline-none"
+                        className="mt-2 w-full rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-3 text-sm text-white placeholder:text-gray-500 focus:border-[#25D604] focus:outline-none"
                     />
                 </div>
                 <div>
@@ -65,7 +65,7 @@ function CreateTeam({isCreateOpen, setIsCreateOpen, setIsAddTeamOpen}) {
                         type="text"
                         name="team_description"
                         placeholder="Enter team description"
-                        className="mt-2 w-full rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-3 text-sm text-white placeholder:text-gray-500 focus:border-teal-400 focus:outline-none"
+                        className="mt-2 w-full rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-3 text-sm text-white placeholder:text-gray-500 focus:border-[#25D604] focus:outline-none"
                     />
                 </div>
                 <button
@@ -74,7 +74,7 @@ function CreateTeam({isCreateOpen, setIsCreateOpen, setIsAddTeamOpen}) {
                 className={`w-full rounded-2xl py-3 text-sm font-semibold transition duration-300 ${
                 createTeamMutation.isPending
                 ? "cursor-not-allowed bg-gray-500"
-                : "bg-gradient-to-r from-teal-400 to-cyan-500 text-black hover:scale-[1.01]"
+                : "bg-[#2CFF05] text-black hover:scale-[1.01]"
                 }`}
                 >
                     {createTeamMutation.isPending ? "Creating..." : "Create Team"}

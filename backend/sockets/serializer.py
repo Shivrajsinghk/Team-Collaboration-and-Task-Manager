@@ -70,13 +70,10 @@ class PersonalConversationSerializer(serializers.ModelSerializer):
         message = obj.personal_conversation_messages.order_by("-created_at").first()
         if not message:
             return None
-        return {
-            "id": message.id,
-            "message": message.message,
-            "sender": message.sender.username,
-            "created_at": message.created_at,
-            "is_read": message.is_read
-        }
+        return PersonalMessageSerializer(
+            message,
+            context=self.context
+        ).data
 
     class Meta:
         model = PersonalConversation

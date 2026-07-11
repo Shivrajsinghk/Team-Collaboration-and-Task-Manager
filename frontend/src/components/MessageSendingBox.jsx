@@ -119,8 +119,8 @@ const MessageSendingBox = ({
     }
 
     return (
-        <div className={`sticky bottom-0 z-20 border-t border-white/10 bg-neutral-900/95 px-3 py-3 backdrop-blur-xl sm:px-6 ${variant === "dm" ? "bg-[#121a18]/95" : "bg-neutral-900/95"}`}>
-            <div className={`relative rounded-[1.75rem] border border-white/10 bg-neutral-950 p-1 shadow-[0_-14px_40px_rgba(0,0,0,0.35)] ring-1 ring-white/5 ${variant === "team" ? "mx-auto max-w-5xl" : "w-full"}`}>
+        <div className={`sticky bottom-0 z-20 border-t border-white/10 bg-black px-3 py-3 backdrop-blur-xl sm:px-6 ${variant === "dm" ? "bg-[#121a18]/95" : "bg-neutral-900/95"}`}>
+            <div className={`relative rounded-[1.75rem] border border-white/10 bg-neutral-950/50 p-1 shadow-[0_-14px_40px_rgba(0,0,0,0.35)] ring-1 ring-white/5 ${variant === "team" ? "mx-auto max-w-5xl" : "w-full"}`}>
                 {supportsMentions && activeMention && suggestions.length > 0 && (
                     <ul className="absolute bottom-full left-4 mb-2 w-64 overflow-hidden rounded-xl border border-white/10 bg-neutral-900 shadow-xl z-30">
                         {suggestions.map((m, i) => (

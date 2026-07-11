@@ -8,10 +8,10 @@ import { listTaskActivities } from '../api/activity'
 import { taskKeys } from '../api/queryKeys'
 
 const formatActivityMessage = (activity) => {
-    const actor = activity.actor.username
+    const actor = activity.actor?.username
     const metadata = activity.metadata || {}
     const activityIcons = {
-        TASK_STATUS_CHANGED: <ArrowRightLeft size={18} className="text-cyan-400 mt-0.5" />,
+        TASK_STATUS_CHANGED: <ArrowRightLeft size={18} className="text-accent mt-0.5" />,
         TASK_PRIORITY_CHANGED: <Flag size={18} className="text-orange-400 mt-0.5" />,
         TASK_TITLE_CHANGED: <Pencil size={18} className="text-yellow-400 mt-0.5" />,
         TASK_DUE_DATE_CHANGED: <CalendarDays size={18} className="text-blue-400 mt-0.5" />,
@@ -24,7 +24,7 @@ const formatActivityMessage = (activity) => {
             <span className="text-lg">
                 {icon}
             </span>
-            <p className="text-gray-200 leading-relaxed">
+            <p className="text-muted leading-relaxed">
                 {message}
             </p>
         </div>
@@ -33,7 +33,7 @@ const formatActivityMessage = (activity) => {
         case 'TASK_STATUS_CHANGED':
             return messageWrapper(
                 <>
-                    <span className="font-semibold capitalize text-cyan-400">
+                    <span className="font-semibold capitalize text-accent">
                         {actor}
                     </span>{" "}
                     updated the status from{" "}
@@ -41,7 +41,7 @@ const formatActivityMessage = (activity) => {
                         {metadata.old_status?.replace("_"," ")}
                     </span>{" "}
                     to{" "}
-                    <span className="text-green-400 capitalize font-medium">
+                    <span className="text-accent capitalize font-medium">
                         {metadata.new_status?.replace("_"," ")}
                     </span>
                 </>
@@ -49,7 +49,7 @@ const formatActivityMessage = (activity) => {
         case 'TASK_PRIORITY_CHANGED':
             return messageWrapper(
                 <>
-                    <span className="font-semibold capitalize text-cyan-400">
+                    <span className="font-semibold capitalize text-accent">
                         {actor}
                     </span>{" "}
                     changed the priority from{" "}
@@ -65,7 +65,7 @@ const formatActivityMessage = (activity) => {
         case 'TASK_TITLE_CHANGED':
             return messageWrapper(
                 <>
-                    <span className="font-semibold capitalize text-cyan-400">
+                    <span className="font-semibold capitalize text-accent">
                         {actor}
                     </span>{" "}
                     changed the title from{" "}
@@ -73,7 +73,7 @@ const formatActivityMessage = (activity) => {
                         {metadata.old_title}
                     </span>{" "}
                     to{" "}
-                    <span className="text-green-400 capitalize font-medium">
+                    <span className="text-accent capitalize font-medium">
                         {metadata.new_title}
                     </span>
                 </>
@@ -81,7 +81,7 @@ const formatActivityMessage = (activity) => {
         case 'TASK_DUE_DATE_CHANGED':
             return messageWrapper(
                 <>
-                    <span className="font-semibold capitalize text-cyan-400">
+                    <span className="font-semibold capitalize text-accent">
                         {actor}
                     </span>{" "}
                     {metadata.old_due_date > metadata.new_due_date ? (
@@ -89,7 +89,7 @@ const formatActivityMessage = (activity) => {
                             reduced
                         </span>
                     ) : (
-                        <span className='font-semibold text-green-400'>
+                        <span className='font-semibold text-accent'>
                             extended
                         </span>
                     )}{" "}
@@ -98,7 +98,7 @@ const formatActivityMessage = (activity) => {
                         {metadata.old_due_date?.split(" ")[0]}
                     </span>{" "}
                     to{" "}
-                    <span className="text-green-400 capitalize font-medium">
+                    <span className="text-accent capitalize font-medium">
                         {metadata.new_due_date?.split(" ")[0]}
                     </span>
                 </>
@@ -106,36 +106,36 @@ const formatActivityMessage = (activity) => {
         case 'TASK_ASSIGNED':
             return messageWrapper(
                 <>
-                    <span className="font-semibold capitalize text-cyan-400">
+                    <span className="font-semibold capitalize text-accent">
                         {actor}
                     </span>{" "}
                     assigned{" "}
                     <span className="capitalize text-purple-400 font-medium">
                         {metadata.assigned_member?.username}
-                    </span>
+                    </span>{" "}
                     to this task
                 </>
             )
         case 'TASK_UNASSIGNED':
             return messageWrapper(
                 <>
-                    <span className="capitalize font-semibold text-cyan-400">
+                    <span className="capitalize font-semibold text-accent">
                         {actor}
                     </span>{" "}
                     removed{" "}
                     <span className="text-pink-400 capitalize font-medium">
                         {metadata.unassigned_member?.username}
-                    </span>
+                    </span>{" "}
                     from this task
                 </>
             )
         default:
             return (
                 <div className="flex items-center gap-3">
-                    <span className="text-gray-400">
+                    <span className="text-muted">
                         📍
                     </span>
-                    <span className="text-gray-300">
+                    <span className="text-muted">
                         No Task Activity
                     </span>
                 </div>
@@ -163,17 +163,17 @@ function TaskActivity() {
     })
 
     return (
-        <div className="bg-[#071717] border border-green-500/20 rounded-3xl p-6 shadow-[0_0_40px_rgba(0,255,255,0.03)]">
+        <div className="bg-surface border border-border rounded-2xl p-6">
             <div className="flex items-center gap-3 mb-6">
-                <Clock3 className="text-green-400" size={28} />
-                <h2 className="text-2xl font-bold text-white">
+                <Clock3 className="text-accent" size={28} />
+                <h2 className="text-2xl font-bold text-ink">
                     Task Activity
                 </h2>
             </div>
-            <div className="relative max-h-[400px] overflow-y-auto pr-2 scrollbar-thin scrollbar-track-transparent scrollbar-thumb-teal-500/40 hover:scrollbar-thumb-teal-400/60">
+            <div className="relative max-h-[400px] overflow-y-auto pr-2 scrollbar-thin scrollbar-track-transparent scrollbar-thumb-accent/40 hover:scrollbar-thumb-accent-hover/60">
                 <div className="relative">
                     {activities.length > 0 &&
-                        <div className="absolute left-[7px] top-0 bottom-0 w-[2px] bg-cyan-500/20"></div>
+                        <div className="absolute left-[7px] top-0 bottom-0 w-[2px] bg-border"></div>
                     }
                     {/* Activities */}
                     <div className="space-y-8">
@@ -184,15 +184,15 @@ function TaskActivity() {
                                     className="relative flex gap-4 group"
                                 >
                                     <div className="relative z-10 mt-8">
-                                        <div className="w-4 h-4 rounded-full bg-green-400 border-4 border-[#071717]"></div>
+                                        <div className="w-4 h-4 rounded-full bg-accent border-4 border-surface"></div>
                                     </div>
-                                    <div className="flex-1 bg-white/[0.03] border border-white/5 rounded-2xl p-4 transition-all duration-300 hover:bg-white/[0.05] hover:border-cyan-500/20">
-                                        <div className="text-[15px] text-gray-200 leading-relaxed">
+                                    <div className="flex-1 bg-surface-alt border border-border rounded-xl p-4 transition-colors duration-150 hover:border-accent/30">
+                                        <div className="text-[15px] text-muted leading-relaxed">
                                             {formatActivityMessage(activity)}
                                         </div>
                                         <div className="flex items-center gap-2 mt-3">
-                                            <Clock3 size={14} className="text-gray-500" />
-                                            <p className="text-xs text-gray-500">
+                                            <Clock3 size={14} className="text-muted" />
+                                            <p className="text-xs text-muted">
                                                 {formatTime(activity.created_at)}
                                             </p>
                                         </div>
@@ -200,7 +200,7 @@ function TaskActivity() {
                                 </div>
                             ))
                             ) : (
-                                <div className='text-red-400 font-medium'>No Activity till now</div>
+                                <div className='text-danger font-medium'>No Activity till now</div>
                             )
                         }
                     </div>

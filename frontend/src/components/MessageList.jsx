@@ -19,7 +19,7 @@ const MessageList = ({
     const isDM = variant === "dm"
 
     return (
-        <div className="relative h-full flex-1 overflow-y-auto overflow-x-hidden bg-[#07110f] scrollbar-thin scrollbar-track-transparent scrollbar-thumb-teal-500/40 hover:scrollbar-thumb-teal-400/60">
+        <div className="relative h-full flex-1 overflow-y-auto overflow-x-hidden bg-[#07110f] custom-scrollbar">
             <div
                 className={`
                     relative min-h-full px-6 py-6 

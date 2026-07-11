@@ -18,7 +18,7 @@ function PreviousPageButton({className=""}) {
         <button
             onClick={handleBack}
             className={
-                `z-20 left-8 hover:border-cyan-400/20 top-8 rounded-2xl border border-white/10 bg-white/5 p-3 transition hover:bg-white/10
+                `z-20 left-8 top-8 rounded-xl border border-border bg-surface-alt p-3 text-ink transition-colors hover:border-accent hover:bg-surface
                 ${className}`
             }
         >

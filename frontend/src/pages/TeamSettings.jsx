@@ -17,10 +17,7 @@ function UpdateTeam() {
     const [isLeaveOpen, setIsLeaveOpen] = useState(false)
     const [isDeleteOpen, setIsDeleteOpen] = useState(false)
     const [isInviteOpen, setIsInviteOpen] = useState(false)
-    const [formData, setFormData] = useState({
-        name: '',
-        description: '',
-    })
+    const [formData, setFormData] = useState({ name: '', description: '' })
     const queryClient = useQueryClient()
     const { data: team = null, isLoading: loading } = useQuery({
         queryKey: teamKeys.detail(team_id),
@@ -39,10 +36,7 @@ function UpdateTeam() {
                 if (!previous) {
                     return { team: response.data }
                 }
-                return {
-                    ...previous,
-                    team: response.data,
-                }
+                return { ...previous, team: response.data }
             })
             queryClient.invalidateQueries({ queryKey: teamKeys.detail(team_id) })
             queryClient.invalidateQueries({ queryKey: teamKeys.list })
@@ -63,10 +57,7 @@ function UpdateTeam() {
     }, [team])
 
     const handleChange = (e) => {
-        setFormData((prev) => ({
-            ...prev,
-            [e.target.name]: e.target.value,
-        }))
+        setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }))
     }
 
     const handleSave = () => {
@@ -80,25 +71,16 @@ function UpdateTeam() {
                     <Loading />
                 </div>
             )}
-            <div className="min-h-screen ml-2 bg-[linear-gradient(180deg,#071714_0%,#020404_100%)] text-white">
+            <div className="min-h-screen ml-2 bg-base text-ink">
                 <div className="mx-auto max-w-6xl px-6 py-8">
                     <div className="mb-8 flex items-center justify-between">
-                        <div className='relative flex flex-row justify-center items-center gap-4'>
-                            <PreviousPageButton className=''/>
-                            <h1 className='text-center pb-3 text-4xl font-bold'>Update Team</h1>
+                        <div className="relative flex flex-row justify-center items-center gap-4">
+                            <PreviousPageButton className="" />
+                            <h1 className="text-center pb-3 text-4xl font-bold">Update Team</h1>
                         </div>
                         <button
                             onClick={handleSave}
-                            className="
-                            flex items-center gap-2
-                            rounded-2xl
-                            bg-cyan-500
-                            px-5 py-3
-                            font-medium
-                            text-black
-                            transition
-                            hover:bg-cyan-400
-                            "
+                            className="flex items-center gap-2 rounded-xl bg-accent px-5 py-3 font-semibold text-accent-ink transition-colors hover:bg-accent-hover"
                         >
                             <Save size={18} />
                             Save Changes
@@ -106,59 +88,27 @@ function UpdateTeam() {
                     </div>
                     <div className="flex flex-col space-y-6">
                         <div className="grid gap-6 lg:grid-cols-2">
-                            <section className="rounded-[2rem] border border-white/[0.08] bg-white/[0.03] p-7">
-                                <h2 className="mb-5 text-xl font-semibold text-white">
-                                    General Settings
-                                </h2>
+                            <section className="rounded-xl border border-border bg-surface p-7">
+                                <h2 className="mb-5 text-xl font-semibold text-ink">General Settings</h2>
                                 <div className="space-y-6">
                                     <div>
-                                        <label className="text-sm font-medium text-gray-400">
-                                            Team Name
-                                        </label>
+                                        <label className="text-sm font-medium text-muted">Team Name</label>
                                         <input
                                             type="text"
                                             name="name"
                                             value={formData.name}
                                             onChange={handleChange}
-                                            className="
-                                            mt-2
-                                            w-full
-                                            rounded-2xl
-                                            border border-white/[0.08]
-                                            bg-black/20
-                                            px-5 py-4
-                                            text-lg
-                                            font-semibold
-                                            text-white
-                                            outline-none
-                                            transition
-                                            focus:border-cyan-500/40
-                                            "
+                                            className="mt-2 w-full rounded-xl border border-border bg-surface-alt px-5 py-4 text-lg font-semibold text-ink outline-none transition-colors focus:border-accent"
                                         />
                                     </div>
                                     <div>
-                                        <label className="text-sm font-medium text-gray-400">
-                                            Team Description
-                                        </label>
+                                        <label className="text-sm font-medium text-muted">Team Description</label>
                                         <textarea
                                             rows={5}
                                             name="description"
                                             value={formData.description}
                                             onChange={handleChange}
-                                            className="
-                                            mt-2
-                                            w-full
-                                            rounded-2xl
-                                            border border-white/[0.08]
-                                            bg-black/20
-                                            p-5
-                                            text-sm
-                                            text-gray-300
-                                            outline-none
-                                            resize-none
-                                            transition
-                                            focus:border-cyan-500/40
-                                            "
+                                            className="mt-2 w-full rounded-xl border border-border bg-surface-alt p-5 text-sm text-muted outline-none resize-none transition-colors focus:border-accent"
                                         />
                                     </div>
                                 </div>
@@ -166,69 +116,37 @@ function UpdateTeam() {
                             <div>
                                 <TeamInfo team={team} />
                             </div>
-                            <section className="rounded-[2rem] border border-cyan-500/10 bg-cyan-500/[0.03] p-6">
-                                <h3 className="text-lg font-semibold text-white">
-                                    Invite Members
-                                </h3>
-                                <p className="mt-1 text-sm text-gray-400">
-                                    Share your invite code with teammates.
-                                </p>
+                            <section className="rounded-xl border border-border bg-surface p-6">
+                                <h3 className="text-lg font-semibold text-ink">Invite Members</h3>
+                                <p className="mt-1 text-sm text-muted">Share your invite code with teammates.</p>
                                 <button
                                     onClick={() => setIsInviteOpen(true)}
-                                    className="
-                                    mt-5
-                                    flex w-full items-center justify-center gap-2
-                                    rounded-2xl
-                                    border border-cyan-500/20
-                                    bg-cyan-500/10
-                                    px-4 py-3
-                                    font-medium
-                                    text-cyan-300
-                                    transition
-                                    hover:bg-cyan-500/20
-                                    "
+                                    className="mt-5 flex w-full items-center justify-center gap-2 rounded-xl border border-accent bg-accent px-4 py-3 font-semibold text-accent-ink transition-colors hover:bg-accent-hover hover:border-accent-hover"
                                 >
                                     <Barcode size={18} />
                                     View Invite Code
                                 </button>
                             </section>
-                            <section className="rounded-[2rem] border border-red-500/15 bg-red-500/[0.03] p-6">
-                                <h3 className="text-lg font-semibold text-white">
-                                    Danger Zone
-                                </h3>
-                                <p className="mt-1 text-sm text-gray-400">
-                                    Sensitive actions for this workspace.
-                                </p>
+                            <section className="rounded-xl border border-danger/20 bg-surface p-6">
+                                <h3 className="text-lg font-semibold text-ink">Danger Zone</h3>
+                                <p className="mt-1 text-sm text-muted">Sensitive actions for this workspace.</p>
                                 <div className="mt-5 space-y-3">
                                     <button
                                         onClick={() => setIsLeaveOpen(true)}
-                                        className="flex w-full items-center justify-center gap-2 rounded-xl
-                                        border border-red-500/40 bg-red-500/10
-                                        px-5 py-3 font-semibold text-red-400
-                                        transition-all duration-200
-                                        hover:border-red-500 hover:bg-red-500/20 hover:text-red-300"
+                                        className="flex w-full items-center justify-center gap-2 rounded-xl border border-danger/40 bg-danger/10 px-5 py-3 font-semibold text-danger transition-colors duration-150 hover:border-danger hover:bg-danger/20"
                                     >
                                         <LogOut size={18} />
                                         Leave Team
                                     </button>
-                                    {isAdmin &&
+                                    {isAdmin && (
                                         <button
                                             onClick={() => setIsDeleteOpen(true)}
-                                            className="
-                                            flex w-full items-center justify-center gap-2
-                                            rounded-2xl
-                                            border border-red-500/20
-                                            bg-red-500/10
-                                            px-4 py-3
-                                            text-red-300
-                                            transition
-                                            hover:bg-red-500/20
-                                            "
+                                            className="flex w-full items-center justify-center gap-2 rounded-xl border border-danger/20 bg-danger/10 px-4 py-3 text-danger transition-colors hover:bg-danger/20"
                                         >
                                             <Trash2 size={18} />
                                             Delete Team
                                         </button>
-                                    }
+                                    )}
                                 </div>
                             </section>
                         </div>
@@ -236,22 +154,9 @@ function UpdateTeam() {
                 </div>
             </div>
 
-            <TeamInviteCode 
-            isInviteOpen={isInviteOpen}
-            setIsInviteOpen={setIsInviteOpen}
-            team={team}
-            />
-
-            <LeaveTeam 
-            isLeaveOpen={isLeaveOpen}
-            setIsLeaveOpen={setIsLeaveOpen}
-            />
-
-            <DeleteTeam 
-            isDeleteOpen={isDeleteOpen}
-            setIsDeleteOpen={setIsDeleteOpen}
-            team={team}
-            />
+            <TeamInviteCode isInviteOpen={isInviteOpen} setIsInviteOpen={setIsInviteOpen} team={team} />
+            <LeaveTeam isLeaveOpen={isLeaveOpen} setIsLeaveOpen={setIsLeaveOpen} />
+            <DeleteTeam isDeleteOpen={isDeleteOpen} setIsDeleteOpen={setIsDeleteOpen} team={team} />
         </>
     )
 }

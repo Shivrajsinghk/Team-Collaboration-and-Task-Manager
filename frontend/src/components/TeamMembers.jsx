@@ -8,8 +8,8 @@ function TeamMembers({
 }) {
     if (filteredMembers.length === 0) {
         return (
-            <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-white/10 bg-white/[0.02] py-16 text-center">
-                <p className="text-sm font-medium text-zinc-400">No members found</p>
+            <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-border bg-surface-alt py-16 text-center">
+                <p className="text-sm font-medium text-muted">No members found</p>
             </div>
         )
     }

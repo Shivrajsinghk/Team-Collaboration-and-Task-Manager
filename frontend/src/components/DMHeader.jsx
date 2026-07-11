@@ -6,6 +6,7 @@ import { useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 import { useChat } from '../context/ChatContext'
 import { isPresenceOnline } from '../utils/presence'
+import NoProfilePhoto from './NoProfilePhoto'
 
 function DMHeader({ selectedConversationId, setSelectedConversationId, isTyping }) {
     const currentUser = useSelector((state) => state.auth.user)
@@ -44,7 +45,7 @@ function DMHeader({ selectedConversationId, setSelectedConversationId, isTyping 
     }
 
     return (
-        <header className="flex items-center justify-between border-b border-white/10 bg-[#121a18]/95 px-5 py-3 backdrop-blur-xl">
+        <header className="flex items-center justify-between border-b border-white/10 bg-black px-5 py-3 backdrop-blur-xl">
             <div 
             onClick={() =>
                 navigate(
@@ -53,16 +54,20 @@ function DMHeader({ selectedConversationId, setSelectedConversationId, isTyping 
             }
             className="flex items-center gap-3"
             >
-                <img
-                    src={other_user?.profile_picture}
-                    alt={other_user?.full_name}
-                    className="
-                        h-12 w-12
-                        rounded-full
-                        object-cover
-                        border border-white/10
-                    "
-                />
+                {other_user?.profile_picture ? (
+                    <img
+                        src={other_user?.profile_picture}
+                        alt={other_user?.full_name}
+                        className="
+                            h-12 w-12
+                            rounded-full
+                            object-cover
+                            border border-white/10
+                        "
+                    />
+                ) : (
+                    <NoProfilePhoto size={44} />
+                )}
                 <div>
                     <h2 className="font-semibold capitalize text-white">
                         {other_user?.full_name}

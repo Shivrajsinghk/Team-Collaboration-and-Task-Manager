@@ -62,8 +62,8 @@ function PromoteMember({
                         disabled={promoteMutation.isPending}
                         className="
                         px-4 py-2 rounded-xl
-                        bg-cyan-500/90
-                        hover:bg-cyan-500
+                        bg-[#2CFF05]/70
+                        hover:bg-[#25D604]
                         text-white
                         transition
                         font-medium

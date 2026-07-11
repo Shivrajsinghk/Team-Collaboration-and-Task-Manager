@@ -12,8 +12,16 @@ export function refreshToken(payload) {
     return api.post("api/token/refresh/", payload);
 }
 
-export function getUserProfile() {
-    return api.get("api/user_profile/");
+export function getUserProfile(accessToken) {
+    const config = accessToken
+        ? {
+            headers: {
+                Authorization: `Bearer ${accessToken}`,
+            },
+        }
+        : undefined
+
+    return api.get("api/user_profile/", config);
 }
 
 export function updateUserProfile(data) {

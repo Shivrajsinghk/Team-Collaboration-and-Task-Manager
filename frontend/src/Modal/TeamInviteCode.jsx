@@ -22,7 +22,7 @@ function TeamInviteCode({isInviteOpen, setIsInviteOpen, team}) {
                 <p className="text-sm text-gray-400 mt-2 leading-relaxed">
                     Share this code with your teammates so they can join your team.
                 </p>
-                <div className="mt-6 rounded-2xl border border-white/10 bg-[rgba(255,255,255,0.04)] px-5 py-4 backdrop-blur-sm">
+                <div className="mt-6 rounded-2xl border border-white/10 hover:border-[#2CFF05] bg-[rgba(255,255,255,0.04)] px-5 py-4 backdrop-blur-sm">
                     <p className="text-2xl font-bold tracking-[0.35em] text-[var(--color-mint-cream)] uppercase">
                         {team?.team?.invite_code}
                     </p>
@@ -31,7 +31,7 @@ function TeamInviteCode({isInviteOpen, setIsInviteOpen, team}) {
                     onClick={() =>
                         navigator.clipboard.writeText(team?.team?.invite_code)
                     }
-                    className="mt-5 flex w-full items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/[0.05] px-4 py-3 text-sm font-medium text-white transition-all hover:bg-white/[0.08]"
+                    className="mt-5 flex w-full hover:border-[#2CFF05] items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/[0.05] px-4 py-3 text-sm font-medium text-white transition-all hover:bg-white/[0.08]"
                 >
                     <Copy size={16} />
                     Copy Invite Code

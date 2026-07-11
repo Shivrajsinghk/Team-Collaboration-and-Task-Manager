@@ -27,22 +27,22 @@ function Dashboard() {
         refetchOnWindowFocus: true,
     })
 
-    const sidebarBtn =
-    "flex w-full items-center gap-3 rounded-2xl px-5 py-3 text-sm font-medium text-[var(--color-cool-steel)] transition-all duration-300 hover:bg-white/[0.05] hover:text-white"
+    const sidebarBtn = "flex w-full items-center gap-3 rounded-xl px-5 py-3 text-sm font-medium text-muted transition-colors duration-150 hover:bg-surface-alt hover:text-ink"
+    const sidebarBtnActive = "flex w-full items-center gap-3 rounded-xl px-5 py-3 text-sm font-medium bg-accent/10 text-accent border border-accent/20 transition-colors duration-150"
 
     return (
         <>
             <div className="flex">    
                 {/* Side Bar */}
-                <aside className="bg-white mt-3 dark:bg-neutral-900 border-slate-300 dark:border-neutral-700 w-full h-full flex flex-col fixed top-0 left-0 max-w-[240px] py-6 px-3 overflow-auto bg-[linear-gradient(180deg,var(--color-onyx),var(--color-jet-black))] border-r border-[var(--color-cool-steel)]/15">
-                    <hr className="my-5 border-slate-300 dark:border-neutral-700" />
+                <aside className="mt-3 w-full h-full flex flex-col fixed top-0 left-0 max-w-[240px] py-6 px-3 overflow-auto bg-gradient-to-b from-surface to-base border-r border-border">
+                    <hr className="my-5 border-border" />
                     {/* Side Bar Fields */}
                     <nav className="mt-6 flex-1 px-4">
                         <ul className="space-y-2">
                             <li>
                                 <button
                                     onClick={() => navigate('/dashboard')}
-                                    className={sidebarBtn}
+                                    className={sidebarBtnActive}
                                 >
                                     <LayoutDashboard size={18} />
                                     Dashboard
@@ -73,50 +73,49 @@ function Dashboard() {
                             </li>
                         </ul>
                     </nav>
+
                     {/* Profile */}
                     <div
                         onClick={() => navigate("/profile")}
-                        className="mx-4 mt-6 flex cursor-pointer items-center gap-4 rounded-2xl border border-white/10 bg-white/[0.03] p-4 transition duration-300 hover:bg-white/[0.05]"
+                        className="mx-4 mt-6 flex cursor-pointer items-center gap-3 rounded-2xl border border-border bg-surface p-4 transition duration-300 hover:bg-surface-alt"
                     >
                         <UserProfilePfp />
                         <div className="overflow-hidden">
-                            <p className="truncate text-sm font-semibold text-white">
+                            <p className="truncate text-sm capitalize font-semibold text-ink">
                                 {profile?.full_name}
-                            </p>
-                            <p className="truncate text-xs text-[var(--color-cool-steel)]">
-                                {profile?.status}
                             </p>
                         </div>
                     </div>
                 </aside>
+                
                 {/* Main Section */}
-                <div className="ml-[240px] w-full min-h-screen text-white">
+                <div className="ml-[240px] w-full min-h-screen text-ink">
                     <div className="mx-auto max-w-7xl xl:max-w-[1400px] px-6 py-6">
-                        <section className="relative overflow-hidden rounded-[2rem] border border-white/10 bg-[linear-gradient(135deg,#112826_0%,#081312_45%,#020404_100%)] p-6 shadow-[0_20px_50px_rgba(0,0,0,0.28)]">
-                            <div className="absolute right-0 top-0 h-40 w-40 rounded-full bg-cyan-500/[0.05] blur-3xl" />
+                        <section className="relative overflow-hidden rounded-[2rem] border border-border bg-surface p-6 shadow-[0_20px_50px_rgba(0,0,0,0.28)]">
+                            <div className="absolute right-0 top-0 h-40 w-40 rounded-full bg-accent/[0.06] blur-3xl" />
                             <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
                                 <div>
-                                    <p className="text-sm text-gray-400">
+                                    <p className="text-sm text-muted">
                                         Welcome back 👋
                                     </p>
-                                    <h1 className="mt-1 text-3xl capitalize font-bold tracking-tight text-white">
+                                    <h1 className="mt-1 text-3xl capitalize font-bold tracking-tight text-ink">
                                         {profile?.first_name}
                                     </h1>
                                 </div>
                                 <div className="grid grid-cols-2 gap-5 lg:w-[320px]">
-                                    <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
-                                        <p className="text-[10px] uppercase tracking-[0.25em] text-gray-500">
+                                    <div className="rounded-2xl border border-border bg-surface-alt p-4">
+                                        <p className="text-[10px] uppercase tracking-[0.25em] text-muted">
                                             Teams
                                         </p>
-                                        <h2 className="mt-2 text-2xl font-bold text-white">
+                                        <h2 className="mt-2 text-2xl font-bold text-ink">
                                             {teams.length}
                                         </h2>
                                     </div>
-                                    <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
-                                        <p className="text-[10px] uppercase tracking-[0.25em] text-gray-500">
+                                    <div className="rounded-2xl border border-border bg-surface-alt p-4">
+                                        <p className="text-[10px] uppercase tracking-[0.25em] text-muted">
                                             Tasks
                                         </p>
-                                        <h2 className="mt-2 text-2xl font-bold text-white">
+                                        <h2 className="mt-2 text-2xl font-bold text-ink">
                                             {profile?.total_tasks ?? 0}
                                         </h2>
                                     </div>

@@ -7,6 +7,7 @@ import { useState } from 'react'
 import DM from '../components/DM'
 import { useChat } from '../context/ChatContext'
 import { isPresenceOnline } from '../utils/presence'
+import NoProfilePhoto from '../components/NoProfilePhoto'
 
 function MessageDashboard() {
     const { conversation_id } = useParams()
@@ -15,13 +16,14 @@ function MessageDashboard() {
     const [selectedConversationId, setSelectedConversationId] = useState(null)
     const currentUser = useSelector((state) => state.auth.user)
     const navigate = useNavigate()
+    const BASE_URL = import.meta.env.VITE_DJANGO_BASE_URL
 
     useEffect(() => {
         if (conversation_id) {
             setSelectedConversationId(Number(conversation_id))
         }
     }, [conversation_id])
-        
+
     const filteredConversations = conversations.filter((convo) => {
         const otherParticipant = convo.participant.find(
             (participant) => participant.id !== currentUser.id
@@ -45,33 +47,47 @@ function MessageDashboard() {
         return date.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })
     }
 
+    const getPreviewText = (convo) => {
+        const lastMessage = convo.last_message
+        if (!lastMessage) return 'No messages yet'
+        if (lastMessage.message?.trim()) {
+            return lastMessage.message
+        }
+        if (lastMessage.attachment_url) {
+            return lastMessage.attachment_is_image
+                ? '🖼️ Photo'
+                : `📎 ${lastMessage.attachment_name || 'Attachment'}`
+        }
+        return 'No messages yet'
+    }
+
     return (
-        <div className="min-h-screen overflow-x-hidden bg-[linear-gradient(180deg,#071714_0%,#020404_100%)] text-white">
+        <div className="min-h-screen overflow-x-hidden bg-base text-ink">
             <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
                 <section className="grid gap-4 lg:grid-cols-[300px_1fr]">
                     {/* LHS */}
-                    <div className="overflow-hidden rounded-[2rem] border border-white/10 bg-white/[0.03] backdrop-blur-xl">
+                    <div className="overflow-hidden rounded-2xl border border-border bg-surface">
                         <div className="flex flex-col md:flex-row md:items-center pt-3 px-4 md:justify-between">
                             <div>
-                                <h1 className="text-xl py-1 font-bold tracking-tight text-[var(--color-mint-cream)]">
+                                <h1 className="text-xl py-1 font-bold tracking-tight text-ink">
                                     Direct Messages
                                 </h1>
                             </div>
                         </div>
-    
+
                         {/* Search Bar */}
-                        <div className="border-b border-white/10 p-4">
-                            <div className="group flex items-center gap-3 rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-2 transition duration-300 focus-within:border-cyan-400/40 focus-within:bg-white/[0.05]">
+                        <div className="border-b border-border p-4">
+                            <div className="group flex items-center gap-3 rounded-xl border border-border bg-surface-alt px-4 py-2 transition-colors duration-150 focus-within:border-accent">
                                 <Search
                                     size={18}
-                                    className="text-gray-500 transition duration-300 group-focus-within:text-cyan-300"
+                                    className="text-muted transition-colors duration-150 group-focus-within:text-accent"
                                 />
                                 <input
                                     type="text"
                                     value={searchQuery}
                                     onChange={(e) => setSearchQuery(e.target.value)}
                                     placeholder="Search chats..."
-                                    className="w-full bg-transparent text-sm text-white placeholder:text-gray-500 focus:outline-none"
+                                    className="w-full bg-transparent text-sm text-ink placeholder:text-muted focus:outline-none"
                                 />
                             </div>
                         </div>
@@ -92,91 +108,75 @@ function MessageDashboard() {
                                             <button
                                                 key={convo.id}
                                                 onClick={() => setSelectedConversationId(convo.id)}
-                                                className='
-                                                    flex w-full items-center gap-4
-                                                    rounded-2xl
-                                                    border-[1.2px] border-cyan-500/20
-                                                    bg-white/[0.01]
-                                                    p-3
-                                                    text-left
-                                                    transition-all duration-200
-                                                    hover:scale-[1.01]
-                                                    hover:border-cyan-500/40
-                                                    hover:bg-white/[0.035]
-                                                '
+                                                className="flex w-full items-center gap-4 rounded-xl border border-border bg-surface-alt p-3 hover:border-accent text-left transition-colors duration-150"
                                             >
                                                 {otherParticipant?.profile_picture ? (
                                                     <img
-                                                        src={otherParticipant.profile_picture}
+                                                        src={
+                                                            otherParticipant.profile_picture.startsWith('http')
+                                                                ? otherParticipant.profile_picture
+                                                                : `${BASE_URL}${otherParticipant.profile_picture}`
+                                                        }
                                                         alt={otherParticipant.full_name}
                                                         onClick={() => navigate(`/profile/${otherParticipant.username}`)}
-                                                        className="
-                                                            h-12 w-12
-                                                            rounded-2xl
-                                                            object-cover
-                                                            border border-white/10
-                                                            cursor-pointer
-                                                        "
+                                                        className="h-12 w-12 rounded-xl object-cover border border-border cursor-pointer"
                                                     />
                                                 ) : (
-                                                    <div 
-                                                    onClick={() => navigate(`/profile/${otherParticipant.username}`)}
-                                                    className="flex h-12 w-12 items-center justify-center rounded-2xl border border-white/10 bg-gradient-to-br from-teal-400 to-indigo-500 text-xl font-bold text-white">
-                                                        {(otherParticipant.full_name || "U").charAt(0).toUpperCase()}
+                                                    <div onClick={() => navigate(`/profile/${otherParticipant.username}`)}>
+                                                        <NoProfilePhoto size={48} />
                                                     </div>
                                                 )}
                                                 <div className="min-w-0 flex-1">
-                                                    <h4 className="truncate capitalize font-medium text-[var(--color-mint-cream)]">
+                                                    <h4 className="truncate capitalize font-medium text-ink">
                                                         {otherParticipant?.full_name}
                                                     </h4>
-                                                    <p className="truncate text-sm text-[var(--color-cool-steel)]">
-                                                        {convo.last_message?.message || ""}
+                                                    <p className="truncate text-sm text-muted">
+                                                        {getPreviewText(convo)}
                                                     </p>
                                                 </div>
                                                 <div className="px-2 text-right">
                                                     {isOtherParticipantOnline ? (
-                                                        <p className="text-[0.7rem] text-emerald-400">Online</p>
+                                                        <p className="text-[0.7rem] text-accent">Online</p>
                                                     ) : (
-                                                        <p className="text-[0.7rem] text-zinc-500">
+                                                        <p className="text-[0.7rem] text-muted">
                                                             {otherParticipant?.last_seen
                                                                 ? `${formatLastSeen(otherParticipant.last_seen)}`
                                                                 : 'Offline'}
                                                         </p>
                                                     )}
                                                 </div>
-                                                {!convo.last_message.is_read && convo.last_message.sender !== currentUser.username && (
-                                                    <span className="h-2 w-2 rounded-full bg-cyan-400 shrink-0" />
+                                                {!convo.last_message?.is_read && convo.last_message?.sender !== currentUser.username && (
+                                                    <span className="h-2 w-2 rounded-full bg-accent shrink-0" />
                                                 )}
                                             </button>
                                         )
                                     })
                                 ) : (
-                                    <div className="py-6 text-center text-zinc-500">
+                                    <div className="py-6 text-center text-muted">
                                         No recent chats
                                     </div>
-                                )
-                            }
+                                )}
                             </div>
                         </div>
                     </div>
 
                     {/* RHS */}
-                    <div className="flex h-[650px] flex-1 rounded-[2rem] border border-white/10 bg-white/[0.03] backdrop-blur-xl">
+                    <div className="flex h-[650px] flex-1 rounded-2xl border border-border bg-surface">
                         {!selectedConversationId ? (
-                            <div className='w-full h-full flex justify-center items-center'>
+                            <div className="w-full h-full flex justify-center items-center">
                                 <div className="text-center pb-24">
-                                    <div className="mx-auto flex h-24 w-24 items-center justify-center rounded-[2rem] border border-cyan-500/20 bg-cyan-500/10">
-                                        <MessageCircle className="h-12 w-12 text-cyan-300" />
+                                    <div className="mx-auto flex h-24 w-24 items-center justify-center rounded-2xl border border-accent bg-base">
+                                        <MessageCircle className="h-12 w-12 text-accent" />
                                     </div>
-                                    <h2 className="mt-6 text-2xl font-bold text-[var(--color-mint-cream)]">
+                                    <h2 className="mt-6 text-2xl font-bold text-ink">
                                         Select a conversation
                                     </h2>
                                 </div>
                             </div>
                         ) : (
                             <DM
-                            selectedConversationId={selectedConversationId}
-                            setSelectedConversationId={setSelectedConversationId}
+                                selectedConversationId={selectedConversationId}
+                                setSelectedConversationId={setSelectedConversationId}
                             />
                         )}
                     </div>

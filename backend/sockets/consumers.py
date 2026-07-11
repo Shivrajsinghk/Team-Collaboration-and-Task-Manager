@@ -175,6 +175,7 @@ class PersonalChatsConsumer(AsyncWebsocketConsumer):
             message=message,
             personal_conversation=conversation
         )
+        conversation.save()
         return PersonalMessageSerializer(chat).data
     
     @database_sync_to_async

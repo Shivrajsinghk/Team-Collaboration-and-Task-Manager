@@ -16,6 +16,7 @@ function DM({
     selectedConversationId,
     setSelectedConversationId
 }) {
+    const WS_URL = import.meta.env.VITE_DJANGO_WS_URL
     const bottomRef = useRef(null)
     const socketRef = useRef(null)
     const typingTimeoutRef = useRef(null)
@@ -27,6 +28,7 @@ function DM({
     const [selectedFile, setSelectedFile] = useState(null)    
     const [showEmojiPicker, setShowEmojiPicker] = useState(false)
     const [isTyping, setIsTyping] = useState(false)
+    
     const { data: initialChats = [], isLoading: loading } = useQuery({
         queryKey: chatKeys.personalMessages(selectedConversationId),
         queryFn: async () => {
@@ -53,7 +55,7 @@ function DM({
     useEffect(() => {
         const token = localStorage.getItem('access')
         socketRef.current = new WebSocket(
-            `ws://127.0.0.1:8000/ws/personal-chats/${selectedConversationId}/?token=${token}`
+            `${WS_URL}personal-chats/${selectedConversationId}/?token=${token}`
         )
         socketRef.current.onmessage = (event) => {
             const data = JSON.parse(event.data)  
@@ -207,7 +209,7 @@ function DM({
     }
 
     return (
-        <section className="flex relative h-full w-full flex-1 min-h-0 flex-col overflow-hidden rounded-[2rem] border border-white/10 bg-white/[0.03] backdrop-blur-xl">
+        <section className="flex relative h-full w-full flex-1 min-h-0 flex-col overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03] backdrop-blur-xl">
             <DMHeader 
                 selectedConversationId={selectedConversationId}
                 setSelectedConversationId={setSelectedConversationId}
