@@ -1,7 +1,7 @@
 import React from 'react'
 import { useNavigate, useParams, useLocation } from 'react-router-dom'
 import UserProfilePfp from './UserProfilePfp'
-import { LayoutDashboard, CheckSquare, Users, MessageCircle, Construction } from "lucide-react"
+import { LayoutDashboard, CheckSquare, Users, MessageCircle, Construction, Sparkles } from "lucide-react"
 import { useCurrentUserQuery } from '../hooks/useCurrentUserQuery'
 
 function Sidebar() {
@@ -15,6 +15,7 @@ function Sidebar() {
         { label: 'Tasks', icon: CheckSquare, path: `/team/${team_id}/tasks` },
         { label: 'Members', icon: Users, path: `/team/${team_id}/members` },
         { label: 'Chats', icon: MessageCircle, path: `/team/${team_id}/chats` },
+        { label: 'AI Assistant', icon: Sparkles, path: `/team/${team_id}/assistant`},
     ]
 
     return (

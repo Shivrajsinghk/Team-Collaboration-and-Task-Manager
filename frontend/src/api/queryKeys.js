@@ -34,3 +34,8 @@ export const notificationKeys = {
     all: ['notifications'],
     list: ['notifications', 'list'],
 }
+
+export const aiKeys = {
+    all: ['ai'],
+    generatedSubtasks: ['ai', 'generated-subtasks'],
+}

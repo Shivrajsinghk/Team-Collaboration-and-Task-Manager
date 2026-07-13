@@ -60,8 +60,6 @@ const ChatDropdown = ({ open, setOpen }) => {
                 <div className="space-y-2">
                     {recentConversations.length > 0 ? (
                         recentConversations.map((convo) => {
-                            console.log(convo.last_message);
-                            
                             const otherParticipant = convo.participant.find(
                                 (participant) => participant.id !== currentUser.id
                             )

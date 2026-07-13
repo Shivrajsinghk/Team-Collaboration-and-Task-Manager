@@ -7,8 +7,9 @@ import PreviousPageButton from '../components/PreviousPageButton'
 import RightSlideDrawer from '../components/RightSlideDrawer'
 import TaskActivity from '../components/TaskActivity'
 import { Crown, SquareCheckBig, Users, CircleDot, LoaderCircle, BadgeCheck, Flame, AlertTriangle, ChevronDown, Settings } from 'lucide-react'
-import { keepPreviousData, useQuery } from '@tanstack/react-query'
+import { keepPreviousData, useQuery, useQueryClient } from '@tanstack/react-query'
 import { taskKeys } from '../api/queryKeys'
+import SubtaskGenerator from '../components/SubtaskGenerator'
 
 const STATUS_STYLES = {
     todo: { badge: 'border-border bg-surface-alt text-muted', icon: <CircleDot className="h-4 w-4" /> },
@@ -24,6 +25,7 @@ const PRIORITY_STYLES = {
 
 function TaskDashboard() {
     const { team_id, task_id } = useParams()
+    const queryClient = useQueryClient()
     const [isSlideDrawerOpen, setIsSlideDrawerOpen] = useState(false)
     const navigate = useNavigate()
     const { data: task = null, isLoading: loading } = useQuery({
@@ -70,15 +72,15 @@ function TaskDashboard() {
         <>
             <div className="relative min-h-screen ml-3 bg-base p-6 text-ink">
                 <div className="mb-6 rounded-2xl border border-border bg-surface p-6">
-                    <div className="flex items-start justify-between">
-                        <div className='flex flex-col gap-6'>
+                    <div className="flex items-start justify-between gap-6">
+                        <div className='flex min-w-0 flex-1 flex-col gap-6'>
                             <div>
                                 <div className='flex flex-row gap-4'>
                                     <div className="mb-4">
                                         <PreviousPageButton className="text-ink" />
                                     </div>
-                                    <h1 className="flex items-center gap-3 mb-4 text-4xl font-bold tracking-tight">
-                                        <SquareCheckBig size={32} className="text-accent" />
+                                    <h1 className="flex items-start gap-3 mb-4 text-4xl font-bold tracking-tight break-words">
+                                        <SquareCheckBig size={32} className="text-accent mt-1 shrink-0" />
                                         {task.title?.slice(0,1).toUpperCase()}{task.title?.slice(1,)}
                                     </h1> 
                                 </div>
@@ -109,7 +111,7 @@ function TaskDashboard() {
                                 </div>
                             </div>
                         </div>
-                        <div className="flex gap-3 flex-col">
+                        <div className="flex shrink-0 gap-3 flex-col">
                             <div className={`flex items-center gap-2 rounded-xl border px-4 py-2 text-sm font-medium ${statusStyle.badge}`}>
                                 {statusStyle.icon}
                                 {task.status?.toUpperCase()}
@@ -222,6 +224,18 @@ function TaskDashboard() {
                         </div>
                     </div>
                 </div>
+                {task.can_edit && (
+                    <div className="mb-6 rounded-2xl border border-border bg-surface p-6">
+                        <SubtaskGenerator
+                            parentTaskId={task.id}
+                            taskTitle={task.title}
+                            taskDescription={task.description}
+                            onCreated={() => {
+                                queryClient.invalidateQueries({ queryKey: taskKeys.detail(team_id, task_id) })
+                            }}
+                        />
+                    </div>
+                )}
                 <div className="rounded-2xl overflow-auto border border-dashed border-border bg-surface p-6">
                     <TaskActivity />
                 </div>

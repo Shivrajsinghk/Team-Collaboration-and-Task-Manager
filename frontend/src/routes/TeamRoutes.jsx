@@ -7,6 +7,7 @@ import Teams from "../pages/Teams";
 import TeamSettings from "../pages/TeamSettings";
 import { TaskRoutes } from "./TaskRoutes";
 import TeamChats from '../pages/TeamChats'
+import AIAssistant from "../pages/AIAssistant";
 
 export const TeamRoutes = () => (
     <>
@@ -17,6 +18,7 @@ export const TeamRoutes = () => (
             <Route path="members/:member_id" element={<MemberProfile />} />
             <Route path="settings" element={<TeamSettings />} />
             <Route path="chats" element={<TeamChats />} />
+            <Route path="assistant" element={<AIAssistant />} />
             {TaskRoutes()}
         </Route>
     </>

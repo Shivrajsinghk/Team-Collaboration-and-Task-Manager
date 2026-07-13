@@ -29,6 +29,9 @@ class Task(models.Model):
     team = models.ForeignKey(Team, on_delete=models.CASCADE, related_name="tasks")
     status = models.CharField(max_length=15, choices=STATUS_CHOICE, default="todo")
     priority = models.CharField(max_length=15, choices=PRIORITY_CHOICE, default="medium")
+    parent_task = models.ForeignKey(
+        'self', on_delete=models.CASCADE, null=True, blank=True, related_name='subtasks'
+    )
 
     def __str__(self):
         return self.title

@@ -14,7 +14,6 @@ function AddMemberToTask({
     setIsAddMemberOpen,
     isAssigned
 }) {
-    console.log("axha", isAssigned)
     const { team_id, task_id } = useParams()
     const { fetchTaskActivities } = useContext(TaskActivityContext)
     const [confirmAddId, setConfirmAddId] = useState(null)
@@ -24,7 +23,6 @@ function AddMemberToTask({
         queryKey: teamKeys.members(team_id),
         queryFn: async () => {
             const response = await listMembers(team_id)
-            console.log(response.data)
             return response.data
         },
         enabled: isAddMemberOpen && !!team_id,

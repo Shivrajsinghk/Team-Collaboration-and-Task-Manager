@@ -10,6 +10,7 @@ urlpatterns = [
     path('teams/', include('tasks.urls')),
     path('activity/', include('activity.urls')),
     path('sockets/', include('sockets.urls')),
+    path('ai/', include('ai_assistant.urls')),
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
