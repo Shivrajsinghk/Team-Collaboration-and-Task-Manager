@@ -49,21 +49,25 @@ function AIAssistant() {
 
     return (
         <div className="flex h-screen ml-5 flex-col bg-base p-6 text-ink">
-            <div className="mb-6 flex items-center gap-3">
-                <Sparkles className="text-accent" size={24} />
+            <div className="mb-6 ml-1 flex items-center gap-3">
+                <div className="relative flex flex-col items-center justify-center">
+                    <span className="text-sm font-extrabold tracking-wider text-[#2CFF05]  leading-none origin-center transition-transform duration-150 group-hover:scale-y-[0.1]">
+                        OO
+                    </span>
+                    <span className="text-[10px] mt-[0.1rem] text-[#2CFF05] font-extrabold leading-none">
+                        ⌣
+                    </span>
+                </div>
                 <h1 className="text-2xl font-bold text-ink">AI Assistant</h1>
             </div>
 
-            <div className="flex flex-1 flex-col overflow-hidden rounded-2xl border border-border bg-surface">
+            <div className="flex flex-1 flex-col overflow-y-auto rounded-2xl border border-border bg-surface">
                 <div className="flex-1 space-y-4 overflow-y-auto p-6">
                     {messages.length === 0 && (
                         <div className="flex h-[95%] flex-col items-center justify-center text-center text-muted">
                             <Sparkles size={32} className="mb-3 text-accent/50" />
                             <p className="text-sm">
                                 Ask about tasks, deadlines, or team activity.
-                            </p>
-                            <p className="mt-1 text-xs">
-                                Try: "What are the overdue tasks?"
                             </p>
                         </div>
                     )}
@@ -133,7 +137,7 @@ function AIAssistant() {
                             value={input}
                             onChange={(e) => setInput(e.target.value)}
                             onKeyDown={handleKeyDown}
-                            placeholder="Ask about your team's tasks..."
+                            placeholder="Ask anything about team..."
                             rows={1}
                             className="flex-1 resize-none rounded-xl border border-border bg-surface-alt px-4 py-2.5 text-sm text-ink placeholder:text-muted focus:border-accent focus:outline-none"
                         />

@@ -5,11 +5,12 @@ from rest_framework.decorators import api_view, permission_classes, throttle_cla
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from .throttles import AIAssistantThrottle
-from .tools import get_overdue_tasks
+from .tools import get_overdue_tasks, get_task_priorities, get_team_workload, search_tasks
 from .tool_schemas import TOOL_SCHEMAS
 from tasks.models import Task
 from teams.models import TeamMembership
 from django.utils.dateparse import parse_datetime
+from google.genai.errors import ClientError
 
 DEFAULT_SUBTASK_TEMPLATES = [
     (
@@ -77,6 +78,9 @@ def build_fallback_subtasks(task_title, task_description=""):
 
 TOOL_FUNCTIONS = {
     "get_overdue_tasks": get_overdue_tasks,
+    "get_task_priorities": get_task_priorities,
+    "get_team_workload": get_team_workload,
+    "search_tasks": search_tasks,
 }
 
 @api_view(['POST'])
@@ -113,6 +117,12 @@ def ai_query(request):
                 system_instruction=system_instruction
             ),
         )
+    except ClientError as exc:
+        if exc.code == 429:
+            return Response({"error": "AI usage quota exceeded. Please try again later."}, status=429)
+        print("=== GEMINI FIRST CALL FAILED ===")
+        traceback.print_exc()
+        return Response({"error": f"AI request failed: {exc}"}, status=502)
     except Exception as exc:
         print("=== GEMINI FIRST CALL FAILED ===")
         traceback.print_exc()
@@ -153,6 +163,12 @@ def ai_query(request):
                     system_instruction=system_instruction,
                 ),
             )
+        except ClientError as exc:
+            if exc.code == 429:
+                return Response({"error": "AI usage quota exceeded. Please try again later."}, status=429)
+            print("=== GEMINI FOLLOW-UP CALL FAILED ===")
+            traceback.print_exc()
+            return Response({"error": f"AI follow-up failed: {exc}"}, status=502)
         except Exception as exc:
             print("=== GEMINI FOLLOW-UP CALL FAILED ===")
             traceback.print_exc()

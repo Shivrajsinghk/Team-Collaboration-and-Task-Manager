@@ -15,7 +15,6 @@ const IMAGE_EXTENSIONS = ['.png', '.jpg', '.jpeg', '.gif', '.webp', '.bmp', '.sv
 
 function TeamChats() {
     const WS_URL = import.meta.env.VITE_DJANGO_WS_URL
-    console.log(WS_URL)
     const BASE_URL = import.meta.env.VITE_DJANGO_BASE_URL
     const { team_id } = useParams()
     const [liveChats, setLiveChats] = useState([])

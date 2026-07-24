@@ -9,7 +9,7 @@ function Logo() {
                     <span className="text-sm font-extrabold tracking-wider text-black leading-none origin-center transition-transform duration-150 group-hover:scale-y-[0.1]">
                         OO
                     </span>
-                    <span className="text-[10px] mt-[0.1rem] text-black font-extrabold leading-none text-accent-ink/90">
+                    <span className="text-[10px] mt-[0.1rem] text-black font-extrabold leading-none">
                         ⌣
                     </span>
                 </div>
