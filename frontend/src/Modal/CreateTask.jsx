@@ -87,6 +87,7 @@ function CreateTask({
                             required
                             name="due_date"
                             className="w-full rounded-2xl border bg-white/[0.04] px-4 py-3 text-sm text-white border-[#26ff007a] focus:border-[#2CFF05] focus:outline-none"
+                            style={{ colorScheme: "dark" }}
                         />
                     </div>
                 </div>

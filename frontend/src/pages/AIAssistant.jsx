@@ -27,7 +27,7 @@ function AIAssistant() {
                 message: trimmed,
                 team_id: Number(team_id),
             })
-            setMessages((prev) => [...prev, { role: 'assistant', text: res.data.answer }])
+            setMessages((prev) => [...prev, { role: 'assistant', text: res.data.answer ?? "I couldn't generate a response. Please try again." }])
         } catch (err) {
             console.error('AI query failed', err)
             const errMsg =

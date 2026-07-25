@@ -108,29 +108,47 @@ def ai_query(request):
         if known_team_id is not None else "")
     )
 
-    try:
-        response = client.models.generate_content(
-            model="gemini-flash-latest",
-            contents=user_message,
-            config=types.GenerateContentConfig(
-                tools=[tools],
-                system_instruction=system_instruction
-            ),
-        )
-    except ClientError as exc:
-        if exc.code == 429:
-            return Response({"error": "AI usage quota exceeded. Please try again later."}, status=429)
-        print("=== GEMINI FIRST CALL FAILED ===")
-        traceback.print_exc()
-        return Response({"error": f"AI request failed: {exc}"}, status=502)
-    except Exception as exc:
-        print("=== GEMINI FIRST CALL FAILED ===")
-        traceback.print_exc()
-        return Response({"error": f"AI request failed: {exc}"}, status=502)
+    contents = [user_message]
+    MAX_TOOL_CALLS = 4  # hard cap so a confused model can't loop forever / burn quota
 
-    part = response.candidates[0].content.parts[0]
+    for call_count in range(MAX_TOOL_CALLS + 1):
+        try:
+            response = client.models.generate_content(
+                model="gemini-flash-latest",
+                contents=contents,
+                config=types.GenerateContentConfig(
+                    tools=[tools],
+                    system_instruction=system_instruction
+                ),
+            )
+        except ClientError as exc:
+            if exc.code == 429:
+                return Response({"error": "AI usage quota exceeded. Please try again later."}, status=429)
+            print(f"=== GEMINI CALL FAILED (round {call_count}) ===")
+            traceback.print_exc()
+            return Response({"error": f"AI request failed: {exc}"}, status=502)
+        except Exception as exc:
+            print(f"=== GEMINI CALL FAILED (round {call_count}) ===")
+            traceback.print_exc()
+            return Response({"error": f"AI request failed: {exc}"}, status=502)
 
-    if part.function_call:
+        part = response.candidates[0].content.parts[0]
+
+        if not part.function_call:
+            final_text = part.text
+            if not final_text:
+                print("=== GEMINI RETURNED EMPTY TEXT ===")
+                return Response({"error": "AI returned an empty response"}, status=502)
+            return Response({"answer": final_text})
+
+        # Model wants to call a tool
+        if call_count == MAX_TOOL_CALLS:
+            print("=== MAX TOOL CALL LIMIT HIT ===")
+            return Response(
+                {"error": "That request needed too many steps to answer. Try asking one thing at a time."},
+                status=502,
+            )
+
         fn_name = part.function_call.name
         fn_args = dict(part.function_call.args)
 
@@ -144,40 +162,18 @@ def ai_query(request):
         try:
             result = fn(requesting_user=request.user, **fn_args)
         except Exception as exc:
-            print("=== TOOL EXECUTION FAILED ===")
+            print(f"=== TOOL EXECUTION FAILED ({fn_name}) ===")
             traceback.print_exc()
             return Response({"error": f"Tool execution failed: {exc}"}, status=500)
 
-        try:
-            follow_up = client.models.generate_content(
-                model="gemini-flash-latest",
-                contents=[
-                    user_message,
-                    part,
-                    types.Part.from_function_response(
-                        name=fn_name, response={"result": result}
-                    ),
-                ],
-                config=types.GenerateContentConfig(
-                    tools=[tools],
-                    system_instruction=system_instruction,
-                ),
-            )
-        except ClientError as exc:
-            if exc.code == 429:
-                return Response({"error": "AI usage quota exceeded. Please try again later."}, status=429)
-            print("=== GEMINI FOLLOW-UP CALL FAILED ===")
-            traceback.print_exc()
-            return Response({"error": f"AI follow-up failed: {exc}"}, status=502)
-        except Exception as exc:
-            print("=== GEMINI FOLLOW-UP CALL FAILED ===")
-            traceback.print_exc()
-            return Response({"error": f"AI follow-up failed: {exc}"}, status=502)
+        # Append this round's model turn + tool result, then loop again
+        contents.append(part)
+        contents.append(
+            types.Part.from_function_response(name=fn_name, response={"result": result})
+        )
 
-        final_text = follow_up.candidates[0].content.parts[0].text
-        return Response({"answer": final_text})
-
-    return Response({"answer": part.text})
+    # Should be unreachable, but just in case
+    return Response({"error": "Unexpected AI response state"}, status=502)
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
