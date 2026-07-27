@@ -19,7 +19,7 @@ def list_team_activities(request, team_id):
             status=status.HTTP_403_FORBIDDEN
         )
     activities = Activity.objects.filter(team=team).order_by('-created_at')
-    serializer = ActivitySerializer(activities, many=True)
+    serializer = ActivitySerializer(activities, many=True, context={"request": request})
     return Response(serializer.data, status=status.HTTP_200_OK)
 
 @api_view(['GET'])
@@ -33,6 +33,6 @@ def list_task_activities(request, team_id, task_id):
         )
     task = get_object_or_404(Task, team=team, id=task_id)
     activities = Activity.objects.filter(team=team, task=task).order_by('-created_at')
-    serializer = ActivitySerializer(activities, many=True)
+    serializer = ActivitySerializer(activities, many=True, context={"request": request})
     return Response(serializer.data, status=status.HTTP_200_OK)
 

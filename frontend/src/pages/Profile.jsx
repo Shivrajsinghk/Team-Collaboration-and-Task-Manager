@@ -12,14 +12,6 @@ import { useCurrentUserQuery } from '../hooks/useCurrentUserQuery'
 import { useQueryClient } from "@tanstack/react-query"
 import NoProfilePhoto from '../components/NoProfilePhoto'
 
-const BASE_URL = import.meta.env.VITE_DJANGO_BASE_URL
-
-function getMediaUrl(baseUrl, path) {
-    if (!path) return ''
-    if (path.startsWith('http://') || path.startsWith('https://')) return path
-    return `${baseUrl}/${path}`.replace(/([^:]\/)\/+/g, '$1')
-}
-
 function Profile() {
     const navigate = useNavigate()
     const authUser = useSelector((state) => state.auth.user)
@@ -55,7 +47,7 @@ function Profile() {
                                 <div className="relative flex-shrink-0">
                                     {user.profile_picture ? (
                                         <img
-                                            src={getMediaUrl(BASE_URL, user.profile_picture)}
+                                            src={user.profile_picture}
                                             alt={user.full_name}
                                             className="h-24 w-24 rounded-2xl border-2 border-surface object-cover shadow-xl"
                                         />

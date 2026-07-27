@@ -302,7 +302,11 @@ def members_list(request, team_id):
             status=status.HTTP_403_FORBIDDEN,
         )
     members = User.objects.filter(team_memberships__team=team).distinct()
-    serializer = TeamMemberListSerializer(members, many=True, context={"team": team})
+    serializer = TeamMemberListSerializer(
+        members,
+        many=True,
+        context={"team": team, "request": request},
+    )
     return Response(serializer.data, status=status.HTTP_200_OK)
 
 @api_view(["GET"])
@@ -321,7 +325,10 @@ def member_details(request, team_id, member_id):
             {"error": "This member is not a part of this team."},
             status=status.HTTP_403_FORBIDDEN,
         )
-    serializer = TeamMemberDetailsSerializer(member, context={"team": team})
+    serializer = TeamMemberDetailsSerializer(
+        member,
+        context={"team": team, "request": request},
+    )
     return Response(serializer.data, status=status.HTTP_200_OK)
 
 @api_view(["GET"])

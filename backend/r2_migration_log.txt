@@ -1,0 +1,35 @@
+WOULD MIGRATE: UserProfile.profile_picture id=4 key=profile_pictures/Fest_3_Golden_Week.jpg (239190 bytes)
+WOULD MIGRATE: UserProfile.profile_picture id=3 key=profile_pictures/Fest_1_Childrens_day.jpg (309106 bytes)
+WOULD MIGRATE: UserProfile.profile_picture id=2 key=profile_pictures/Screenshot_2026-04-05_023349.png (1990516 bytes)
+WOULD MIGRATE: Chats.attachment id=28 key=team_chat_attachments/My_Resume.pdf (120857 bytes)
+WOULD MIGRATE: Chats.attachment id=29 key=team_chat_attachments/download.jpg (156584 bytes)
+WOULD MIGRATE: Chats.attachment id=34 key=team_chat_attachments/My_Resume_NT0LCSn.pdf (120857 bytes)
+WOULD MIGRATE: Chats.attachment id=36 key=team_chat_attachments/Screenshot_2025-12-05_211746.png (2022708 bytes)
+WOULD MIGRATE: Chats.attachment id=37 key=team_chat_attachments/Screenshot_2026-01-13_155347.png (443456 bytes)
+WOULD MIGRATE: Chats.attachment id=38 key=team_chat_attachments/Screenshot_2025-12-03_200833.png (613849 bytes)
+WOULD MIGRATE: Chats.attachment id=39 key=team_chat_attachments/Screenshot_2026-01-13_155347_TKTHBw7.png (443456 bytes)
+WOULD MIGRATE: Chats.attachment id=58 key=team_chat_attachments/Screen_Recording_2026-04-26_225247.mp4 (5676308 bytes)
+WOULD MIGRATE: Chats.attachment id=59 key=team_chat_attachments/Screen_Recording_2026-05-09_183008.mp4 (11892132 bytes)
+WOULD MIGRATE: Chats.attachment id=60 key=team_chat_attachments/Screen_Recording_2026-07-01_165644.mp4 (9055441 bytes)
+WOULD MIGRATE: PersonalMessage.attachment id=88 key=personal_chat_attachments/Screen_Recording_2026-07-01_165644.mp4 (9055441 bytes)
+WOULD MIGRATE: PersonalMessage.attachment id=89 key=personal_chat_attachments/fake_profile_2.avif (73697 bytes)
+
+=== SUMMARY ===
+Dry run: True
+Migrated: 0
+Already in R2 (skipped): 1
+Missing locally (could not migrate): 0
+Total bytes that would be transferred: 42213598
+
+MIGRATED: Chats.attachment id=59 key=team_chat_attachments/Screen_Recording_2026-05-09_183008.mp4 (11892132 bytes)
+MIGRATED: Chats.attachment id=60 key=team_chat_attachments/Screen_Recording_2026-07-01_165644.mp4 (9055441 bytes)
+MIGRATED: PersonalMessage.attachment id=88 key=personal_chat_attachments/Screen_Recording_2026-07-01_165644.mp4 (9055441 bytes)
+MIGRATED: PersonalMessage.attachment id=89 key=personal_chat_attachments/fake_profile_2.avif (73697 bytes)
+
+=== SUMMARY ===
+Dry run: False
+Migrated: 4
+Already in R2 (skipped): 12
+Missing locally (could not migrate): 0
+Total bytes  transferred: 30076711
+

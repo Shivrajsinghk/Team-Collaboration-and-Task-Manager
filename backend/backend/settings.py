@@ -1,3 +1,4 @@
+import os
 from pathlib import Path
 from datetime import timedelta
 from dotenv import load_dotenv
@@ -31,10 +32,11 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework_simplejwt',
     'activity',
-    "debug_toolbar",
+    'debug_toolbar',
     'channels',
     'sockets',
     'ai_assistant',
+    'storages',
 ]   
 
 MIDDLEWARE = [
@@ -106,9 +108,6 @@ USE_TZ = True
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [BASE_DIR / 'static']
 
-MEDIA_URL = '/media/'
-MEDIA_ROOT = BASE_DIR / 'media'
-
 CORS_ALLOW_ALL_ORIGINS = True
 
 REST_FRAMEWORK = {
@@ -143,5 +142,31 @@ CHANNEL_LAYERS = {
                 }
             ],
         },
+    },
+}
+
+# R2 / S3-compatible storage config
+R2_ACCESS_KEY_ID = os.environ.get("R2_ACCESS_KEY_ID")
+R2_SECRET_ACCESS_KEY = os.environ.get("R2_SECRET_ACCESS_KEY")
+R2_ENDPOINT_URL = os.environ.get("R2_ENDPOINT_URL")
+R2_BUCKET_NAME = os.environ.get("R2_BUCKET_NAME")
+
+AWS_ACCESS_KEY_ID = R2_ACCESS_KEY_ID
+AWS_SECRET_ACCESS_KEY = R2_SECRET_ACCESS_KEY
+AWS_STORAGE_BUCKET_NAME = R2_BUCKET_NAME
+AWS_S3_ENDPOINT_URL = R2_ENDPOINT_URL
+AWS_S3_REGION_NAME = "auto"  
+AWS_S3_SIGNATURE_VERSION = "s3v4"
+AWS_DEFAULT_ACL = None  
+AWS_S3_FILE_OVERWRITE = False  
+AWS_QUERYSTRING_AUTH = True  
+AWS_QUERYSTRING_EXPIRE = 600 
+
+STORAGES = {
+    "default": {
+        "BACKEND": "storages.backends.s3boto3.S3Boto3Storage",
+    },
+    "staticfiles": {
+        "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
     },
 }

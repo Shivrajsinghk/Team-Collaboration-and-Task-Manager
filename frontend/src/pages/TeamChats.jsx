@@ -15,7 +15,6 @@ const IMAGE_EXTENSIONS = ['.png', '.jpg', '.jpeg', '.gif', '.webp', '.bmp', '.sv
 
 function TeamChats() {
     const WS_URL = import.meta.env.VITE_DJANGO_WS_URL
-    const BASE_URL = import.meta.env.VITE_DJANGO_BASE_URL
     const { team_id } = useParams()
     const [liveChats, setLiveChats] = useState([])
     const [message, setMessage] = useState('')
@@ -101,11 +100,7 @@ function TeamChats() {
         if (!chat?.attachment_url && !chat?.attachments) {
             return null
         }
-        if (chat.attachment_url?.startsWith('http')) {
-            return chat.attachment_url
-        }
-        const path = chat.attachment_url || chat.attachments
-        return `${BASE_URL}${path.startsWith('/') ? path : `/${path}`}`
+        return chat.attachment_url || chat.attachments
     }
 
     const getAttachmentName = (chat) => {

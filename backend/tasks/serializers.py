@@ -29,13 +29,16 @@ class TaskSerializer(serializers.ModelSerializer):
         return membership.role == "admin"
     
     def get_created_by(self, obj):
-        return SimpleUserSerializer(obj.created_by, context={"team": obj.team}).data
+        return SimpleUserSerializer(
+            obj.created_by,
+            context={"team": obj.team, "request": self.context.get("request")},
+        ).data
 
     def get_assigned_to(self, obj):
         return SimpleUserSerializer(
             obj.assigned_to.all(),
             many=True,
-            context={"team": obj.team},
+            context={"team": obj.team, "request": self.context.get("request")},
         ).data
 
     class Meta:

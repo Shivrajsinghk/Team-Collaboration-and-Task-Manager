@@ -27,7 +27,6 @@ import NoProfilePhoto from '../components/NoProfilePhoto'
 function PublicProfile() {
     const { username } = useParams()
     const navigate = useNavigate()
-    const BASE_URL = import.meta.env.VITE_DJANGO_BASE_URL
     const queryClient = useQueryClient()
 
     const { data: user, isLoading: loading } = useQuery({
@@ -87,7 +86,7 @@ function PublicProfile() {
                                 <div className="relative flex-shrink-0">
                                     {user.profile_picture ? (
                                         <img
-                                            src={`${BASE_URL}${user.profile_picture}`}
+                                            src={user.profile_picture}
                                             alt={user.full_name}
                                             className="h-24 w-24 rounded-2xl border-2 border-surface object-cover shadow-xl"
                                         />

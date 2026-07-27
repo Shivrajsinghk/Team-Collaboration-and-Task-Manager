@@ -1,4 +1,5 @@
 from django.contrib.auth.models import User
+from django.core.files.storage import default_storage
 from rest_framework import serializers
 from api.serializers import UserProfileSerializer
 from tasks.models import Task
@@ -22,7 +23,7 @@ class TeamSerializer(serializers.ModelSerializer):
         return obj.memberships.filter(user=request.user, role="admin").exists()
     
     def get_all_members(self, obj):
-        return obj.memberships.all().values(
+        members = list(obj.memberships.all().values(
             "id",
             "user__first_name",
             "user__last_name",
@@ -32,7 +33,12 @@ class TeamSerializer(serializers.ModelSerializer):
             "role",
             "user__profile__is_online",  
             "user__profile__last_seen",
-        )
+        ))
+        for member in members:
+            profile_picture = member["user__profile__profile_picture"]
+            if profile_picture:
+                member["user__profile__profile_picture"] = default_storage.url(profile_picture)
+        return members
 
     def get_task_count(self, obj):
         return obj.tasks.count()

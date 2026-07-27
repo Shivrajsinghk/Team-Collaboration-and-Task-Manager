@@ -2,14 +2,6 @@ import React, { useState } from "react"
 import { useSelector } from 'react-redux'
 import NoProfilePhoto from "./NoProfilePhoto"
 
-const BASE_URL = import.meta.env.VITE_DJANGO_BASE_URL
-
-function getMediaUrl(baseUrl, path) {
-    if (!path) return ''
-    if (path.startsWith('http://') || path.startsWith('https://')) return path
-    return `${baseUrl}/${path}`.replace(/([^:]\/)\/+/g, '$1')
-}
-
 function UserProfilePfp({ memberUser, isOnline }) {
     const reduxUser = useSelector((state) => state.auth.user)
     const user = memberUser || reduxUser
@@ -20,9 +12,7 @@ function UserProfilePfp({ memberUser, isOnline }) {
     const profilePicture = memberUser
         ? (
             user.profile_picture ||
-            (user.user__profile__profile_picture
-                ? `media/${user.user__profile__profile_picture}`
-                : '')
+            user.user__profile__profile_picture
         )
         : user.profile_picture
 
@@ -37,7 +27,7 @@ function UserProfilePfp({ memberUser, isOnline }) {
 
                 {profilePicture && !imgError ? (
                     <img
-                        src={getMediaUrl(BASE_URL, profilePicture)}
+                        src={profilePicture}
                         alt={fullName}
                         onError={() => setImgError(true)}
                         className="relative h-full w-full object-cover"

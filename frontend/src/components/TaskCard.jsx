@@ -43,7 +43,6 @@ function formatDate(date) {
 function TaskCard({ task, index }) {
     const navigate = useNavigate()
     const { team_id } = useParams()
-    const BASE_URL = import.meta.env.VITE_DJANGO_BASE_URL
     const queryClient = useQueryClient()
 
     const priorityStyles = {
@@ -121,7 +120,7 @@ function TaskCard({ task, index }) {
                                 <div key={assignee.id}>
                                     {assignee.profile_picture ? (
                                         <img
-                                            src={`${BASE_URL}${assignee.profile_picture}`}
+                                            src={assignee.profile_picture}
                                             alt={assignee.username}
                                             title={assignee.username}
                                             className="h-8 w-8 rounded-full border-2 border-surface object-cover transition-transform duration-200 hover:z-20 hover:scale-110"

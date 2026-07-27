@@ -14,7 +14,6 @@ function CreateTask({
     const { team_id } = useParams()
     const [isDropdownOpen, setIsDropdownOpen] = useState(false)
     const [selectedMembers, setSelectedMembers] = useState([])
-    const BASE_URL = import.meta.env.VITE_DJANGO_BASE_URL
     const queryClient = useQueryClient()
 
     const createTaskMutation = useMutation({
@@ -109,7 +108,7 @@ function CreateTask({
                                         <div className="flex h-10 w-10 overflow-hidden rounded-full">
                                             {selectedMember.user__profile__profile_picture ? (
                                                 <img
-                                                    src={`${BASE_URL}/media/${selectedMember.user__profile__profile_picture}`}
+                                                    src={selectedMember.user__profile__profile_picture}
                                                     alt={selectedMember.user__first_name}
                                                     className="h-full w-full object-cover"
                                                 />
@@ -171,7 +170,7 @@ function CreateTask({
                                     <div className="flex h-10 w-10 overflow-hidden rounded-full">
                                         {member.user__profile__profile_picture ? (
                                             <img
-                                                src={`${BASE_URL}/media/${member.user__profile__profile_picture}`}
+                                                src={member.user__profile__profile_picture}
                                                 alt={member.user__first_name}
                                                 className="h-full w-full object-cover"
                                             />

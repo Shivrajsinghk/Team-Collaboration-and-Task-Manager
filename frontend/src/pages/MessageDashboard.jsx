@@ -16,7 +16,6 @@ function MessageDashboard() {
     const [selectedConversationId, setSelectedConversationId] = useState(null)
     const currentUser = useSelector((state) => state.auth.user)
     const navigate = useNavigate()
-    const BASE_URL = import.meta.env.VITE_DJANGO_BASE_URL
 
     useEffect(() => {
         if (conversation_id) {
@@ -112,11 +111,7 @@ function MessageDashboard() {
                                             >
                                                 {otherParticipant?.profile_picture ? (
                                                     <img
-                                                        src={
-                                                            otherParticipant.profile_picture.startsWith('http')
-                                                                ? otherParticipant.profile_picture
-                                                                : `${BASE_URL}${otherParticipant.profile_picture}`
-                                                        }
+                                                        src={otherParticipant.profile_picture}
                                                         alt={otherParticipant.full_name}
                                                         onClick={() => navigate(`/profile/${otherParticipant.username}`)}
                                                         className="h-12 w-12 rounded-xl object-cover border border-border cursor-pointer"

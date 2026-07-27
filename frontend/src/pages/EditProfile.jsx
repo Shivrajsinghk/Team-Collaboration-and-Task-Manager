@@ -14,14 +14,6 @@ import { authKeys } from '../api/queryKeys'
 import { useCurrentUserQuery } from '../hooks/useCurrentUserQuery'
 import NoProfilePhoto from '../components/NoProfilePhoto' 
 
-const BASE_URL = import.meta.env.VITE_DJANGO_BASE_URL
-
-function getMediaUrl(baseUrl, path) {
-    if (!path) return ''
-    if (path.startsWith('http://') || path.startsWith('https://')) return path
-    return `${baseUrl}/${path}`.replace(/([^:]\/)\/+/g, '$1')
-}
-
 function EditProfile() {
     const navigate = useNavigate()
     const dispatch = useDispatch()
@@ -120,7 +112,7 @@ function EditProfile() {
 
     if (loading) return <Loading />
 
-    const currentPreview = removeProfilePicture ? '' : (previewUrl || getMediaUrl(BASE_URL, user?.profile_picture))
+    const currentPreview = removeProfilePicture ? '' : (previewUrl || user?.profile_picture)
     const displayName = `${formData.first_name} ${formData.last_name}`.trim() || formData.username || "User"
 
     return (

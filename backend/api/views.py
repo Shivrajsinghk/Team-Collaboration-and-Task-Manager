@@ -19,7 +19,7 @@ from django.db.models import Q, Case, When, IntegerField, F
 @permission_classes([IsAuthenticated])
 def user_profile(request):
     user_profile, _ = UserProfile.objects.get_or_create(user=request.user)
-    serializer = UserProfileSerializer(user_profile)
+    serializer = UserProfileSerializer(user_profile, context={"request": request})
     return Response(serializer.data)
 
 @api_view(["GET"])
@@ -29,7 +29,7 @@ def get_public_profile(request, username):
         UserProfile,
         user__username=username
     )
-    serializer = PublicUserProfileSerializer(user_profile)
+    serializer = PublicUserProfileSerializer(user_profile, context={"request": request})
     return Response(
         serializer.data,
         status=status.HTTP_200_OK
@@ -41,7 +41,12 @@ def get_public_profile(request, username):
 @transaction.atomic
 def update_user_profile(request):
     user_profile, _ = UserProfile.objects.get_or_create(user=request.user)
-    serializer = UserProfileSerializer(user_profile, data=request.data, partial=True)
+    serializer = UserProfileSerializer(
+        user_profile,
+        data=request.data,
+        partial=True,
+        context={"request": request},
+    )
     if serializer.is_valid():
         serializer.save()
         return Response(serializer.data, status=status.HTTP_200_OK)
@@ -154,7 +159,11 @@ def get_search_results(request):
         tasks_data = tasks_data.order_by('-created_at')  
     tasks = tasks_data[:10]
 
-    user_serializer = PublicUserProfileSerializer(users, many=True)
+    user_serializer = PublicUserProfileSerializer(
+        users,
+        many=True,
+        context={"request": request},
+    )
     team_serializer = TeamSerializer(teams, many=True, context={"request": request})
     task_serializer = TaskSerializer(tasks, many=True, context={"request": request})
     return Response({

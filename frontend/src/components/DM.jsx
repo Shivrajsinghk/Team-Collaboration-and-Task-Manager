@@ -118,11 +118,7 @@ function DM({
         if (!chat?.attachment_url && !chat?.attachments) {
             return null
         }
-        if (chat.attachment_url?.startsWith('http')) {
-            return chat.attachment_url
-        }
-        const path = chat.attachment_url || chat.attachments
-        return `http://127.0.0.1:8000${path.startsWith('/') ? path : `/${path}`}`
+        return chat.attachment_url || chat.attachments
     }
 
     const formatMessageTime = (timestamp) => {

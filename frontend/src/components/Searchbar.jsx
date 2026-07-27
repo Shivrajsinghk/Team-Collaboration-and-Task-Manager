@@ -287,7 +287,7 @@ function Searchbar() {
                         >
                             <div className="relative flex-shrink-0">
                                 {user.profile_picture ? (
-                                <img src={`http://localhost:8000${user.profile_picture}`} alt={user.username}
+                                <img src={user.profile_picture} alt={user.username}
                                     className="h-9 w-9 rounded-lg object-cover" />
                                 ) : (
                                 <div

@@ -12,7 +12,6 @@ import NoProfilePhoto from '../components/NoProfilePhoto'
 function MemberProfile() {
     const { team_id, member_id } = useParams()
     const navigate = useNavigate()
-    const BASE_URL = import.meta.env.VITE_DJANGO_BASE_URL
     const { data: member = null, isLoading: loading } = useQuery({
         queryKey: teamKeys.memberDetail(team_id, member_id),
         queryFn: async () => {
@@ -54,7 +53,7 @@ function MemberProfile() {
                             >
                                 {member.profile.profile_picture ? (
                                     <img
-                                        src={`${BASE_URL}${member.profile.profile_picture}`}
+                                        src={member.profile.profile_picture}
                                         alt={member.profile.full_name}
                                         className="h-full w-full object-cover hover:scale-105 transition-transform"
                                     />
