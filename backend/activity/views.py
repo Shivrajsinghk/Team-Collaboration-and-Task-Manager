@@ -35,4 +35,3 @@ def list_task_activities(request, team_id, task_id):
     activities = Activity.objects.filter(team=team, task=task).order_by('-created_at')
     serializer = ActivitySerializer(activities, many=True, context={"request": request})
     return Response(serializer.data, status=status.HTTP_200_OK)
-
