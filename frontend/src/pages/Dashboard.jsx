@@ -96,7 +96,7 @@ function Dashboard() {
                             <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
                                 <div>
                                     <p className="text-sm text-muted">
-                                        Welcome back 👋
+                                        Welcome 
                                     </p>
                                     <h1 className="mt-1 text-3xl capitalize font-bold tracking-tight text-ink">
                                         {profile?.first_name}

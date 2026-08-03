@@ -7,11 +7,11 @@ load_dotenv()
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = 'django-insecure-1vs=ji5vs32w-2%ozn@o+pd@8ke_vcvo)dxf11yqw!b6p0as-j'
+SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-1vs=ji5vs32w-2%ozn@o+pd@8ke_vcvo)dxf11yqw!b6p0as-j')
 
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
 
 INTERNAL_IPS = [
     "127.0.0.1",
@@ -74,11 +74,11 @@ ASGI_APPLICATION = 'backend.asgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'team_collab',
-        'USER': 'postgres',
-        'PASSWORD': '123',
-        'HOST': 'localhost',
-        'PORT': '5432',
+        'NAME': os.environ.get('DB_NAME', 'team_collab'),
+        'USER': os.environ.get('DB_USER', 'postgres'),
+        'PASSWORD': os.environ.get('DB_PASSWORD', '123'),
+        'HOST': os.environ.get('DB_HOST', 'localhost'),
+        'PORT': os.environ.get('DB_PORT', '5432'),
     }
 }
 
@@ -107,6 +107,7 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [BASE_DIR / 'static']
+STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 CORS_ALLOW_ALL_ORIGINS = True
 
@@ -136,8 +137,8 @@ CHANNEL_LAYERS = {
         "CONFIG": {
             "hosts": [
                 {
-                    "host": "127.0.0.1",
-                    "port": 6379,
+                    "host": os.environ.get("REDIS_HOST", "127.0.0.1"),
+                    "port": int(os.environ.get("REDIS_PORT", 6379)),
                     "socket_timeout": None,
                 }
             ],

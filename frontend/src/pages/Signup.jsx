@@ -114,7 +114,7 @@ function Signup() {
                                 <input
                                     name="first_name"
                                     type="text"
-                                    placeholder="John"
+                                    placeholder="Franz"
                                     required
                                     value={formData.first_name}
                                     onChange={handleChange}
@@ -129,7 +129,7 @@ function Signup() {
                                 <input
                                     name="last_name"
                                     type="text"
-                                    placeholder="Doe"
+                                    placeholder="Kafka"
                                     required
                                     value={formData.last_name}
                                     onChange={handleChange}
