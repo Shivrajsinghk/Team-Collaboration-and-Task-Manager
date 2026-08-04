@@ -1,3 +1,5 @@
+# Here we use Alpine because it is best for Node applications and it's much smaller also 
+# We don't need heavy system libraries
 ARG NODE_VERSION=24-alpine
 
 FROM node:${NODE_VERSION}

@@ -1,16 +1,22 @@
+# Node
 node_modules/
 dist/
 
+# Environment Variables
 .env
 .env.*
 
+# Git
 .git/
 .gitignore
 
+# IDE
 .vscode/
 .idea/
 
+# Logs
 *.log
 
+# OS files
 .DS_Store
 Thumbs.db
