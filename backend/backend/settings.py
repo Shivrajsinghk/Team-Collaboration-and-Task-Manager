@@ -135,13 +135,7 @@ CHANNEL_LAYERS = {
     "default": {
         "BACKEND": "channels_redis.core.RedisChannelLayer",
         "CONFIG": {
-            "hosts": [
-                {
-                    "host": os.environ.get("REDIS_HOST", "127.0.0.1"),
-                    "port": int(os.environ.get("REDIS_PORT", 6379)),
-                    "socket_timeout": None,
-                }
-            ],
+            "hosts": [os.environ.get("REDIS_URL", "redis://127.0.0.1:6379")],
         },
     },
 }
