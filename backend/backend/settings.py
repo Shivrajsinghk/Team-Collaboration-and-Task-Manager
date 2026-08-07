@@ -172,6 +172,7 @@ CSRF_TRUSTED_ORIGINS = os.environ.get('CSRF_TRUSTED_ORIGINS', '').split(',') if 
 
 print("DEBUG =", DEBUG)
 print("ALLOWED_HOSTS =", ALLOWED_HOSTS)
-print("CSRF =", CSRF_TRUSTED_ORIGINS)
+print("RAW:", repr(os.environ.get("CSRF_TRUSTED_ORIGINS")))
+print("PARSED:", repr(CSRF_TRUSTED_ORIGINS))
 print("DB_HOST =", os.environ.get("DB_HOST"))
 print("REDIS =", os.environ.get("REDIS_URL"))
