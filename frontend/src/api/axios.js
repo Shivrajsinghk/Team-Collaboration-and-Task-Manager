@@ -2,8 +2,10 @@ import axios from 'axios'
 import { store } from '../Features/store'
 import { logout, updateAccessToken } from '../Features/authslice'
 
+const BASE_URL = import.meta.env.VITE_DJANGO_BASE_URL || "http://127.0.0.1:8000"
+
 const api = axios.create({
-    baseURL: "http://127.0.0.1:8000/"
+    baseURL: `${BASE_URL}/`
 })
 
 api.interceptors.request.use((config) => {
@@ -71,7 +73,7 @@ api.interceptors.response.use(
         isRefreshing = true
 
         try {
-            const response = await axios.post('http://127.0.0.1:8000/api/token/refresh/', {
+            const response = await axios.post(`${BASE_URL}/api/token/refresh/`, {
                 refresh: refreshToken,
             })
 
