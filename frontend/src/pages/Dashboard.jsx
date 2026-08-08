@@ -99,7 +99,7 @@ function Dashboard() {
                                         Welcome 
                                     </p>
                                     <h1 className="mt-1 text-3xl capitalize font-bold tracking-tight text-ink">
-                                        {profile?.first_name}
+                                        {profile?.first_name || profile?.username} 
                                     </h1>
                                 </div>
                                 <div className="grid grid-cols-2 gap-5 lg:w-[320px]">
