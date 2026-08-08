@@ -57,7 +57,7 @@ RUN pip install --no-cache-dir --no-index --find-links=/wheels -r requirements.t
 COPY . .
 
 # Collect all the static files at build time (Images, Fonts, CSS, JS, etc)
-RUN python manage.py collectstatic --noinput
+RUN python manage.py collectstatic --noinput --ignore=input.css
 
 EXPOSE 8000
 
