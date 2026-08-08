@@ -168,3 +168,5 @@ STORAGES = {
 }
 
 CSRF_TRUSTED_ORIGINS = os.environ.get('CSRF_TRUSTED_ORIGINS', '').split(',') if os.environ.get('CSRF_TRUSTED_ORIGINS') else []
+
+WHITENOISE_MANIFEST_STRICT = False
