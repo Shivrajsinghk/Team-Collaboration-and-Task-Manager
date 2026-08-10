@@ -1,26 +1,28 @@
-# ---------- Stage 1: build the static assets ----------
+# Stage 1: Node -> build the static assets 
+# Node installs the dependencies and builds the static assests/files like
+# HTML, CSS, JS, Images, etc in a dist/ folder using npm run build command 
 ARG NODE_VERSION=24-alpine
 FROM node:${NODE_VERSION} AS builder
 
 WORKDIR /app
 
+# Caching
 COPY package*.json ./
 RUN npm install
-
 COPY . .
 
-# These get baked directly into the compiled JS bundle at build time
 ARG VITE_DJANGO_BASE_URL
 ARG VITE_DJANGO_WS_URL
+
 ENV VITE_DJANGO_BASE_URL=${VITE_DJANGO_BASE_URL}
 ENV VITE_DJANGO_WS_URL=${VITE_DJANGO_WS_URL}
 
-ARG VITE_DJANGO_BASE_URL
-RUN echo "BASE URL IS: $VITE_DJANGO_BASE_URL"
-
 RUN npm run build
 
-# ---------- Stage 2: serve with Nginx ----------
+
+
+# Stage 2: Nginx -> Serve the browser using nginx
+# Nginx serves the browser with these static assets/files that are built by Node.
 FROM nginx:alpine
 
 COPY --from=builder /app/dist /usr/share/nginx/html
@@ -28,4 +30,6 @@ COPY nginx.conf /etc/nginx/conf.d/default.conf
 
 EXPOSE 80
 
+# Normally nginx run in background/daemon but containers need a foreground process
+# to remain alive. That's why we use daemon off; -> Nginx running in foreground/
 CMD ["nginx", "-g", "daemon off;"]
