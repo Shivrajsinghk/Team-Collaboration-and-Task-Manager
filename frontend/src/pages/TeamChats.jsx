@@ -161,8 +161,6 @@ function TeamChats() {
         return <Loading />
     }
 
-    console.log("chats[0]", chats[0])
-
     return (
         <div className="min-h-screen overflow-x-hidden overflow-y-auto bg-base text-ink">
             <div className="mx-auto ml-4 flex max-w-7xl flex-col px-2 py-4 sm:px-6 lg:px-8">
