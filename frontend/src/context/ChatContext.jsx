@@ -8,6 +8,9 @@ const ChatContext = createContext()
 
 export const ChatProvider = ({ children }) => {
     const currentUser = useSelector((state) => state.auth.user)
+    const isAuthenticated = useSelector((state) => state.auth.isAuthenticated)
+    const isAuthResolved = useSelector((state) => state.auth.isAuthResolved)
+    const accessToken = useSelector((state) => state.auth.access)
 
     const { data: conversations = [], isLoading } = useQuery({
         queryKey: chatKeys.conversations,
@@ -15,6 +18,7 @@ export const ChatProvider = ({ children }) => {
             const response = await listConversations()
             return response.data
         },
+        enabled: isAuthResolved && isAuthenticated && !!accessToken,
         staleTime: 30 * 1000,
         refetchOnWindowFocus: true,
     })

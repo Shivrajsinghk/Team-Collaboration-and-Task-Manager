@@ -23,6 +23,9 @@ function DM({
     const fileInputRef = useRef(null)
     const navigate = useNavigate()
     const currentUser = useSelector((state) => state.auth.user)
+    const isAuthenticated = useSelector((state) => state.auth.isAuthenticated)
+    const isAuthResolved = useSelector((state) => state.auth.isAuthResolved)
+    const accessToken = useSelector((state) => state.auth.access)
     const [liveChats, setLiveChats] = useState([])
     const [message, setMessage] = useState('')
     const [selectedFile, setSelectedFile] = useState(null)    
@@ -35,7 +38,7 @@ function DM({
             const response = await list_personal_messages(selectedConversationId)
             return response.data
         },
-        enabled: !!selectedConversationId,
+        enabled: isAuthResolved && isAuthenticated && !!accessToken && !!selectedConversationId,
         staleTime: 15 * 1000,
         refetchOnWindowFocus: true,
     })
@@ -53,9 +56,11 @@ function DM({
     }, [initialChats, selectedConversationId])
 
     useEffect(() => {
-        const token = localStorage.getItem('access')
+        if (!isAuthResolved || !isAuthenticated || !accessToken || !selectedConversationId) {
+            return
+        }
         socketRef.current = new WebSocket(
-            `${WS_URL}personal-chats/${selectedConversationId}/?token=${token}`
+            `${WS_URL}personal-chats/${selectedConversationId}/?token=${encodeURIComponent(accessToken)}`
         )
         socketRef.current.onmessage = (event) => {
             const data = JSON.parse(event.data)  
@@ -98,7 +103,7 @@ function DM({
             clearTimeout(typingTimeoutRef.current)
             socketRef.current?.close()
         }
-    }, [selectedConversationId, currentUser?.id])
+    }, [selectedConversationId, currentUser?.id, isAuthResolved, isAuthenticated, accessToken, WS_URL])
 
     useEffect(() => {
         if (!selectedConversationId || !initialChats.length) return
