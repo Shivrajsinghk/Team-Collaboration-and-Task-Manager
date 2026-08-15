@@ -1,7 +1,7 @@
 import React from 'react'
 import EmojiPicker from "emoji-picker-react";
 
-function EmojiPickerComp({showEmojiPicker, setShowEmojiPicker, onEmojiSelect}) {
+function EmojiPickerComp({showEmojiPicker, onEmojiSelect}) {
     return (
         <div>
             {showEmojiPicker && (

@@ -120,7 +120,6 @@ const MessageSendingBox = ({
 
     const handleEmojiSelect = (emoji) => {
         setMessage(prev => prev + emoji)
-        setShowEmojiPicker(false)
         requestAnimationFrame(() => {
             inputRef.current?.focus()
         })
@@ -167,7 +166,7 @@ const MessageSendingBox = ({
                         <button type="button" onClick={() => setShowEmojiPicker(prev => !prev)} className="rounded-2xl p-3 text-slate-400 transition hover:bg-white/5 hover:text-white">
                             <Smile size={18} />
                         </button>
-                        <EmojiPickerComp showEmojiPicker={showEmojiPicker} setShowEmojiPicker={setShowEmojiPicker} onEmojiSelect={handleEmojiSelect} />
+                        <EmojiPickerComp showEmojiPicker={showEmojiPicker} onEmojiSelect={handleEmojiSelect} />
                     </div>
                     <div className="flex flex-1 items-center rounded-[1.3rem] bg-black/20 px-4">
                         <input
