@@ -118,6 +118,14 @@ const MessageSendingBox = ({
         }
     }
 
+    const handleEmojiSelect = (emoji) => {
+        setMessage(prev => prev + emoji)
+        setShowEmojiPicker(false)
+        requestAnimationFrame(() => {
+            inputRef.current?.focus()
+        })
+    }
+
     return (
         <div className={`sticky bottom-0 z-20 border-t border-white/10 bg-black px-3 py-3 backdrop-blur-xl sm:px-6 ${variant === "dm" ? "bg-[#121a18]/95" : "bg-neutral-900/95"}`}>
             <div className={`relative rounded-[1.75rem] border border-white/10 bg-neutral-950/50 p-1 shadow-[0_-14px_40px_rgba(0,0,0,0.35)] ring-1 ring-white/5 ${variant === "team" ? "mx-auto max-w-5xl" : "w-full"}`}>
@@ -159,7 +167,7 @@ const MessageSendingBox = ({
                         <button type="button" onClick={() => setShowEmojiPicker(prev => !prev)} className="rounded-2xl p-3 text-slate-400 transition hover:bg-white/5 hover:text-white">
                             <Smile size={18} />
                         </button>
-                        <EmojiPickerComp showEmojiPicker={showEmojiPicker} setShowEmojiPicker={setShowEmojiPicker} setMessage={setMessage} />
+                        <EmojiPickerComp showEmojiPicker={showEmojiPicker} setShowEmojiPicker={setShowEmojiPicker} onEmojiSelect={handleEmojiSelect} />
                     </div>
                     <div className="flex flex-1 items-center rounded-[1.3rem] bg-black/20 px-4">
                         <input
