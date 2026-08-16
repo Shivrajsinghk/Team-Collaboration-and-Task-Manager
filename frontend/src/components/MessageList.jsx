@@ -31,10 +31,6 @@ const MessageList = ({
             >
                 {chats.length === 0 ? (
                     <div className="flex flex-1 min-h-[350px] flex-col items-center justify-center rounded-[1.75rem] border border-dashed border-white/10 bg-black/10 px-6 text-center">
-                        <div className="flex h-20 w-20 items-center justify-center rounded-[1.5rem] bg-gradient-to-br from-cyan-500/20 to-teal-500/20">
-                            <MessageCircle className="h-8 w-8 text-cyan-300" />
-                        </div>
-
                         <h3 className="mt-6 text-2xl font-semibold text-white">
                             No Messages Yet
                         </h3>
