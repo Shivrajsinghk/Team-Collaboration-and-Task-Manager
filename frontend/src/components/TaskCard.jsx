@@ -14,13 +14,14 @@ function getPriorityIcon(priority) {
             return (
                 <ChevronDown className="h-4 w-4 shrink-0 fill-accent text-accent" />
             )
-
         case 'medium':
-            return <Flame className="h-4 w-4 text-yellow-400" />
-
+            return (
+                <Flame className="h-4 w-4 shrink-0 text-yellow-400" />
+            )
         case 'high':
-            return <AlertTriangle className="h-4 w-4 text-danger" />
-
+            return (
+                <AlertTriangle className="h-4 w-4 shrink-0 text-danger" />
+            )
         default:
             return null
     }
@@ -78,7 +79,7 @@ function TaskCard({ task, index }) {
                     className={`group relative cursor-grab overflow-hidden rounded-xl border border-border bg-surface-alt p-3 transition-colors duration-200 hover:border-accent/40 active:cursor-grabbing ${snapshot.isDragging ? 'z-[9999] rotate-1 scale-[1.02] shadow-2xl' : ''}`}
                 >
                     <div className="relative flex items-start justify-between gap-3">
-                        <h3 className="text-[15px] leading-snug font-semibold first-letter:capitalize text-ink">
+                        <h3 className="min-w-0 text-[15px] leading-snug font-semibold first-letter:capitalize text-ink">
                             {task.title}
                         </h3>
 
@@ -106,7 +107,14 @@ function TaskCard({ task, index }) {
                     <div className="mt-3 flex items-center justify-between gap-4 border-t border-border pt-3">
                         <div className="flex min-w-0 items-center justify-between gap-4 text-xs text-muted">
                             <span className="whitespace-nowrap">
-                                #{task.id}
+                                <div className="relative flex flex-col items-center justify-center">
+                                    <span className="text-xs font-extrabold tracking-wider text-[#2CFF05] leading-none origin-center transition-transform duration-150 group-hover:scale-y-[0.1]">
+                                        OO
+                                    </span>
+                                    <span className="text-[9px] mt-[0.1rem] text-[#2CFF05] font-extrabold leading-none">
+                                        ⌣
+                                    </span>
+                                </div>
                             </span>
 
                             <span className="whitespace-nowrap">
