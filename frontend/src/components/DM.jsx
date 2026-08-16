@@ -24,6 +24,7 @@ const IMAGE_EXTENSIONS = [
 ];
 const MAX_RECONNECT_ATTEMPTS = 5;
 const RECONNECT_BASE_DELAY_MS = 1000;
+const MAX_FILE_SIZE_BYTES = 10 * 1024 * 1024;
 
 function DM({ selectedConversationId, setSelectedConversationId }) {
 	const WS_URL = import.meta.env.VITE_DJANGO_WS_URL;
@@ -42,6 +43,7 @@ function DM({ selectedConversationId, setSelectedConversationId }) {
 	const [showEmojiPicker, setShowEmojiPicker] = useState(false);
 	const [isTyping, setIsTyping] = useState(false);
 	const [isConnected, setIsConnected] = useState(false);
+	const [uploadError, setUploadError] = useState(null);
 
 	const { data: initialChats = [], isLoading: loading } = useQuery({
 		queryKey: chatKeys.personalMessages(selectedConversationId),
@@ -240,6 +242,7 @@ function DM({ selectedConversationId, setSelectedConversationId }) {
 
 	const sendAttachment = async () => {
 		if (!selectedFile) return;
+		setUploadError(null);
 		const formData = new FormData();
 		formData.append("file", selectedFile);
 		formData.append("message", message.trim());
@@ -248,6 +251,11 @@ function DM({ selectedConversationId, setSelectedConversationId }) {
 			setMessage("");
 			resetSelectedFile();
 		} catch (error) {
+			const msg =
+				error?.response?.data?.message ||
+				error?.response?.data?.detail ||
+				"Failed to send attachment.";
+			setUploadError(msg);
 			console.log(error?.response?.data || error);
 		}
 	};
@@ -262,6 +270,14 @@ function DM({ selectedConversationId, setSelectedConversationId }) {
 	const handleFileChange = (event) => {
 		const file = event.target.files?.[0];
 		if (!file) return;
+		if (file.size > MAX_FILE_SIZE_BYTES) {
+			setUploadError("File size cannot exceed 10 MB.");
+			if (fileInputRef.current) {
+				fileInputRef.current.value = "";
+			}
+			return;
+		}
+		setUploadError(null);
 		setSelectedFile(file);
 	};
 
@@ -291,6 +307,11 @@ function DM({ selectedConversationId, setSelectedConversationId }) {
 			{!isConnected && (
 				<p className="px-4 py-1 text-center text-xs text-amber-300">
 					Reconnecting…
+				</p>
+			)}
+			{uploadError && (
+				<p className="px-4 py-1 text-center text-xs text-red-400">
+					{uploadError}
 				</p>
 			)}
 			<div className="flex-1 min-h-0 overflow-hidden">

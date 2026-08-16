@@ -7,7 +7,7 @@ def generate_invite_code():
 
 class Team(models.Model):
     name = models.CharField(max_length=50)
-    description = models.CharField(max_length=50, null=True, blank=True)
+    description = models.TextField(null=True, blank=True)
     created_by = models.ForeignKey(
         User,
         on_delete=models.SET_NULL,
