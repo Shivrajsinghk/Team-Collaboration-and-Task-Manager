@@ -4,6 +4,7 @@ from django.urls import reverse
 from rest_framework.test import APIClient
 from teams.models import Team, TeamMembership
 from tasks.models import Task
+from unittest.mock import patch
 
 class AIAssistantTests(TestCase):
     def setUp(self):
@@ -51,10 +52,10 @@ class AIAssistantTests(TestCase):
         )
         self.assertEqual(response.status_code, 400)
 
-    @override_settings(GEMINI_API_KEY=None)
+    @patch.dict("os.environ", {}, clear=False)
     def test_ai_query_without_api_key(self):
         import os
-        old = os.environ.pop("GEMINI_API_KEY", None)
+        os.environ.pop("GEMINI_API_KEY", None)
         response = self.client.post(
             reverse("ai_query"),
             {
@@ -63,8 +64,6 @@ class AIAssistantTests(TestCase):
             format="json"
         )
         self.assertEqual(response.status_code, 503)
-        if old:
-            os.environ["GEMINI_API_KEY"] = old
 
     def test_ai_query_requires_authentication(self):
         self.client.credentials()
@@ -84,9 +83,10 @@ class AIAssistantTests(TestCase):
         )
         self.assertEqual(response.status_code, 400)
 
+    @patch.dict("os.environ", {}, clear=False)
     def test_generate_subtasks_fallback(self):
         import os
-        old = os.environ.pop("GEMINI_API_KEY", None)
+        os.environ.pop("GEMINI_API_KEY", None)
         response = self.client.post(
             reverse("generate_subtasks"),
             {
@@ -97,9 +97,7 @@ class AIAssistantTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTrue(response.data["fallback"])
         self.assertTrue(len(response.data["subtasks"]) > 0)
-        if old:
-            os.environ["GEMINI_API_KEY"] = old
-
+        
     def test_create_subtasks(self):
         response = self.client.post(
             reverse("ai-create-subtasks"),

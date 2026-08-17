@@ -1,3 +1,4 @@
+import sys
 import os
 from pathlib import Path
 from datetime import timedelta
@@ -178,3 +179,15 @@ CSRF_TRUSTED_ORIGINS = (
     if os.environ.get('CSRF_TRUSTED_ORIGINS') 
     else []
 )
+
+
+if 'test' in sys.argv:
+    STORAGES = {
+        "default": {
+            "BACKEND": "django.core.files.storage.FileSystemStorage",
+        },
+        "staticfiles": {
+            "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
+        },
+    }
+    
