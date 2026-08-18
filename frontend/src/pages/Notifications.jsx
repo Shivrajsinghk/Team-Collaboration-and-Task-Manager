@@ -81,6 +81,8 @@ function Notifications() {
                 prev.map((n) => ({ ...n, is_read: true }))
             )
         }
+        catch(error){}
+    }
 
     return (
         <div className="min-h-screen bg-base text-ink">
