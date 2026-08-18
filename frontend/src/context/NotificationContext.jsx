@@ -64,11 +64,9 @@ export function NotificationProvider({ children }) {
 				);
 			};
 			socket.onerror = (error) => {
-				console.error("WebSocket error:", error);
 				socket.close();
 			};
 			socket.onclose = (event) => {
-				console.log("Notification WebSocket closed:", event.code, event.reason);
 				if (socketRef.current === socket) {
 					socketRef.current = null;
 				}

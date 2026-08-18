@@ -43,9 +43,6 @@ function RightSlideDrawer({ isSlideDrawerOpen, setIsSlideDrawerOpen }) {
             queryClient.invalidateQueries({ queryKey: taskKeys.list(team_id) })
             fetchTaskActivities(team_id, task_id)
         },
-        onError: (error) => {
-            console.log(error?.response || error)
-        },
         onSettled: () => {
             setIsSaving(false)
         },

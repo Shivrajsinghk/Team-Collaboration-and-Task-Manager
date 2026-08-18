@@ -124,12 +124,8 @@ def ai_query(request):
         except ClientError as exc:
             if exc.code == 429:
                 return Response({"error": "AI usage quota exceeded. Please try again later."}, status=429)
-            print(f"=== GEMINI CALL FAILED (round {call_count}) ===")
-            traceback.print_exc()
             return Response({"error": f"AI request failed: {exc}"}, status=502)
         except Exception as exc:
-            print(f"=== GEMINI CALL FAILED (round {call_count}) ===")
-            traceback.print_exc()
             return Response({"error": f"AI request failed: {exc}"}, status=502)
 
         part = response.candidates[0].content.parts[0]
@@ -137,13 +133,11 @@ def ai_query(request):
         if not part.function_call:
             final_text = part.text
             if not final_text:
-                print("=== GEMINI RETURNED EMPTY TEXT ===")
                 return Response({"error": "AI returned an empty response"}, status=502)
             return Response({"answer": final_text})
 
         # Model wants to call a tool
         if call_count == MAX_TOOL_CALLS:
-            print("=== MAX TOOL CALL LIMIT HIT ===")
             return Response(
                 {"error": "That request needed too many steps to answer. Try asking one thing at a time."},
                 status=502,
@@ -162,8 +156,6 @@ def ai_query(request):
         try:
             result = fn(requesting_user=request.user, **fn_args)
         except Exception as exc:
-            print(f"=== TOOL EXECUTION FAILED ({fn_name}) ===")
-            traceback.print_exc()
             return Response({"error": f"Tool execution failed: {exc}"}, status=500)
 
         # Append this round's model turn + tool result, then loop again

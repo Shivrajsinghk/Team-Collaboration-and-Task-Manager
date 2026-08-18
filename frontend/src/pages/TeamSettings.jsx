@@ -41,10 +41,7 @@ function UpdateTeam() {
             queryClient.invalidateQueries({ queryKey: teamKeys.detail(team_id) })
             queryClient.invalidateQueries({ queryKey: teamKeys.list })
             navigate(`/team/${team_id}`)
-        },
-        onError: (error) => {
-            console.log(error.response?.data || error)
-        },
+        }
     })
     const isAdmin = team?.team?.is_admin
 

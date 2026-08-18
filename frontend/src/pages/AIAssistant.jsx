@@ -29,7 +29,6 @@ function AIAssistant() {
             })
             setMessages((prev) => [...prev, { role: 'assistant', text: res.data.answer ?? "I couldn't generate a response. Please try again." }])
         } catch (err) {
-            console.error('AI query failed', err)
             const errMsg =
                 err.response?.status === 429
                     ? "You've hit the AI usage limit. Try again in a bit."

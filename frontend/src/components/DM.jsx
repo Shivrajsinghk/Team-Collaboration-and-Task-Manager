@@ -127,15 +127,9 @@ function DM({ selectedConversationId, setSelectedConversationId }) {
 				}
 			};
 			socket.onerror = (error) => {
-				console.log(error);
 				socket.close();
 			};
 			socket.onclose = (event) => {
-				console.log(
-					"Personal chat WebSocket closed:",
-					event.code,
-					event.reason,
-				);
 				if (socketRef.current === socket) {
 					socketRef.current = null;
 				}
@@ -256,7 +250,6 @@ function DM({ selectedConversationId, setSelectedConversationId }) {
 				error?.response?.data?.detail ||
 				"Failed to send attachment.";
 			setUploadError(msg);
-			console.log(error?.response?.data || error);
 		}
 	};
 

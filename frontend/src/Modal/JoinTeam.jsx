@@ -28,8 +28,8 @@ function JoinTeam({isJoinOpen, setIsJoinOpen, setIsAddTeamOpen}) {
             await joinTeamMutation.mutateAsync(data)
         }
         catch(error){
-            console.log("ERROR", error.response || error);
-            alert(error.response.data.error)
+            const message = error.response || error
+            alert(message)
         }
         finally {
             setIsJoinOpen(false);

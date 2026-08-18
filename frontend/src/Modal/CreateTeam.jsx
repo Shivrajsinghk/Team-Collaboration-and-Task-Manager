@@ -31,9 +31,6 @@ function CreateTeam({isCreateOpen, setIsCreateOpen, setIsAddTeamOpen}) {
         try{
             await createTeamMutation.mutateAsync(data)
         }
-        catch(error){
-            console.log("ERROR", error.response || error);
-        }
         finally {
             setIsCreateOpen(false);
             setIsAddTeamOpen(false)

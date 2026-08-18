@@ -12,7 +12,6 @@ from django.db import transaction
 
 class TeamChatsConsumer(AsyncWebsocketConsumer):
     async def connect(self):
-        print("CONNECTED")
         self.team_id = self.scope["url_route"]['kwargs']['team_id']
         self.group_name = f'team_{self.team_id}'
         is_member = await self.is_team_member()
@@ -41,9 +40,8 @@ class TeamChatsConsumer(AsyncWebsocketConsumer):
 
         try:
             await database_sync_to_async(process_mentions)(chat_instance, mention_ids)
-        except Exception as e:
-            print(f"Mention processing failed for chat {chat_instance.id}: {e}")
-        
+        except Exception:
+            pass
         chat = await self.serialize_chat(chat_instance)
 
         await self.channel_layer.group_send(self.group_name, {
@@ -51,13 +49,10 @@ class TeamChatsConsumer(AsyncWebsocketConsumer):
             'chat': chat
         }) 
     
-        print("MESSAGE RECEIVED FROM CLIENT TO SERVER", text_data)
-
     async def chat_message(self, event):
         await self.send(text_data=json.dumps(event['chat']))
 
     async def disconnect(self, close_code):
-        print("DISCONNECTED", close_code)
         await self.channel_layer.group_discard(
             self.group_name, self.channel_name
         )
@@ -88,7 +83,6 @@ class TeamChatsConsumer(AsyncWebsocketConsumer):
 
 class PersonalChatsConsumer(AsyncWebsocketConsumer):
     async def connect(self):
-        print("Connected")
         user = self.scope['user']
         if not user.is_authenticated:
             await self.close()
@@ -142,7 +136,6 @@ class PersonalChatsConsumer(AsyncWebsocketConsumer):
                 'chat': chat
             }
         )
-        print("Message received from Client to Server")
     
     async def messages_seen(self, event):
         await self.send(text_data=json.dumps({
@@ -162,7 +155,6 @@ class PersonalChatsConsumer(AsyncWebsocketConsumer):
         }))
 
     async def disconnect(self, close_code):
-        print('Disconnected')
         await self.channel_layer.group_discard(self.group_name, self.channel_name)
         raise StopConsumer()
 
@@ -194,14 +186,12 @@ class PersonalChatsConsumer(AsyncWebsocketConsumer):
         ).exclude(
             sender=self.scope['user']
         )
-        print("UNREAD:", list(messages.values('id', 'sender_id', 'is_read')))
         ids = list(messages.values_list('id', flat=True))
         messages.update(is_read=True)
         return ids
 
 class NotificationsConsumer(AsyncWebsocketConsumer):
     async def connect(self):
-        print("Connected")
         user = self.scope['user']
         if not user.is_authenticated:
             await self.close()
@@ -225,7 +215,6 @@ class NotificationsConsumer(AsyncWebsocketConsumer):
         await self.send(text_data=json.dumps(event['notification']))
 
     async def disconnect(self, close_code):
-        print("Disconnected")
         if hasattr(self, 'group_name'):
             await self.set_online_status(-1)                
             await self.channel_layer.group_discard(self.group_name, self.channel_name)

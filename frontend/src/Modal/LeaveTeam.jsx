@@ -17,8 +17,8 @@ function LeaveTeam({isLeaveOpen, setIsLeaveOpen}) {
             navigate('/dashboard')
         },
         onError: (error) => {
-            console.log("ERROR", error.response?.data?.error || error);
-            alert(error.response?.data?.error)
+            const message = error.response?.data?.error || error
+            alert(message)
         },
         onSettled: () => {
             setIsLeaveOpen(false);

@@ -25,7 +25,6 @@ class JWTAuthMiddleware:
                 pass 
             except User.DoesNotExist:
                 pass  
-            except Exception as e:
-                print(f"Unexpected middleware error: {e}")
-
+            except Exception:
+                pass
         return await self.inner(scope, receive, send)

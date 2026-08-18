@@ -45,7 +45,6 @@ function EditProfile() {
             navigate("/profile")
         },
         onError: (error) => {
-            console.log(error.response?.data)
             setErrorMessage("Couldn't save your profile. Please try again.")
         },
     })

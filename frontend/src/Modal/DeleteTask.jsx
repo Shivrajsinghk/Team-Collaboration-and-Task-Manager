@@ -19,8 +19,8 @@ function DeleteTask({isDeleteTaskOpen, setIsDeleteTaskOpen, setIsSlideDrawerOpen
             setIsSlideDrawerOpen(false)
         },
         onError: (err) => {
-            alert(err?.response?.data?.error || err)
-            console.log(err?.response || err)
+            const message = err?.response?.data?.error || err
+            alert(message)
         },
     })
 

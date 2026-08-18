@@ -23,8 +23,8 @@ function KickFromTeam({
             setIsMemberOpen(false)
         },
         onError: (error) => {
-            console.log(error.response?.data?.error || error)
-            alert(error.response?.data?.error || error)
+            const message = error.response?.data?.error || error
+            alert(message)
         },
         onSettled: () => {
             setIsKickAYSOpen(false);

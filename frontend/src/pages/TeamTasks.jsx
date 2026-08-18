@@ -60,7 +60,6 @@ function TeamTasks() {
             return { previousTasks }
         },
         onError: (error, _variables, context) => {
-            console.log(error?.response?.data || error)
             if (context?.previousTasks) {
                 queryClient.setQueryData(
                     taskKeys.list(team_id),

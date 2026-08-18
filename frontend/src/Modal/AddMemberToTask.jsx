@@ -44,7 +44,6 @@ function AddMemberToTask({
         },
         onError: (err) => {
             alert(err?.response?.data?.error || err)
-            console.log(err?.response || err)
         },
     })
 

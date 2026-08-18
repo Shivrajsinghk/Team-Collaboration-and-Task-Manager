@@ -51,7 +51,6 @@ function App() {
 					refresh: storedRefresh,
 				}))
 			} catch (error) {
-				console.log("Session restore failed", error)
 				dispatch(logout())
 			} finally {
 				dispatch(setAuthResolved(true))

@@ -106,11 +106,9 @@ function TeamChats() {
 				setLiveChats((prev) => [...prev, data]);
 			};
 			socket.onerror = (error) => {
-				console.log(error);
 				socket.close();
 			};
 			socket.onclose = (event) => {
-				console.log("Team chat WebSocket closed:", event.code, event.reason);
 				if (socketRef.current === socket) {
 					socketRef.current = null;
 				}
@@ -215,7 +213,6 @@ function TeamChats() {
 				error?.response?.data?.detail ||
 				"Failed to send attachment.";
 			setUploadError(msg);
-			console.log(error?.response?.data || error);
 		}
 	};
 

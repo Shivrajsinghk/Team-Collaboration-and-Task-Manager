@@ -46,7 +46,6 @@ function Login() {
             navigate("/dashboard")
         },
         onError: (error) => {
-            console.log("Login Failed", error.response?.data || error.message)
             dispatch(logout())
             setError("Invalid username or password")
         },

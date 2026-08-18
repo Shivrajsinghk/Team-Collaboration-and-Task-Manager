@@ -28,9 +28,6 @@ function RemoveMemberFromTask({
             fetchTaskActivities(team_id, task_id)
             setIsRemoveMemberOpen(false)
         },
-        onError: (err) => {
-            console.log(err?.response || err)
-        },
     })
 
     const handleClick = async () => {

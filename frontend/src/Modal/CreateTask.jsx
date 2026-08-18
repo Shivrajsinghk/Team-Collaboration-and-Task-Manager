@@ -26,9 +26,6 @@ function CreateTask({
             setIsDropdownOpen(false)
             setIsCreateOpen(false)
         },
-        onError: (error) => {
-            console.log("ERROR", error.response || error)
-        },
     })
 
     const handleCreateSubmit = async (e) => {

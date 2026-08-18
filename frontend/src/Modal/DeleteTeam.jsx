@@ -17,8 +17,10 @@ function DeleteTeam({isDeleteOpen, setIsDeleteOpen, team}) {
             navigate('/dashboard')
         },
         onError: (error) => {
-            console.log("ERROR", error.response?.data?.error || error);
-            alert(error.response?.data?.error)
+            const message =
+                error.response?.data?.error ||
+                "Something went wrong. Please try again.";
+            alert(message);
         },
         onSettled: () => {
             setIsDeleteOpen(false);

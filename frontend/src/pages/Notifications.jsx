@@ -62,7 +62,6 @@ function Notifications() {
                 })
             }, 200)
         } catch (error) {
-            console.log(error)
             setRemovingIds((prev) => {
                 const next = new Set(prev)
                 next.delete(notification.id)
@@ -72,7 +71,6 @@ function Notifications() {
     }
 
     const handleMarkAllRead = async () => {
-        console.log("clicked")
         try {
             await Promise.all(
                 notifications
@@ -82,10 +80,7 @@ function Notifications() {
             setNotifications((prev) =>
                 prev.map((n) => ({ ...n, is_read: true }))
             )
-        } catch (error) {
-            console.log(error)
         }
-    }
 
     return (
         <div className="min-h-screen bg-base text-ink">

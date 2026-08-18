@@ -24,14 +24,8 @@ function DemoteMember({
             setSelectedMember(null)
         },
         onError: (error) => {
-            console.log(
-                "ERROR",
-                error.response?.data || error
-            )
-            alert(
-                error.response?.data?.error ||
-                "Something went wrong"
-            )
+            const message = error.response?.data?.error || "Something went wrong"
+            alert(message)
         },
         onSettled: () => {
             setIsDemoteAYSOpen(false);
