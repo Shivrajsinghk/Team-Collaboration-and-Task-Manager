@@ -29,8 +29,6 @@ function Profile() {
 
     if (!user) return <Loading />
 
-    const initials = (user.full_name || user.username || 'U').slice(0, 1).toUpperCase()
-
     const skills = user.skills
         ? user.skills.split(',').map(s => s.trim()).filter(Boolean)
         : []

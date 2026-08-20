@@ -1,14 +1,12 @@
-import React, { useEffect, useState } from 'react'
 import { MoreVertical, Phone, Video } from 'lucide-react'
-import { listConversations } from '../api/chat'
 import Loading from './Loading'
 import { useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
-import { useChat } from '../context/ChatContext'
+import { useChat } from '../context/useChat'
 import { isPresenceOnline } from '../utils/presence'
 import NoProfilePhoto from './NoProfilePhoto'
 
-function DMHeader({ selectedConversationId, setSelectedConversationId, isTyping }) {
+function DMHeader({ selectedConversationId, isTyping }) {
     const currentUser = useSelector((state) => state.auth.user)
     const navigate = useNavigate()
     const { conversations } = useChat()

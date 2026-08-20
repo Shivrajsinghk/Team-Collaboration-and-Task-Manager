@@ -105,10 +105,10 @@ function TeamChats() {
 				const data = JSON.parse(event.data);
 				setLiveChats((prev) => [...prev, data]);
 			};
-			socket.onerror = (error) => {
+			socket.onerror = () => {
 				socket.close();
 			};
-			socket.onclose = (event) => {
+			socket.onclose = () => {
 				if (socketRef.current === socket) {
 					socketRef.current = null;
 				}

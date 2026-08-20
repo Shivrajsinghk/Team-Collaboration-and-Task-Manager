@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { Save, Trash2, LogOut, Barcode } from 'lucide-react'
 import Loading from '../components/Loading'
@@ -11,13 +11,17 @@ import { getTeam, updateTeam } from '../api/teams'
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { teamKeys } from '../api/queryKeys'
 
+const getFormData = (team) => ({
+    name: team?.team?.name || '',
+    description: team?.team?.description || '',
+})
+
 function UpdateTeam() {
     const { team_id } = useParams()
     const navigate = useNavigate()
     const [isLeaveOpen, setIsLeaveOpen] = useState(false)
     const [isDeleteOpen, setIsDeleteOpen] = useState(false)
     const [isInviteOpen, setIsInviteOpen] = useState(false)
-    const [formData, setFormData] = useState({ name: '', description: '' })
     const queryClient = useQueryClient()
     const { data: team = null, isLoading: loading } = useQuery({
         queryKey: teamKeys.detail(team_id),
@@ -29,6 +33,13 @@ function UpdateTeam() {
         staleTime: 2 * 60 * 1000,
         placeholderData: keepPreviousData,
     })
+    const [formData, setFormData] = useState(() => getFormData(team))
+    const [formDataTeam, setFormDataTeam] = useState(team)
+
+    if (team !== formDataTeam) {
+        setFormDataTeam(team)
+        setFormData(getFormData(team))
+    }
     const updateTeamMutation = useMutation({
         mutationFn: (payload) => updateTeam(team_id, payload),
         onSuccess: (response) => {
@@ -44,14 +55,6 @@ function UpdateTeam() {
         }
     })
     const isAdmin = team?.team?.is_admin
-
-    useEffect(() => {
-        if (!team) return
-        setFormData({
-            name: team?.team?.name || '',
-            description: team?.team?.description || '',
-        })
-    }, [team])
 
     const handleChange = (e) => {
         setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }))

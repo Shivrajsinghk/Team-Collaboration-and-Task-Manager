@@ -14,7 +14,6 @@ const MessageList = ({
     getSenderName,
     formatMessageTime,
     navigate,
-    teamId,
 }) => {
     const isDM = variant === "dm"
 
@@ -46,7 +45,6 @@ const MessageList = ({
                                 <MessageBubble
                                     key={chat.id}
                                     members={members}
-                                    variant={variant}
                                     chat={chat}
                                     currentUser={currentUser}
                                     getAttachmentUrl={getAttachmentUrl}
@@ -55,7 +53,6 @@ const MessageList = ({
                                     getSenderName={getSenderName}
                                     formatMessageTime={formatMessageTime}
                                     navigate={navigate}
-                                    teamId={teamId}
                                 />
                             ))}
                         </div>

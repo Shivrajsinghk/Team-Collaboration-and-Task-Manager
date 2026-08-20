@@ -1,4 +1,4 @@
-import React, { useContext } from 'react'
+import React from 'react'
 import Modal from './Modal'
 import { TeamActivityContext } from '../context/TeamActivityContext'
 import { createTeam } from '../api/teams'
@@ -6,8 +6,6 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { teamKeys } from '../api/queryKeys'
 
 function CreateTeam({isCreateOpen, setIsCreateOpen, setIsAddTeamOpen}) {
-
-    const { fetchTeamActivities } = useContext(TeamActivityContext)
     const queryClient = useQueryClient()
     const createTeamMutation = useMutation({
         mutationFn: (payload) => createTeam(payload),

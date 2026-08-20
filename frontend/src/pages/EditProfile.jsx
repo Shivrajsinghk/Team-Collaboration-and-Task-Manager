@@ -14,6 +14,20 @@ import { authKeys } from '../api/queryKeys'
 import { useCurrentUserQuery } from '../hooks/useCurrentUserQuery'
 import NoProfilePhoto from '../components/NoProfilePhoto' 
 
+const getFormData = (user) => ({
+    username: user?.username || "",
+    email: user?.email || "",
+    first_name: user?.first_name || "",
+    last_name: user?.last_name || "",
+    bio: user?.bio || "",
+    about: user?.about || "",
+    job_title: user?.job_title || "",
+    location: user?.location || "",
+    github_url: user?.github_url || "",
+    linkedin_url: user?.linkedin_url || "",
+    skills: user?.skills || "",
+})
+
 function EditProfile() {
     const navigate = useNavigate()
     const dispatch = useDispatch()
@@ -21,21 +35,15 @@ function EditProfile() {
     const [selectedFile, setSelectedFile] = useState(null)
     const [previewUrl, setPreviewUrl] = useState('')
     const [removeProfilePicture, setRemoveProfilePicture] = useState(false)
-    const [formData, setFormData] = useState({
-        username: "",
-        email: "",
-        first_name: "",
-        last_name: "",
-        bio: "",
-        about: "",
-        job_title: "",
-        location: "",
-        github_url: "",
-        linkedin_url: "",
-        skills: "",
-    })
     const queryClient = useQueryClient()
     const { data: user, isLoading: loading } = useCurrentUserQuery()
+    const [formData, setFormData] = useState(() => getFormData(user))
+    const [formDataUser, setFormDataUser] = useState(user)
+
+    if (user !== formDataUser) {
+        setFormDataUser(user)
+        setFormData(getFormData(user))
+    }
 
     const updateProfileMutation = useMutation({
         mutationFn: (payload) => updateUserProfile(payload),
@@ -44,7 +52,7 @@ function EditProfile() {
             dispatch(setAuthUser(response.data))
             navigate("/profile")
         },
-        onError: (error) => {
+        onError: () => {
             setErrorMessage("Couldn't save your profile. Please try again.")
         },
     })
@@ -91,23 +99,6 @@ function EditProfile() {
         if (previewUrl) URL.revokeObjectURL(previewUrl)
         setPreviewUrl('')
     }
-
-    useEffect(() => {
-        if (!user) return
-        setFormData({
-            username: user.username || "",
-            email: user.email || "",
-            first_name: user.first_name || "",
-            last_name: user.last_name || "",
-            bio: user.bio || "",
-            about: user.about || "",
-            job_title: user.job_title || "",
-            location: user.location || "",
-            github_url: user.github_url || "",
-            linkedin_url: user.linkedin_url || "",
-            skills: user.skills || "",
-        })
-    }, [user])
 
     if (loading) return <Loading />
 

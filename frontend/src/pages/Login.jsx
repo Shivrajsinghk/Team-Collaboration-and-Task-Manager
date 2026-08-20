@@ -45,7 +45,7 @@ function Login() {
             }))
             navigate("/dashboard")
         },
-        onError: (error) => {
+        onError: () => {
             dispatch(logout())
             setError("Invalid username or password")
         },

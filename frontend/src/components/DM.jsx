@@ -26,7 +26,7 @@ const MAX_RECONNECT_ATTEMPTS = 5;
 const RECONNECT_BASE_DELAY_MS = 1000;
 const MAX_FILE_SIZE_BYTES = 10 * 1024 * 1024;
 
-function DM({ selectedConversationId, setSelectedConversationId }) {
+function DM({ selectedConversationId }) {
 	const WS_URL = import.meta.env.VITE_DJANGO_WS_URL;
 	const bottomRef = useRef(null);
 	const socketRef = useRef(null);
@@ -37,7 +37,7 @@ function DM({ selectedConversationId, setSelectedConversationId }) {
 	const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
 	const isAuthResolved = useSelector((state) => state.auth.isAuthResolved);
 	const accessToken = useSelector((state) => state.auth.access);
-	const [liveChats, setLiveChats] = useState([]);
+	const [liveChats, setLiveChats] = useState(null);
 	const [message, setMessage] = useState("");
 	const [selectedFile, setSelectedFile] = useState(null);
 	const [showEmojiPicker, setShowEmojiPicker] = useState(false);
@@ -59,7 +59,7 @@ function DM({ selectedConversationId, setSelectedConversationId }) {
 		staleTime: 15 * 1000,
 		refetchOnWindowFocus: true,
 	});
-	const chats = liveChats.length > 0 ? liveChats : initialChats;
+	const chats = liveChats ?? initialChats;
 	const uploadAttachmentMutation = useMutation({
 		mutationFn: (formData) =>
 		uploadPersonalChatAttachment(selectedConversationId, formData),
@@ -68,10 +68,6 @@ function DM({ selectedConversationId, setSelectedConversationId }) {
 	useEffect(() => {
 		bottomRef.current?.scrollIntoView({ behavior: "smooth" });
 	}, [chats]);
-
-	useEffect(() => {
-		setLiveChats(initialChats);
-	}, [initialChats, selectedConversationId]);
 
 	useEffect(() => {
 		if (
@@ -126,10 +122,10 @@ function DM({ selectedConversationId, setSelectedConversationId }) {
 					return;
 				}
 			};
-			socket.onerror = (error) => {
+			socket.onerror = () => {
 				socket.close();
 			};
-			socket.onclose = (event) => {
+			socket.onclose = () => {
 				if (socketRef.current === socket) {
 					socketRef.current = null;
 				}
@@ -294,7 +290,6 @@ function DM({ selectedConversationId, setSelectedConversationId }) {
 		<section className="flex relative h-full w-full flex-1 min-h-0 flex-col overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03] backdrop-blur-xl">
 			<DMHeader
 				selectedConversationId={selectedConversationId}
-				setSelectedConversationId={setSelectedConversationId}
 				isTyping={isTyping}
 			/>
 			{!isConnected && (

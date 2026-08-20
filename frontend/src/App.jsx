@@ -20,7 +20,6 @@ import Loading from './components/Loading'
 function App() {
 	const dispatch = useDispatch()
 	const isAuthenticated = useSelector(state => state.auth.isAuthenticated)
-	const isAuthResolved = useSelector(state => state.auth.isAuthResolved)	
 	const queryClient = useQueryClient()
 	
 	useEffect(() => {
@@ -50,7 +49,7 @@ function App() {
 					access,
 					refresh: storedRefresh,
 				}))
-			} catch (error) {
+			} catch {
 				dispatch(logout())
 			} finally {
 				dispatch(setAuthResolved(true))

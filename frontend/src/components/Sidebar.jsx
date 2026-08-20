@@ -1,7 +1,7 @@
 import React from 'react'
 import { useNavigate, useParams, useLocation } from 'react-router-dom'
 import UserProfilePfp from './UserProfilePfp'
-import { LayoutDashboard, CheckSquare, Users, MessageCircle, Construction, Sparkles } from "lucide-react"
+import { LayoutDashboard, CheckSquare, Users, MessageCircle, Sparkles } from "lucide-react"
 import { useCurrentUserQuery } from '../hooks/useCurrentUserQuery'
 
 function Sidebar() {
@@ -36,7 +36,7 @@ function Sidebar() {
                                                 : 'text-muted border border-transparent hover:bg-surface-alt hover:text-ink'
                                         }`}
                                     >
-                                        <Icon size={18} />
+                                        {React.createElement(Icon, { size: 18 })}
                                         {label}
                                     </button>
                                 </li>

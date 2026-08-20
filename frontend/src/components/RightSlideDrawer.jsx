@@ -31,6 +31,16 @@ function RightSlideDrawer({ isSlideDrawerOpen, setIsSlideDrawerOpen }) {
         queryKey: taskKeys.detail(team_id, task_id),
         queryFn: async () => {
             const response = await getTask(team_id, task_id)
+            setFormData({
+                title: response.data.title,
+                description: response.data.description,
+                priority: response.data.priority,
+                due_date: response.data.due_date
+                    ? response.data.due_date.split('T')[0]
+                    : '',
+                assigned_to: response.data.assigned_to,
+            })
+            setIsInitialLoad(false)
             return response.data
         },
         enabled: isSlideDrawerOpen && !!team_id && !!task_id,
@@ -60,34 +70,25 @@ function RightSlideDrawer({ isSlideDrawerOpen, setIsSlideDrawerOpen }) {
     }, [isRemoveMemberOpen])
 
     useEffect(() => {
-        if (!task) return
-        setFormData({
-            title: task.title,
-            description: task.description,
-            priority: task.priority,
-            due_date: task.due_date ? task.due_date.split('T')[0] : '',
-            assigned_to: task.assigned_to,
-        })
-        setIsInitialLoad(false)
-    }, [task])
-
-    async function updateTask() {
-        setIsSaving(true)
-        updateTaskMutation.mutate({
-            title: formData.title,
-            description: formData.description,
-            priority: formData.priority,
-            due_date: formData.due_date
-        })
-    }
-
-    useEffect(() => {
         if (isInitialLoad) return
         const timeout = setTimeout(() => {
-            updateTask()
+            setIsSaving(true)
+            updateTaskMutation.mutate({
+                title: formData.title,
+                description: formData.description,
+                priority: formData.priority,
+                due_date: formData.due_date,
+            })
         }, 500)
         return () => clearTimeout(timeout)
-    }, [formData.title, formData.description, formData.priority, formData.due_date])
+    }, [
+        formData.title,
+        formData.description,
+        formData.priority,
+        formData.due_date,
+        isInitialLoad,
+        updateTaskMutation,
+    ])
 
     const handleChange = async (e) => {
         setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }))

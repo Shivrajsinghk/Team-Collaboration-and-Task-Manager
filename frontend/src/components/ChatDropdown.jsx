@@ -1,7 +1,7 @@
 import React, { useRef, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useSelector } from 'react-redux'
-import { useChat } from '../context/ChatContext'
+import { useChat } from '../context/useChat'
 import NoProfilePhoto from './NoProfilePhoto'
 
 const ChatDropdown = ({ open, setOpen }) => {
@@ -23,7 +23,7 @@ const ChatDropdown = ({ open, setOpen }) => {
         return () => {
             document.removeEventListener('mousedown', handleClickOutside)
         }
-    }, [open])
+    }, [open, setOpen])
 
     const recentConversations = conversations.slice(0, 10)
 

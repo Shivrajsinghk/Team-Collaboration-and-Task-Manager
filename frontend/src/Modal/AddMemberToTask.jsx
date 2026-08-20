@@ -1,6 +1,6 @@
 import { useParams } from 'react-router-dom'
 import Modal from './Modal'
-import { useContext, useEffect, useState } from 'react'
+import { useContext, useState } from 'react'
 import UserProfilePfp from '../components/UserProfilePfp'
 import { Plus, UserPlus } from 'lucide-react'
 import { TaskActivityContext } from '../context/TaskActivityContext'

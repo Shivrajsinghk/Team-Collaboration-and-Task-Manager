@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react'
 import { mark_notification_read } from '../api/chat'
-import { useNotifications } from '../context/NotificationContext'
+import { useNotifications } from '../context/useNotifications'
 import { useMutation } from '@tanstack/react-query'
 import { ClipboardPlus, ClipboardEdit, MessageCircle, Bell, BellOff } from 'lucide-react'
 
@@ -61,7 +61,7 @@ function Notifications() {
                     return next
                 })
             }, 200)
-        } catch (error) {
+        } catch {
             setRemovingIds((prev) => {
                 const next = new Set(prev)
                 next.delete(notification.id)
@@ -81,7 +81,9 @@ function Notifications() {
                 prev.map((n) => ({ ...n, is_read: true }))
             )
         }
-        catch(error){}
+        catch{
+            // IGNORE
+        }
     }
 
     return (

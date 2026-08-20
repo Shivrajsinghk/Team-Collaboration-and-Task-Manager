@@ -80,8 +80,6 @@ function Searchbar() {
 
     useEffect(() => {
         if (!query.trim()) {
-            setDebouncedQuery('')
-            setOpen(false)
             return
         }
         clearTimeout(debounceRef.current)
@@ -169,7 +167,14 @@ function Searchbar() {
                 )}
                 <input
                     value={query}
-                    onChange={(e) => setQuery(e.target.value)}
+                    onChange={(e) => {
+                        const value = e.target.value
+                        setQuery(value)
+                        if (!value.trim()) {
+                            setDebouncedQuery('')
+                            setOpen(false)
+                        }
+                    }}
                     onFocus={() => setFocused(true)}
                     type="text"
                     placeholder="Search people, teams, tasks..."
@@ -268,7 +273,7 @@ function Searchbar() {
                 </div>
             )}
 
-            {open && !filterOpen && (
+            {open && query.trim() && !filterOpen && (
                 <div className="absolute top-full left-0 z-50 mt-1.5 w-full max-h-[75vh] overflow-y-auto overflow-x-hidden rounded-xl border border-white/[0.06] bg-[#0d1512] shadow-xl shadow-black/40 scrollbar-thin scrollbar-track-transparent scrollbar-thumb-[#2CFF05]/40 hover:scrollbar-thumb-[#25D604]/60">
                     {results.users.length > 0 && (
                     <>

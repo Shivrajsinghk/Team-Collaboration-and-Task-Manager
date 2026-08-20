@@ -1,11 +1,10 @@
 import React from 'react'
 import { MessageCircle, Search } from 'lucide-react'
-import { useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useSelector } from 'react-redux'
 import { useState } from 'react'
 import DM from '../components/DM'
-import { useChat } from '../context/ChatContext'
+import { useChat } from '../context/useChat'
 import { isPresenceOnline } from '../utils/presence'
 import NoProfilePhoto from '../components/NoProfilePhoto'
 
@@ -13,15 +12,17 @@ function MessageDashboard() {
     const { conversation_id } = useParams()
     const { conversations } = useChat()
     const [searchQuery, setSearchQuery] = useState("")
-    const [selectedConversationId, setSelectedConversationId] = useState(null)
+    const [selectedConversationId, setSelectedConversationId] = useState(
+        conversation_id ? Number(conversation_id) : null
+    )
+    const [selectedConversationParam, setSelectedConversationParam] = useState(conversation_id)
     const currentUser = useSelector((state) => state.auth.user)
     const navigate = useNavigate()
 
-    useEffect(() => {
-        if (conversation_id) {
-            setSelectedConversationId(Number(conversation_id))
-        }
-    }, [conversation_id])
+    if (conversation_id && conversation_id !== selectedConversationParam) {
+        setSelectedConversationParam(conversation_id)
+        setSelectedConversationId(Number(conversation_id))
+    }
 
     const filteredConversations = conversations.filter((convo) => {
         const otherParticipant = convo.participant.find(
@@ -171,7 +172,6 @@ function MessageDashboard() {
                         ) : (
                             <DM
                                 selectedConversationId={selectedConversationId}
-                                setSelectedConversationId={setSelectedConversationId}
                             />
                         )}
                     </div>

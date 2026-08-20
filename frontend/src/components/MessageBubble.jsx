@@ -1,7 +1,6 @@
 import React from 'react'
 import { Download, FileText } from 'lucide-react'
 import UserProfilePfp from './UserProfilePfp'
-import { format, isToday, isYesterday } from 'date-fns'
 
 function renderMessageWithMentions(text, mentionUserIds, members, currentUserId) {
     if (!mentionUserIds?.length) return text
@@ -35,7 +34,6 @@ function renderMessageWithMentions(text, mentionUserIds, members, currentUserId)
 }
 
 const MessageBubble = ({
-    variant = "team",
     members = [],
     chat,
     currentUser,
@@ -45,7 +43,6 @@ const MessageBubble = ({
     getSenderName,
     formatMessageTime,
     navigate,
-    teamId,
 }) => {
     const isMine = chat?.sender?.id === currentUser?.id
     const attachmentUrl = getAttachmentUrl(chat)

@@ -56,25 +56,23 @@ const MessageSendingBox = ({
         }
         document.addEventListener('mousedown', handleClickOutside)
         return () => document.removeEventListener('mousedown', handleClickOutside)
-    }, [])
-
-    useEffect(() => {
-        if (message === '') {
-            mentionSpansRef.current = []
-            setActiveMention(null)
-        }
-    }, [message])
+    }, [setShowEmojiPicker])
 
     const handleChange = (e) => {
         const newText = e.target.value
         const cursor = e.target.selectionStart
-        mentionSpansRef.current = revalidateSpans(newText, mentionSpansRef.current)
+        if (newText === '') {
+            mentionSpansRef.current = []
+            setActiveMention(null)
+        } else {
+            mentionSpansRef.current = revalidateSpans(newText, mentionSpansRef.current)
+            if (supportsMentions) {
+                setActiveMention(getActiveMentionQuery(newText, cursor))
+                setHighlightIndex(0)
+            }
+        }
         setMessage(newText)
         onTyping()
-        if (supportsMentions) {
-            setActiveMention(getActiveMentionQuery(newText, cursor))
-            setHighlightIndex(0)
-        }
     }
 
     const insertMention = useCallback((member) => {

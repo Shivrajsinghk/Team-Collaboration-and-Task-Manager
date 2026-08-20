@@ -5,8 +5,8 @@ import UserProfilePfp from './UserProfilePfp'
 import { Link, useNavigate } from 'react-router-dom'
 import { Bell, Settings, MessageCircle } from 'lucide-react'
 import ChatDropdown from './ChatDropdown'
-import { useNotifications } from '../context/NotificationContext'
-import { useChat } from '../context/ChatContext'
+import { useNotifications } from '../context/useNotifications'
+import { useChat } from '../context/useChat'
 
 function Navbar() {
     const { unreadMessages } = useChat()
