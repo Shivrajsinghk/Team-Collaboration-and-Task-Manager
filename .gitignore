@@ -20,3 +20,8 @@ __pycache__/
 
 # Logs
 *.log
+
+# Coverage
+coverage.xml
+.coverage
+htmlcov/
