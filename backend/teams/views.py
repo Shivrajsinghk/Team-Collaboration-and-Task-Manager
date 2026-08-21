@@ -334,11 +334,14 @@ def member_details(request, team_id, member_id):
 @api_view(["GET"])
 @permission_classes([IsAuthenticated])
 def team_members_presence(request, team_id):
+    team = get_object_or_404(Team, id=team_id)
+    if not TeamMembership.objects.filter(user=request.user, team=team).exists():
+        return Response(
+            {"error": "You are not a part of this team."},
+            status=status.HTTP_403_FORBIDDEN,
+        )
     memberships = TeamMembership.objects.filter(
         team_id=team_id
     ).select_related("user", "user__profile")
-    serializer = TeamMemberPresenceSerializer(
-        memberships,
-        many=True
-    )
+    serializer = TeamMemberPresenceSerializer(memberships, many=True)
     return Response(serializer.data)
