@@ -181,7 +181,7 @@ CSRF_TRUSTED_ORIGINS = (
 )
 
 
-if 'test' in sys.argv:
+if 'test' in sys.argv or 'pytest' in sys.argv[0]:
     STORAGES = {
         "default": {
             "BACKEND": "django.core.files.storage.FileSystemStorage",
