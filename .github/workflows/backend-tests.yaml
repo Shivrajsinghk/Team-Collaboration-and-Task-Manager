@@ -1,4 +1,4 @@
-name: Backend Tests
+name: Backend CI
 
 on:
   push:
@@ -71,4 +71,3 @@ jobs:
           name: coverage-report
           path: htmlcov/
           retention-days: 14
-
