@@ -18,39 +18,42 @@ function RightSlideDrawer({ isSlideDrawerOpen, setIsSlideDrawerOpen }) {
     const [isDeleteTaskOpen, setIsDeleteTaskOpen] = useState(false)
     const [selectedMember, setSelectedMember] = useState("")
     const [isSaving, setIsSaving] = useState(false)
-    const [isInitialLoad, setIsInitialLoad] = useState(true)
-    const [formData, setFormData] = useState({
-        title: "",
-        description: "",
-        priority: "low",
-        due_date: '',
-        assigned_to: []
-    })
     const queryClient = useQueryClient()
+    const [editedFields, setEditedFields] = useState({})
+    const [isDirty, setIsDirty] = useState(false)
+
     const { data: task } = useQuery({
         queryKey: taskKeys.detail(team_id, task_id),
         queryFn: async () => {
             const response = await getTask(team_id, task_id)
-            setFormData({
-                title: response.data.title,
-                description: response.data.description,
-                priority: response.data.priority,
-                due_date: response.data.due_date
-                    ? response.data.due_date.split('T')[0]
-                    : '',
-                assigned_to: response.data.assigned_to,
-            })
-            setIsInitialLoad(false)
             return response.data
         },
         enabled: isSlideDrawerOpen && !!team_id && !!task_id,
         staleTime: 30 * 1000,
     })
+
+    const formData = {
+        title: editedFields.title ?? task?.title ?? "",
+        description: editedFields.description ?? task?.description ?? "",
+        priority: editedFields.priority ?? task?.priority ?? "low",
+        due_date:
+            editedFields.due_date ??
+            (task?.due_date ? task.due_date.split("T")[0] : ""),
+        assigned_to: task?.assigned_to ?? [],
+    }
+
     const updateTaskMutation = useMutation({
         mutationFn: (payload) => saveTask(team_id, task_id, payload),
         onSuccess: (response) => {
-            queryClient.setQueryData(taskKeys.detail(team_id, task_id), response.data)
-            queryClient.invalidateQueries({ queryKey: taskKeys.list(team_id) })
+            queryClient.setQueryData(
+                taskKeys.detail(team_id, task_id),
+                response.data
+            )
+            queryClient.invalidateQueries({
+                queryKey: taskKeys.list(team_id)
+            })
+            setEditedFields({})
+            setIsDirty(false)
             fetchTaskActivities(team_id, task_id)
         },
         onSettled: () => {
@@ -70,7 +73,7 @@ function RightSlideDrawer({ isSlideDrawerOpen, setIsSlideDrawerOpen }) {
     }, [isRemoveMemberOpen])
 
     useEffect(() => {
-        if (isInitialLoad) return
+        if (!isDirty) return
         const timeout = setTimeout(() => {
             setIsSaving(true)
             updateTaskMutation.mutate({
@@ -82,16 +85,21 @@ function RightSlideDrawer({ isSlideDrawerOpen, setIsSlideDrawerOpen }) {
         }, 500)
         return () => clearTimeout(timeout)
     }, [
+        isDirty,
         formData.title,
         formData.description,
         formData.priority,
         formData.due_date,
-        isInitialLoad,
         updateTaskMutation,
     ])
 
-    const handleChange = async (e) => {
-        setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }))
+    const handleChange = (e) => {
+        const { name, value } = e.target
+        setEditedFields((prev) => ({
+            ...prev,
+            [name]: value,
+        }))
+        setIsDirty(true)
     }
 
     return (
