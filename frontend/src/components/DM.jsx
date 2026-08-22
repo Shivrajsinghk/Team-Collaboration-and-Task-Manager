@@ -102,7 +102,8 @@ function DM({ selectedConversationId }) {
 				}
 				if (data.type === "seen") {
 					setLiveChats((prev) => {
-						return prev.map((m) =>
+						const base = prev ?? initialChats;
+						return base.map((m) =>
 							data.message_ids.includes(m.id) ? { ...m, is_read: true } : m,
 						);
 					});
@@ -110,7 +111,8 @@ function DM({ selectedConversationId }) {
 				}
 				if (data.id) {
 					setLiveChats((prev) => {
-						const updated = [...prev, data];
+						const base = prev ?? initialChats;
+						const updated = [...base, data];
 						if (
 						String(data.sender?.id) !== String(currentUser?.id) &&
 						socketRef.current?.readyState === WebSocket.OPEN
@@ -130,10 +132,8 @@ function DM({ selectedConversationId }) {
 					socketRef.current = null;
 				}
 				setIsConnected(false);
-
 				if (intentionallyClosed || reconnectAttempts >= MAX_RECONNECT_ATTEMPTS)
 				return;
-
 				const delay = Math.min(
 					RECONNECT_BASE_DELAY_MS * 2 ** reconnectAttempts,
 					10000,
@@ -159,6 +159,7 @@ function DM({ selectedConversationId }) {
 		isAuthenticated,
 		accessToken,
 		WS_URL,
+		initialChats
 	]);
 
 	useEffect(() => {
