@@ -7,7 +7,7 @@ A full-stack, real-time team collaboration platform with task management, live c
 
 **Live demo:** [frontend-production-499f.up.railway.app](https://frontend-production-499f.up.railway.app/)
 
-<!-- ![demo](./docs/demo.gif) -->
+![Task drag and drop demo](./docs/Task-Drag-Drop.gif)
 
 ## Features
 
@@ -19,6 +19,22 @@ A full-stack, real-time team collaboration platform with task management, live c
 - **Real-time notifications** for mentions, task assignments, and team activity
 - **File attachments** via Cloudflare R2 (S3-compatible object storage) with presigned URLs
 - **Global search** with filtering and sorting across tasks and teams
+
+## Screenshots
+
+| Task Dashboard | Team Dashboard |
+|---|---|
+| ![Task Dashboard](./docs/Task-Dashboard.png) | ![Team Dashboard](./docs/Team-Dashboard.png) |
+
+| Team Chat | Personal Chat |
+|---|---|
+| ![Team Chat](./docs/Team-Chat.png) | ![Personal Chat](./docs/Personal-Chat.png) |
+
+**See it in action:**
+
+![Team chat in real time](./docs/Team-Chat.gif)
+
+![Personal chat in real time](./docs/Personal-Chat.gif)
 
 ## Key Engineering Highlights
 
