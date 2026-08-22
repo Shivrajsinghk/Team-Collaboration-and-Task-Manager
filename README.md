@@ -30,6 +30,10 @@ A full-stack, real-time team collaboration platform with task management, live c
 |---|---|
 | ![Team Chat](./docs/Team-Chat.png) | ![Personal Chat](./docs/Personal-Chat.png) |
 
+| AI Chatbot | AI Subtask Generator |
+|---|---|
+| ![AI Chatbot](./docs/AI-Chatbot.png) | ![AI Subtask Generator](./docs/AI-Subtask-Generator.png) |
+
 **See it in action:**
 
 ![Team chat in real time](./docs/Team-Chat.gif)
